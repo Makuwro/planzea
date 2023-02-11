@@ -56,8 +56,22 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
     <section id={styles.background} className={isOpen ? styles.open : undefined}>
       <section id={styles.box}>
         <section id={styles.header}>
-          <h1>{issue.name}</h1>
-          <button onClick={() => navigate("/")}>X</button>
+          <section id={styles.options}>
+            <button onClick={() => navigate("/")}>
+              <span className="material-icons-round">
+                arrow_back
+              </span>
+            </button>
+            <button onClick={() => navigate("/")}>
+              <span className="material-icons-round">
+                close
+              </span>
+            </button>
+          </section>
+          <section id={styles.details}>
+            <h1>{issue.name}</h1>
+            <h2>The Showrunners</h2>
+          </section>
         </section>
         <section id={styles.content}>
           <section>
@@ -78,6 +92,10 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
           </section>
           <section>
             <h1>Labels</h1>
+            <ul id={styles.labels}>
+              <li>Characters</li>
+              <li>Dialogue</li>
+            </ul>
             <p>This issue has no labels.</p>
           </section>
           <section>
@@ -96,9 +114,11 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
             <h1>ID</h1>
             <p>{issue.id}</p>
           </section>
-        </section>
-        <section>
-          <button onClick={deleteIssue}>Delete</button>
+          <ul id={styles.actions}>
+            <li>
+              <button onClick={deleteIssue}>Delete</button>
+            </li>
+          </ul>
         </section>
       </section>
     </section>

@@ -1,6 +1,9 @@
 import ObjectID from "bson-objectid";
 import { ClientDatabase } from "./ClientDatabase";
 import Issue, { IssueProperties } from "./Issue";
+import Label, { LabelProperties } from "./Label";
+
+export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
 
 const clientDatabase = new ClientDatabase();
 
@@ -16,29 +19,24 @@ export default class Client {
    */
   async createIssue(props: Omit<IssueProperties, "id">): Promise<Issue> {
 
-    // Get an unused ID.
-    
-    let id = null;
-    do {
-      
-      id = new ObjectID().toHexString();
-      try {
-
-        await clientDatabase.issues.get(id);
-
-      } catch (err) {
-
-
-
-      }
-      
-    } while (!id);
-
-    // Create the issue.
-    const issue = new Issue({id, ...props}, this);
+    const issue = new Issue({
+      id: await this.#getUnusedId("issues"), 
+      ...props
+    }, this);
     await clientDatabase.issues.add(issue);
     return issue;
     
+  }
+
+  async createLabel(props: Omit<LabelProperties, "id">): Promise<Label> {
+
+    const label = new Label({
+      id: await this.#getUnusedId("labels"), 
+      ...props
+    }, this);
+    await clientDatabase.labels.add(label);
+    return label;
+
   }
 
   /**
@@ -48,6 +46,12 @@ export default class Client {
   async deleteIssue(issueId: string): Promise<void> {
 
     await this.db.issues.delete(issueId);
+
+  }
+
+  async deleteLabel(labelId: string): Promise<void> {
+
+    await this.db.labels.delete(labelId);
 
   }
 
@@ -80,6 +84,38 @@ export default class Client {
     }
 
     return issues;
+
+  }
+
+  async updateIssue(labelId: string, newProperties: PropertiesUpdate<IssueProperties>): Promise<void> {
+
+    await this.db.issues.update(labelId, newProperties);
+
+  }
+
+  async updateLabel(labelId: string, newProperties: PropertiesUpdate<LabelProperties>): Promise<void> {
+
+    await this.db.labels.update(labelId, newProperties);
+
+  }
+
+  async #getUnusedId(contentType: "issues" | "labels"): Promise<string> {
+
+    let id;
+    do {
+      
+      id = new ObjectID().toHexString();
+      try {
+
+        await clientDatabase[contentType].get(id);
+
+      } catch (err) {
+
+      }
+      
+    } while (!id);
+
+    return id;
 
   }
 

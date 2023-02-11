@@ -9,7 +9,7 @@
   --background-popup-box: #eaeaea;
   --border: #e0e2e6;
   --border-default: 1px solid var(--border);
-  --button: #31b768;
+  --button: #5297f1;
   --button-border: #2ea15e;
   --button-hover: #69b65c;
   --button-disabled: #b8b8b8;
@@ -18,7 +18,7 @@
   --link: #2e871e;
   --text: #5f6368;
   --text-important: #101010;
-  --box-shadow-default: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  --box-shadow-default: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
   --formatter-selected: #aae9ba;
   --placeholder: #6c6c6e;
   --input-min-height: 47.2px;
@@ -59,6 +59,14 @@ body, #root {
   overflow-y: hidden;
 }
 
+button {
+  box-shadow: var(--box-shadow-default);
+  background-color: var(--button);
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
 :focus-visible {
   outline: none;
 }
@@ -69,4 +77,9 @@ html, body, button, input, textarea {
 
 p {
   font-weight: 100;
+  color: var(--text);
+}
+
+h1 {
+  color: var(--text-important);
 }

@@ -1,4 +1,4 @@
-import Client from "./Client";
+import Client, { PropertiesUpdate } from "./Client";
 
 export interface IssueProperties {
   id: string;
@@ -33,7 +33,13 @@ export default class Issue {
 
   async delete() {
 
-    this.#client.deleteIssue(this.id);
+    await this.#client.deleteIssue(this.id);
+
+  }
+
+  async update(newProperties: PropertiesUpdate<IssueProperties>): Promise<void> {
+
+    await this.#client.updateIssue(this.id, newProperties);
 
   }
 
