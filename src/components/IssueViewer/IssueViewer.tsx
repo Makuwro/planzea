@@ -7,6 +7,7 @@ import styles from "./IssueViewer.module.css";
 export default function IssueViewer({ client, onIssueDelete }: { client: Client; onIssueDelete: (issueId: string) => void }) {
 
   const { issueId } = useParams<{ issueId: string }>();
+  const [newIssueName, setNewIssueName] = useState<string>("");
   const [issue, setIssue] = useState<Issue | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
 
           const newIssue = await client.getIssue(issueId);
           setIssue(newIssue);
+          setNewIssueName(newIssue.name);
           setIsOpen(true);
 
         } catch (err) {
@@ -52,6 +54,20 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
 
   }
 
+  async function changeIssueName() {
+
+    if (issue && newIssueName) {
+
+      await issue.update({name: newIssueName});
+      issue.name = newIssueName;
+      setIssue(new Issue(structuredClone(issue), client));
+
+    }
+
+    setNewIssueName(issue?.name ?? "");
+
+  }
+
   return issue ? (
     <section id={styles.background} className={isOpen ? styles.open : undefined}>
       <section id={styles.box}>
@@ -69,7 +85,7 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
             </button>
           </section>
           <section id={styles.details}>
-            <input type="text" disabled value={issue.name} />
+            <input type="text" value={newIssueName} onBlur={changeIssueName} onInput={(event: React.ChangeEvent<HTMLInputElement>) => setNewIssueName(event.target.value)} onKeyDown={(event) => event.key === "Enter" ? event.currentTarget.blur() : undefined} placeholder={issue.name} />
             <label>The Showrunners</label>
           </section>
         </section>
