@@ -69,7 +69,9 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
             </button>
           </section>
           <section id={styles.details}>
-            <h1>{issue.name}</h1>
+            <h1 contentEditable suppressContentEditableWarning>
+              {issue.name}
+            </h1>
             <h2>The Showrunners</h2>
           </section>
         </section>

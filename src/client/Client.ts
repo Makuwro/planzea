@@ -10,7 +10,6 @@ const clientDatabase = new ClientDatabase();
 export default class Client {
 
   db = clientDatabase;
-  eventListeners = [];
 
   /**
    * Adds an issue to the database.
@@ -71,19 +70,80 @@ export default class Client {
 
   /**
    * Gets all client issues.
-   * @returns An array of `Issue`.
+   * @returns An array of `Issue` objects.
    */
-  async getIssues(): Promise<Issue[]> {
+  async getIssues(filter: Partial<IssueProperties> = {}, exclusiveKeys: [(keyof IssueProperties)?] = []): Promise<Issue[]> {
 
     const issues = [];
+    const issuePropertiesArray = (await this.db.issues.toArray()).filter((issue) => {
 
-    for (const properties of await this.db.issues.toArray()) {
+      for (const key of Object.keys(filter) as (keyof IssueProperties)[]) {
+
+        const issueValue = issue[key];
+        const filterValue = filter[key];
+        if (issueValue instanceof Array && filterValue instanceof Array) {
+
+          const includesKey = issueValue.includes(key);
+          if (exclusiveKeys.includes(key) ? !includesKey : includesKey) {
+
+            return false;
+
+          }
+
+        } else if (exclusiveKeys.includes(key) ? issueValue === filterValue : issueValue !== filterValue) {
+
+          return false;
+
+        }
+
+      }
+
+      return true;
+
+    });
+
+    for (const properties of issuePropertiesArray) {
 
       issues.push(new Issue(properties, this));
 
     }
 
     return issues;
+
+  }
+
+  /**
+   * Gets all client labels.
+   * @returns An array of `Label` objects.
+   */
+  async getLabels(filter: Partial<LabelProperties> = {}, exclusiveKeys: [(keyof LabelProperties)?] = []): Promise<Label[]> {
+
+    const labels = [];
+    const labelPropertiesArray = (await this.db.labels.toArray()).filter((label) => {
+
+      for (const key of Object.keys(filter) as (keyof LabelProperties)[]) {
+
+        const labelValue = label[key];
+        const filterValue = filter[key];
+        if (exclusiveKeys.includes(key) ? labelValue === filterValue : labelValue !== filterValue) {
+
+          return false;
+
+        }
+
+      }
+
+      return true;
+
+    });
+
+    for (const properties of labelPropertiesArray) {
+
+      labels.push(new Label(properties, this));
+
+    }
+
+    return labels;
 
   }
 
@@ -101,15 +161,13 @@ export default class Client {
 
   async #getUnusedId(contentType: "issues" | "labels"): Promise<string> {
 
-    let id;
+    let id = null;
     do {
       
       id = new ObjectID().toHexString();
-      try {
+      if (await clientDatabase[contentType].get(id)) {
 
-        await clientDatabase[contentType].get(id);
-
-      } catch (err) {
+        id = null;
 
       }
       

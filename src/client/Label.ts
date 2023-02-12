@@ -13,6 +13,7 @@ export default class Label {
   id: string;
   name: string;
   description?: string;
+  projects?: string[];
   color?: string;
 
   constructor(props: LabelProperties, client: Client) {
