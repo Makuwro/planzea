@@ -29,9 +29,22 @@
   overflow-y: scroll;
 }
 
-#content h1 {
-  font-weight: 400;
-  font-size: 16px;
+#details input {
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  font-weight: 500;
+  padding: 0;
+  color: var(--text-important);
+}
+
+#details label {
+  color: var(--text);
+  margin-top: 8px;
+  display: block;
+  font-weight: 200;
 }
 
 #header {

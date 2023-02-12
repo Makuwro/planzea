@@ -69,31 +69,29 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
             </button>
           </section>
           <section id={styles.details}>
-            <h1 contentEditable suppressContentEditableWarning>
-              {issue.name}
-            </h1>
-            <h2>The Showrunners</h2>
+            <input type="text" disabled value={issue.name} />
+            <label>The Showrunners</label>
           </section>
         </section>
         <section id={styles.content}>
           <section>
-            <h1>Description</h1>
+            <label>Description</label>
             <p>This issue has no description.</p>
           </section>
           <section>
-            <h1>Child issues</h1>
+            <label>Child issues</label>
             <p>This issue has no child issues.</p>
           </section>
           <section>
-            <h1>Activity</h1>
+            <label>Activity</label>
             <p>Loading activity...</p>
           </section>
           <section>
-            <h1>Assignees</h1>
+            <label>Assignees</label>
             <p>This issue has no assignees.</p>
           </section>
           <section>
-            <h1>Labels</h1>
+            <label>Labels</label>
             <ul id={styles.labels}>
               <li>Characters</li>
               <li>Dialogue</li>
@@ -101,11 +99,11 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
             <p>This issue has no labels.</p>
           </section>
           <section>
-            <h1>Due date</h1>
+            <label>Due date</label>
             <p>This issue doesn't have a due date.</p>
           </section>
           <section>
-            <h1>Status</h1>
+            <label>Status</label>
             <select>
               <option>To Do</option>
               <option>In Progress</option>
@@ -113,7 +111,7 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
             </select>
           </section>
           <section>
-            <h1>ID</h1>
+            <label>ID</label>
             <p>{issue.id}</p>
           </section>
           <ul id={styles.actions}>
