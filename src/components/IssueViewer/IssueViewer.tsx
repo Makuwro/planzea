@@ -75,12 +75,7 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
           <section id={styles.options}>
             <button onClick={() => navigate("/")}>
               <span className="material-icons-round">
-                arrow_back
-              </span>
-            </button>
-            <button onClick={() => navigate("/")}>
-              <span className="material-icons-round">
-                close
+                arrow_back_ios
               </span>
             </button>
           </section>
