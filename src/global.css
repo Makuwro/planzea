@@ -1,3 +1,7 @@
+:focus-visible {
+  outline: none;
+}
+
 :root {
   --article: #313237;
   --background: #ffffff;
@@ -67,12 +71,13 @@ button {
   box-shadow: var(--box-shadow-default);
   background-color: var(--button);
   border: none;
-  padding: 5px 10px;
+  padding: 10px 15px;
   border-radius: 5px;
+  font-size: 16px;
 }
 
-:focus-visible {
-  outline: none;
+button.destructive {
+  background-color: var(--destructive);
 }
 
 html, body, button, input, textarea {

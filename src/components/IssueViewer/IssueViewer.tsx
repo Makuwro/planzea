@@ -72,62 +72,51 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
     <section id={styles.background} className={isOpen ? styles.open : undefined}>
       <section id={styles.box}>
         <section id={styles.header}>
-          <section id={styles.options}>
-            <button onClick={() => navigate("/")}>
-              <span className="material-icons-round">
-                arrow_back_ios
-              </span>
-            </button>
+          <section id={styles.firstRow}>
+            <section id={styles.options}>
+              <button onClick={() => navigate("/")}>
+                <span className="material-icons-round">
+                  arrow_back_ios
+                </span>
+              </button>
+            </section>
+            <ul id={styles.assignees}>
+              <li>
+                <button>
+                  <span className="material-icons-round">
+                    person_add_alt
+                  </span>
+                </button>
+              </li>
+            </ul>
           </section>
           <section id={styles.details}>
+            <ul id={styles.labels}>
+              <li>
+                <button>Characters</button>
+              </li>
+              <li>
+                <button>Dialogue</button>
+              </li>
+              <li>
+                <button id={styles.labelAddButton}>
+                  <span className="material-icons-round">
+                    add
+                  </span>
+                </button>
+              </li>
+            </ul>
             <input type="text" value={newIssueName} onBlur={changeIssueName} onInput={(event: React.ChangeEvent<HTMLInputElement>) => setNewIssueName(event.target.value)} onKeyDown={(event) => event.key === "Enter" ? event.currentTarget.blur() : undefined} placeholder={issue.name} />
-            <label>The Showrunners</label>
           </section>
         </section>
         <section id={styles.content}>
-          <section>
-            <label>Description</label>
-            <p>This issue has no description.</p>
-          </section>
-          <section>
-            <label>Child issues</label>
-            <p>This issue has no child issues.</p>
-          </section>
-          <section>
-            <label>Activity</label>
-            <p>Loading activity...</p>
-          </section>
-          <section>
-            <label>Assignees</label>
-            <p>This issue has no assignees.</p>
-          </section>
-          <section>
-            <label>Labels</label>
-            <ul id={styles.labels}>
-              <li>Characters</li>
-              <li>Dialogue</li>
-            </ul>
-            <p>This issue has no labels.</p>
-          </section>
-          <section>
-            <label>Due date</label>
-            <p>This issue doesn't have a due date.</p>
-          </section>
-          <section>
-            <label>Status</label>
-            <select>
-              <option>To Do</option>
-              <option>In Progress</option>
-              <option>Completed</option>
-            </select>
-          </section>
           <section>
             <label>ID</label>
             <p>{issue.id}</p>
           </section>
           <ul id={styles.actions}>
             <li>
-              <button onClick={deleteIssue}>Delete</button>
+              <button className="destructive" onClick={deleteIssue}>Delete</button>
             </li>
           </ul>
         </section>

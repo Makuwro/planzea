@@ -1,3 +1,21 @@
+#assignees {
+  display: flex;
+  list-style: none;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+#assignees button {
+  border-radius: 100%;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+}
+
 #background {
   display: none;
 }
@@ -28,6 +46,12 @@
   overflow-y: scroll;
 }
 
+#details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 #details input {
   width: 100%;
   box-sizing: border-box;
@@ -41,44 +65,50 @@
 
 #details label {
   color: var(--text);
-  margin-top: 8px;
   display: block;
   font-weight: 200;
 }
 
+#firstRow {
+  display: flex;
+  justify-content: space-between;
+}
+
 #header {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   padding: 20px;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
-}
-
-#header h1 {
-  font-size: 25px;
-}
-
-#header h2 {
-  font-size: 16px;
-  font-weight: 100;
 }
 
 #actions, #labels {
   display: flex;
   padding: 0;
   list-style-type: none;
-  gap: 5px;
+  gap: 10px;
+  margin: 0;
 }
 
-#labels li {
+#labels li button {
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
   background-color: rgb(236, 236, 236);
   padding: 4px 10px;
   border-radius: 15px;
   font-weight: 100;
+  height: 28px;
+}
+
+#labelAddButton {
+  width: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #options {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
 }
 
 #options button {
