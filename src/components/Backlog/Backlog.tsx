@@ -29,24 +29,28 @@ export default function Backlog({client, project}: {client: Client, project: Pro
 
     (async () => {
 
-      const newIssueComponents = [];
-      for (const issue of issues) {
+      if (project) {
 
-        newIssueComponents.push(
-          <li key={issue.id}>
-            <button onClick={() => navigate(`/issues/${issue.id}`)}>
-              {issue.name}
-            </button>
-          </li>
-        );
+        const newIssueComponents = [];
+        for (const issue of issues) {
+
+          newIssueComponents.push(
+            <li key={issue.id}>
+              <button onClick={() => navigate(`/${project.id}/issues/${issue.id}`)}>
+                {issue.name}
+              </button>
+            </li>
+          );
+
+        }
+
+        setIssueComponents(newIssueComponents);
 
       }
 
-      setIssueComponents(newIssueComponents);
-
     })();
 
-  }, [issues]);
+  }, [project, issues]);
 
   async function createIssue() {
 

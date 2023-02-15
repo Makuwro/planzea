@@ -38,8 +38,8 @@ export default function App() {
     <>
       <Routes location={currentLocation}>
         <Route path="/" element={<ProjectSelector client={client} />} />
-        <Route path="/:projectId/issues/:issueId" element={<Backlog client={client} project={project} />} />
         <Route path="/:projectId/issues" element={<Backlog client={client} project={project} />} />
+        <Route path="/:projectId/issues/:issueId" element={<Backlog client={client} project={project} />} />
       </Routes>
     </>
   );
