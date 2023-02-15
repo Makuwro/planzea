@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Client from "../../client/Client";
 import Issue from "../../client/Issue";
+import Project from "../../client/Project";
+import LabelSelector from "../LabelSelector/LabelSelector";
 import styles from "./IssueViewer.module.css";
 
-export default function IssueViewer({ client, onIssueDelete }: { client: Client; onIssueDelete: (issueId: string) => void }) {
+export default function IssueViewer({ client, onIssueDelete, project }: { client: Client; onIssueDelete: (issueId: string) => void; project: Project }) {
 
   const { issueId } = useParams<{ issueId: string }>();
   const [newIssueName, setNewIssueName] = useState<string>("");
@@ -70,6 +72,7 @@ export default function IssueViewer({ client, onIssueDelete }: { client: Client;
 
   return issue ? (
     <section id={styles.background} className={isOpen ? styles.open : undefined}>
+      <LabelSelector isOpen project={project} />
       <section id={styles.box}>
         <section id={styles.header}>
           <section id={styles.firstRow}>

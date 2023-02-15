@@ -1,18 +1,45 @@
-import React, { useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Location, matchPath, Route, Routes, useLocation } from "react-router-dom";
 import Client from "./client/Client";
+import Project from "./client/Project";
 import Backlog from "./components/Backlog/Backlog";
+import ProjectSelector from "./components/ProjectSelector/ProjectSelector";
 import "./global.css";
+
+export type SetState<T> = Dispatch<SetStateAction<T>>;
 
 export default function App() {
 
   const [client] = useState(new Client());
+  const [project, setProject] = useState<Project | null>(null);
+  const newLocation = useLocation();
+  const [currentLocation, setCurrentLocation] = useState<Location>(newLocation);
+
+  useEffect(() => {
+
+    (async () => {
+
+      const matchedPath = matchPath("/:projectId/*", newLocation.pathname);
+      const desiredProjectId = matchedPath?.params.projectId;
+      if (desiredProjectId && desiredProjectId !== project?.id) {
+
+        const project = await client.getProject(desiredProjectId);
+        setProject(project);
+
+      }
+      
+      setCurrentLocation(newLocation);
+
+    })();
+
+  }, [newLocation, project]);
 
   return (
     <>
-      <Routes>
-        <Route path="/issues/:issueId" element={<Backlog client={client} />} />
-        <Route path="/" element={<Backlog client={client} />} />
+      <Routes location={currentLocation}>
+        <Route path="/" element={<ProjectSelector client={client} />} />
+        <Route path="/:projectId/issues/:issueId" element={<Backlog client={client} project={project} />} />
+        <Route path="/:projectId/issues" element={<Backlog client={client} project={project} />} />
       </Routes>
     </>
   );

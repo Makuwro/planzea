@@ -4,13 +4,18 @@ export interface LabelProperties {
   id: string;
   name: string;
   description?: string;
+  projects?: string[];
   color?: string;
 }
 
+export type InitialLabelProperties = Omit<LabelProperties, "id">;
+
 export default class Label {
 
-  #client: Client;
-  id: string;
+  static readonly tableName = "labels" as const;
+  
+  readonly #client: Client;
+  readonly id: string;
   name: string;
   description?: string;
   projects?: string[];

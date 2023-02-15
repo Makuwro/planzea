@@ -10,10 +10,14 @@ export interface IssueProperties {
   status?: string;
 }
 
+export type InitialIssueProperties = Omit<IssueProperties, "id">;
+
 export default class Issue {
 
-  #client: Client;
-  id: string;
+  static readonly tableName = "issues" as const;
+
+  readonly #client: Client;
+  readonly id: string;
   name: string;
   description?: string;
   projects: string[];

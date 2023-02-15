@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Client from "../../client/Client";
 import Issue from "../../client/Issue";
+import Project from "../../client/Project";
 import IssueViewer from "../IssueViewer/IssueViewer";
 
-export default function Backlog({client}: {client: Client}) {
+export default function Backlog({client, project}: {client: Client, project: Project | null}) {
 
   const [issues, setIssues] = useState<Issue[]>([]);
   const [issueComponents, setIssueComponents] = useState<React.ReactElement[]>([]);
@@ -12,9 +13,17 @@ export default function Backlog({client}: {client: Client}) {
 
   useEffect(() => {
 
-    (async () => setIssues(await client.getIssues()))();
+    (async () => {
+      
+      if (project) {
 
-  }, []);
+        setIssues(await project.getIssues());
+
+      }
+      
+    })();
+
+  }, [project]);
 
   useEffect(() => {
 
@@ -50,17 +59,17 @@ export default function Backlog({client}: {client: Client}) {
 
   }
 
-  return (
+  return project ? (
     <>
-      <IssueViewer client={client} onIssueDelete={(deletedIssueId) => setIssues(issues.filter((issue) => issue.id !== deletedIssueId))} />
+      <IssueViewer client={client} onIssueDelete={(deletedIssueId) => setIssues(issues.filter((issue) => issue.id !== deletedIssueId))} project={project} />
       <main>
-        <h1>Unnamed project</h1>
+        <h1>{project.name}</h1>
         <button onClick={createIssue}>Create issue</button>
         <ul>
           {issueComponents}
         </ul>
       </main>
     </>
-  );
+  ) : null;
 
 }
