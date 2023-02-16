@@ -74,8 +74,14 @@ export default function LabelSelector({isOpen, project, issue}: {isOpen: boolean
 
   async function createLabel() {
 
-    const label = await project.createLabel({name: query});
-    setListItemInfo([...listItemInfo, {isSelected: true, label}]);
+    const name = prompt("Enter a label name.");
+    if (name) {
+
+      const label = await project.createLabel({name});
+      issue.update({labels: [...(issue.labels ?? []), label.id]});
+      setListItemInfo([...listItemInfo, {isSelected: true, label}]);
+
+    }
 
   }
 
@@ -94,9 +100,9 @@ export default function LabelSelector({isOpen, project, issue}: {isOpen: boolean
           </section>
           <ul id={styles.assignees}>
             <li>
-              <button>
+              <button onClick={createLabel}>
                 <span className="material-icons-round">
-                  person_add_alt
+                  add
                 </span>
               </button>
             </li>
