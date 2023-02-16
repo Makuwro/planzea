@@ -52,7 +52,7 @@ export default function LabelSelector({client, isOpen, project}: {client: Client
     }
 
     const newLabelComponents = [];
-    for (const result of listItemInfo.filter((item) => !query || item.label.name.includes(query))) {
+    for (const result of listItemInfo.filter((item) => !query || item.label.name.toLowerCase().includes(query.toLowerCase()))) {
 
       newLabelComponents.push(
         <li key={result.label.id}>
