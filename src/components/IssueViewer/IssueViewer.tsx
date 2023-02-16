@@ -184,7 +184,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
           <section>
             <label>Description</label>
             <section ref={descriptionRef} id={styles.description} contentEditable suppressContentEditableWarning onKeyDown={updateDescription} onKeyUp={updateDescription} onBlur={updateDescription}>
-              {descriptionComponents[0] ? descriptionComponents : <br />}
+              {descriptionComponents[0] ? descriptionComponents : <p placeholder="Add a description" />}
             </section>
           </section>
           <section>

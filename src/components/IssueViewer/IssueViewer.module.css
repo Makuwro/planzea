@@ -70,6 +70,11 @@
   font-weight: 200;
 }
 
+#description p:empty[placeholder]::before {
+  content: attr(placeholder);
+  cursor: text;
+}
+
 #firstRow {
   display: flex;
   justify-content: space-between;
