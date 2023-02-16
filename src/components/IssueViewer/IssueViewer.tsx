@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, ReactElement } from "react";
 import { useParams, useNavigate, useLocation, matchPath } from "react-router-dom";
 import Client from "../../client/Client";
 import Issue from "../../client/Issue";
@@ -10,8 +10,9 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
   const { issueId } = useParams<{ issueId: string }>();
   const [newIssueName, setNewIssueName] = useState<string>("");
-  const [labelComponents, setLabelComponents] = useState<React.ReactElement[]>([]);
+  const [labelComponents, setLabelComponents] = useState<ReactElement[]>([]);
   const [issue, setIssue] = useState<Issue | null>(null);
+  const [descriptionComponents, setDescriptionComponents] = useState<ReactElement[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -23,6 +24,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
         try {
 
+          // Create label components
           const newIssue = await client.getIssue(issueId);
           const projectLabels = await project.getLabels();
           const newLabelComponents = [];
@@ -42,6 +44,24 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
             }
 
           }
+
+          // Create description components
+          if (newIssue.description) {
+
+            const descriptionComponents = [];
+            for (const paragraph of newIssue.description.split("\n")) {
+
+              descriptionComponents.push(
+                <p key={descriptionComponents.length} placeholder="Add a description">
+                  {paragraph}
+                </p>
+              );
+
+            }
+            setDescriptionComponents(descriptionComponents);
+
+          } 
+
           setLabelComponents(newLabelComponents);
           setIssue(newIssue);
           setNewIssueName(newIssue.name);
@@ -156,9 +176,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
           <section>
             <label>Description</label>
             <section ref={descriptionRef} id={styles.description} contentEditable suppressContentEditableWarning onKeyDown={updateDescription} onKeyUp={updateDescription} onBlur={updateDescription}>
-              <p placeholder="This issue has no description">
-                <br />
-              </p>
+              {descriptionComponents[0] ? descriptionComponents : <br />}
             </section>
           </section>
           <section>
