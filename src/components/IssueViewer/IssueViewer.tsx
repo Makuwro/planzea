@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation, matchPath } from "react-router-dom";
 import Client from "../../client/Client";
 import Issue from "../../client/Issue";
 import Project from "../../client/Project";
@@ -90,9 +90,11 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
   }
 
+  const location = useLocation();
+  const isLabelSelectorOpen = Boolean(matchPath("/:projectId/issues/:issueId/labels", location.pathname));
   return issue ? (
     <section id={styles.background} className={isOpen ? styles.open : undefined}>
-      <LabelSelector isOpen={false} project={project} issue={issue} />
+      <LabelSelector isOpen={isLabelSelectorOpen} project={project} issue={issue} />
       <section id={styles.box}>
         <section id={styles.header}>
           <section id={styles.firstRow}>
