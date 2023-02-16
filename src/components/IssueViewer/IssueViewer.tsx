@@ -99,7 +99,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
         <section id={styles.header}>
           <section id={styles.firstRow}>
             <section id={styles.options}>
-              <button onClick={() => navigate("/")}>
+              <button onClick={() => navigate(`/${project.id}/issues`)}>
                 <span className="material-icons-round">
                   arrow_back_ios
                 </span>
