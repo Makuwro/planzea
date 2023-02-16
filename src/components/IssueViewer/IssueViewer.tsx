@@ -10,6 +10,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
   const { issueId } = useParams<{ issueId: string }>();
   const [newIssueName, setNewIssueName] = useState<string>("");
+  const [labelComponents, setLabelComponents] = useState<React.ReactElement[]>([]);
   const [issue, setIssue] = useState<Issue | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -23,6 +24,25 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
         try {
 
           const newIssue = await client.getIssue(issueId);
+          const projectLabels = await project.getLabels();
+          const newLabelComponents = [];
+          for (const labelId of (newIssue.labels ?? [])) {
+
+            const label = projectLabels.find((possibleLabel) => possibleLabel.id === labelId);
+            if (label) {
+
+              newLabelComponents.push(
+                <li key={labelId}>
+                  <button onClick={() => navigate(`/${project.id}/issues?search=`)}>
+                    {label.name}
+                  </button>
+                </li>
+              );
+
+            }
+
+          }
+          setLabelComponents(newLabelComponents);
           setIssue(newIssue);
           setNewIssueName(newIssue.name);
           setIsOpen(true);
@@ -72,7 +92,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
   return issue ? (
     <section id={styles.background} className={isOpen ? styles.open : undefined}>
-      <LabelSelector client={client} isOpen project={project} />
+      <LabelSelector isOpen={false} project={project} issue={issue} />
       <section id={styles.box}>
         <section id={styles.header}>
           <section id={styles.firstRow}>
@@ -95,14 +115,9 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
           </section>
           <section id={styles.details}>
             <ul id={styles.labels}>
+              {labelComponents}
               <li>
-                <button>Characters</button>
-              </li>
-              <li>
-                <button>Dialogue</button>
-              </li>
-              <li>
-                <button id={styles.labelAddButton}>
+                <button id={styles.labelAddButton} onClick={() => navigate(`/${project.id}/issues/${issue.id}/labels`)}>
                   <span className="material-icons-round">
                     add
                   </span>

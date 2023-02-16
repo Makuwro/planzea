@@ -22,6 +22,11 @@
   padding: 0;
 }
 
+#header > section {
+  display: flex;
+  justify-content: space-between;
+}
+
 .circle {
   width: 20px;
   height: 20px;
@@ -41,10 +46,6 @@
 .selected {
   background-color: var(--link);
   border-color: var(--link);
-}
-
-.selected.circle:global(.material-icons-round) {
-
 }
 
 .option {

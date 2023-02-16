@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Client from "../../client/Client";
+import { useNavigate } from "react-router-dom";
+import Issue from "../../client/Issue";
 import Label from "../../client/Label";
 import Project from "../../client/Project";
 import styles from "./LabelSelector.module.css";
 
-export default function LabelSelector({client, isOpen, project}: {client: Client, isOpen: boolean, project: Project}) {
+export default function LabelSelector({isOpen, project, issue}: {isOpen: boolean, project: Project, issue: Issue}) {
 
   const [query, setQuery] = useState<string>("");
   const [listItemInfo, setListItemInfo] = useState<{isSelected: boolean, label: Label}[]>([]);
@@ -15,11 +16,10 @@ export default function LabelSelector({client, isOpen, project}: {client: Client
     (async () => {
 
       const newListItemInfo = [];
-      const projectLabels = (await project.getLabels()).map((label) => label.id);
-      for (const label of await client.getLabels()) {
+      for (const label of await project.getLabels()) {
 
         newListItemInfo.push({
-          isSelected: projectLabels.includes(label.id),
+          isSelected: Boolean(issue.labels?.includes(label.id)),
           label
         });
 
@@ -35,9 +35,9 @@ export default function LabelSelector({client, isOpen, project}: {client: Client
 
     async function toggleLabel(label: Label, remove: boolean) {
 
-      // Update the label's projects.
-      const projects = remove ? (label.projects?.filter((projectId) => projectId !== project.id) || []) : [...(label.projects ?? []), project.id];
-      await label.update({projects});
+      // Update the label's issues.
+      const labels = remove ? (issue.labels?.filter((labelId) => labelId !== label.id) || []) : [...(issue.labels ?? []), label.id];
+      await issue.update({labels});
 
       // Update the checklist.
       const newList = [...listItemInfo];
@@ -79,18 +79,36 @@ export default function LabelSelector({client, isOpen, project}: {client: Client
 
   }
 
-  return (
+  const navigate = useNavigate();
+
+  return isOpen ? (
     <section id={styles.selector}>
+      <section id={styles.header}>
+        <section>
+          <section id={styles.options}>
+            <button onClick={() => navigate(`/${project.id}/issues/${issue.id}`)}>
+              <span className="material-icons-round">
+                arrow_back_ios
+              </span>
+            </button>
+          </section>
+          <ul id={styles.assignees}>
+            <li>
+              <button>
+                <span className="material-icons-round">
+                  person_add_alt
+                </span>
+              </button>
+            </li>
+          </ul>
+        </section>
+        <h1>Manage labels</h1>
+      </section>
       <input type="text" value={query} placeholder="Label name" onInput={(event: React.ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)} />
       <ul>
-        <li>
-          <button disabled={!query} onClick={createLabel}>
-            Create new <b>{query}</b> label 
-          </button>
-        </li>
         {labelComponents}
       </ul>
     </section>
-  );
+  ) : null;
 
 }

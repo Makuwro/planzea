@@ -40,6 +40,7 @@ export default function App() {
         <Route path="/" element={<ProjectSelector client={client} />} />
         <Route path="/:projectId/issues" element={<Backlog client={client} project={project} />} />
         <Route path="/:projectId/issues/:issueId" element={<Backlog client={client} project={project} />} />
+        <Route path="/:projectId/issues/:issueId/labels" element={<Backlog client={client} project={project} />} />
       </Routes>
     </>
   );
