@@ -115,9 +115,26 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
   }
 
   const descriptionRef = useRef<HTMLElement>(null);
-  async function updateDescription() {
+  async function updateDescription(event: React.FocusEvent | React.KeyboardEvent) {
 
+    
     if (issue && descriptionRef.current) {
+
+      if (event.type === "keydown" && "key" in event && event.key === "Backspace") {
+
+        // Check if the user is selecting multiple paragraphs.
+        // TODO: Don't delete first paragraph
+        const selection = document.getSelection();
+        const anchorParentElement = selection?.anchorNode?.parentElement;
+        const focusParentElement = selection?.focusNode?.parentElement;
+        if (anchorParentElement && anchorParentElement === focusParentElement && [...descriptionRef.current.children].indexOf(anchorParentElement) === 0 && selection?.anchorOffset === 0 && selection.focusOffset === 0) {
+
+          event.preventDefault();
+          return;
+
+        }
+
+      }
 
       let description = "";
 
@@ -184,7 +201,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
           <section>
             <label>Description</label>
             <section ref={descriptionRef} id={styles.description} contentEditable suppressContentEditableWarning onKeyDown={updateDescription} onKeyUp={updateDescription} onBlur={updateDescription}>
-              {descriptionComponents[0] ? descriptionComponents : <p placeholder="Add a description" />}
+              {descriptionComponents[0] ? descriptionComponents : <p placeholder="Add a description"><br /></p>}
             </section>
           </section>
           <section>
