@@ -72,7 +72,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
   return issue ? (
     <section id={styles.background} className={isOpen ? styles.open : undefined}>
-      <LabelSelector isOpen project={project} />
+      <LabelSelector client={client} isOpen project={project} />
       <section id={styles.box}>
         <section id={styles.header}>
           <section id={styles.firstRow}>

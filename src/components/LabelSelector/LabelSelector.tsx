@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import Client from "../../client/Client";
 import Label from "../../client/Label";
 import Project from "../../client/Project";
 import styles from "./LabelSelector.module.css";
 
-export default function LabelSelector({isOpen, project}: {isOpen: boolean, project: Project}) {
+export default function LabelSelector({client, isOpen, project}: {client: Client, isOpen: boolean, project: Project}) {
 
   const [query, setQuery] = useState<string>("");
   const [listItemInfo, setListItemInfo] = useState<{isSelected: boolean, label: Label}[]>([]);
@@ -14,10 +15,11 @@ export default function LabelSelector({isOpen, project}: {isOpen: boolean, proje
     (async () => {
 
       const newListItemInfo = [];
-      for (const label of await project.getLabels()) {
+      const projectLabels = (await project.getLabels()).map((label) => label.id);
+      for (const label of await client.getLabels()) {
 
         newListItemInfo.push({
-          isSelected: false,
+          isSelected: projectLabels.includes(label.id),
           label
         });
 
@@ -36,8 +38,13 @@ export default function LabelSelector({isOpen, project}: {isOpen: boolean, proje
 
       newLabelComponents.push(
         <li key={result.label.id}>
-          <button>
-            {result.label.name}
+          <button className={styles.option}>
+            <span className={`${styles.circle} ${result.isSelected ? styles.selected : ""} material-icons-round`}>
+              check
+            </span>
+            <span>
+              {result.label.name}
+            </span>
           </button>
         </li>
       );
@@ -49,7 +56,8 @@ export default function LabelSelector({isOpen, project}: {isOpen: boolean, proje
 
   async function createLabel() {
 
-    
+    const label = await project.createLabel({name: query});
+    setListItemInfo([...listItemInfo, {isSelected: true, label}]);
 
   }
 

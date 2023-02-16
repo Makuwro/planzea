@@ -74,6 +74,15 @@ button {
   padding: 10px 15px;
   border-radius: 5px;
   font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(0.9);
+}
+
+button:hover:active {
+  filter: brightness(0.8)
 }
 
 button.destructive {
@@ -84,7 +93,7 @@ html, body, button, input, textarea {
   font-family: "Lexend Deca";
 }
 
-p {
+p, li {
   font-weight: 100;
   color: var(--text);
 }

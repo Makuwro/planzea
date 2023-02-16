@@ -15,3 +15,44 @@
   border: 1px solid var(--border);
   height: var(--input-min-height);
 }
+
+#selector ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.circle {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.circle:global(.material-icons-round) {
+  color: var(--border);
+}
+
+.selected {
+  background-color: var(--link);
+  border-color: var(--link);
+}
+
+.selected.circle:global(.material-icons-round) {
+
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: none;
+  width: 100%;
+  border-radius: 0;
+  background-color: var(--background);
+}

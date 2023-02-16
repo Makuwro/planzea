@@ -5,8 +5,8 @@ import Label, { InitialLabelProperties, LabelProperties } from "./Label";
 import Project, { InitialProjectProperties, ProjectProperties } from "./Project";
 
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
-
-export type PlanzeaObject = typeof Issue | typeof Label | typeof Project;
+export type PlanzeaObject = Issue | Label | Project;
+export type PlanzeaObjectConstructor = typeof Issue | typeof Label | typeof Project;
 export type PlanzeaObjectProperties = IssueProperties & LabelProperties & ProjectProperties;
 
 const clientDatabase = new ClientDatabase();
@@ -18,7 +18,7 @@ export default class Client {
   async #createObject(constructor: typeof Issue, props: InitialIssueProperties): Promise<Issue>;
   async #createObject(constructor: typeof Label, props: InitialLabelProperties): Promise<Label>;
   async #createObject(constructor: typeof Project, props: InitialProjectProperties): Promise<Project>;
-  async #createObject(constructor: typeof Issue | typeof Label | typeof Project, props: InitialIssueProperties | InitialLabelProperties | InitialProjectProperties): Promise<Issue | Label | Project> {
+  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialIssueProperties | InitialLabelProperties | InitialProjectProperties): Promise<PlanzeaObject> {
 
     const { tableName } = constructor;
     const content = new constructor({
@@ -31,8 +31,9 @@ export default class Client {
   }
 
   async #getObject(constructor: typeof Issue, objectId: string): Promise<Issue>;
+  async #getObject(constructor: typeof Label, objectId: string): Promise<Label>;
   async #getObject(constructor: typeof Project, objectId: string): Promise<Project>;
-  async #getObject(constructor: PlanzeaObject, objectId: string): Promise<Issue | Label | Project> {
+  async #getObject(constructor: PlanzeaObjectConstructor, objectId: string): Promise<PlanzeaObject> {
 
     const properties = await this.#db[constructor.tableName].get(objectId);
 
@@ -43,6 +44,54 @@ export default class Client {
     }
 
     return new (constructor)(properties as PlanzeaObjectProperties, this);
+
+  }
+
+  async #getObjects(constructor: typeof Issue, filter?: Partial<IssueProperties>, exclusiveKeys?: [(keyof IssueProperties)?]): Promise<Issue[]>;
+  async #getObjects(constructor: typeof Label, filter?: Partial<LabelProperties>, exclusiveKeys?: [(keyof LabelProperties)?]): Promise<Label[]>;
+  async #getObjects(constructor: typeof Project, filter?: Partial<ProjectProperties>, exclusiveKeys?: [(keyof ProjectProperties)?]): Promise<Project[]>;
+  async #getObjects(constructor: PlanzeaObjectConstructor, filter: Partial<PlanzeaObjectProperties> = {}, exclusiveKeys: [(keyof PlanzeaObjectProperties)?] = []): Promise<PlanzeaObject[]> {
+
+    const objects = [];
+    const issuePropertiesArray = (await this.#db[constructor.tableName].toArray() as PlanzeaObjectProperties[]).filter((object) => {
+
+      for (const key of Object.keys(filter) as (keyof IssueProperties)[]) {
+
+        const issueValue = object[key];
+        const filterValue = filter[key];
+        if (issueValue instanceof Array && filterValue instanceof Array) {
+
+          for (const item of filterValue) {
+
+            const includesKey = issueValue.includes(item);
+            if (exclusiveKeys.includes(key) ? includesKey : !includesKey) {
+
+              return false;
+
+            }
+
+          }
+
+        } else if (exclusiveKeys.includes(key) ? issueValue === filterValue : issueValue !== filterValue) {
+
+          return false;
+
+        }
+
+      }
+
+      return true;
+
+    });
+
+
+    for (const properties of issuePropertiesArray) {
+
+      objects.push(new (constructor)(properties, this));
+
+    }
+
+    return objects;
 
   }
 
@@ -126,49 +175,7 @@ export default class Client {
    */
   async getIssues(filter: Partial<IssueProperties> = {}, exclusiveKeys: [(keyof IssueProperties)?] = []): Promise<Issue[]> {
 
-    const issues = [];
-    const issuePropertiesArray = (await this.#db.issues.toArray()).filter((issue) => {
-
-      for (const key of Object.keys(filter) as (keyof IssueProperties)[]) {
-
-        const issueValue = issue[key];
-        const filterValue = filter[key];
-        if (issueValue instanceof Array && filterValue instanceof Array) {
-
-          for (const item of filterValue) {
-
-            const includesKey = issueValue.includes(item);
-            if (exclusiveKeys.includes(key) ? includesKey : !includesKey) {
-
-              return false;
-
-            }
-
-          }
-
-        } else if (exclusiveKeys.includes(key) ? issueValue === filterValue : issueValue !== filterValue) {
-
-          return false;
-
-        }
-
-      }
-
-      console.warn("yes")
-      return true;
-
-    });
-
-
-    for (const properties of issuePropertiesArray) {
-
-      issues.push(new Issue(properties, this));
-
-    }
-    
-    console.log(issues);
-
-    return issues;
+    return await this.#getObjects(Issue, filter, exclusiveKeys);
 
   }
 
@@ -178,32 +185,7 @@ export default class Client {
    */
   async getLabels(filter: Partial<LabelProperties> = {}, exclusiveKeys: [(keyof LabelProperties)?] = []): Promise<Label[]> {
 
-    const labels = [];
-    const labelPropertiesArray = (await this.#db.labels.toArray()).filter((label) => {
-
-      for (const key of Object.keys(filter) as (keyof LabelProperties)[]) {
-
-        const labelValue = label[key];
-        const filterValue = filter[key];
-        if (exclusiveKeys.includes(key) ? labelValue === filterValue : labelValue !== filterValue) {
-
-          return false;
-
-        }
-
-      }
-
-      return true;
-
-    });
-
-    for (const properties of labelPropertiesArray) {
-
-      labels.push(new Label(properties, this));
-
-    }
-
-    return labels;
+    return await this.#getObjects(Label, filter, exclusiveKeys);
 
   }
 
@@ -215,32 +197,7 @@ export default class Client {
 
   async getProjects(filter: Partial<ProjectProperties> = {}, exclusiveKeys: [(keyof ProjectProperties)?] = []): Promise<Project[]> {
 
-    const projects = [];
-    const projectPropertiesArray = (await this.#db.projects.toArray()).filter((project) => {
-
-      for (const key of Object.keys(filter) as (keyof ProjectProperties)[]) {
-
-        const labelValue = project[key];
-        const filterValue = filter[key];
-        if (exclusiveKeys.includes(key) ? labelValue === filterValue : labelValue !== filterValue) {
-
-          return false;
-
-        }
-
-      }
-
-      return true;
-
-    });
-
-    for (const properties of projectPropertiesArray) {
-
-      projects.push(new Project(properties, this));
-
-    }
-
-    return projects;
+    return await this.#getObjects(Project, filter, exclusiveKeys);
 
   }
 

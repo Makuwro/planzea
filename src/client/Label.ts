@@ -27,6 +27,7 @@ export default class Label {
     this.name = props.name;
     this.description = props.description;
     this.color = props.color;
+    this.projects = props.projects;
     this.#client = client;
 
   }

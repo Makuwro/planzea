@@ -1,6 +1,6 @@
 import Client, { PropertiesUpdate } from "./Client";
-import Issue from "./Issue";
-import Label from "./Label";
+import Issue, { InitialIssueProperties } from "./Issue";
+import Label, { InitialLabelProperties } from "./Label";
 
 export interface ProjectProperties {
   id: string;
@@ -31,6 +31,18 @@ export default class Project {
     this.isArchived = props.isArchived;
     this.isRecycled = props.isRecycled;
     this.#client = client;
+
+  }
+
+  async createIssue(props: Omit<InitialIssueProperties, "projects">): Promise<Issue> {
+
+    return await this.#client.createIssue({...props, projects: [this.id]});
+
+  }
+
+  async createLabel(props: Omit<InitialLabelProperties, "projects">): Promise<Label> {
+
+    return await this.#client.createLabel({...props, projects: [this.id]});
 
   }
 
