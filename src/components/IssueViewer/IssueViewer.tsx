@@ -131,6 +131,14 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
         </section>
         <section id={styles.content}>
           <section>
+            <label>Description</label>
+            <section id={styles.description} contentEditable suppressContentEditableWarning>
+              <p placeholder="This issue has no description">
+                <br />
+              </p>
+            </section>
+          </section>
+          <section>
             <label>ID</label>
             <p>{issue.id}</p>
           </section>
