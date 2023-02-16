@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation, matchPath } from "react-router-dom";
 import Client from "../../client/Client";
 import Issue from "../../client/Issue";
@@ -90,6 +90,29 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
   }
 
+  const descriptionRef = useRef<HTMLElement>(null);
+  async function updateDescription() {
+
+    if (issue && descriptionRef.current) {
+
+      let description = "";
+
+      for (const node of descriptionRef.current.childNodes) {
+
+        description += `${node.textContent}\n`;
+
+      }
+
+      if (description !== issue.description) {
+
+        await issue.update({description});
+
+      }
+
+    }
+
+  }
+
   const location = useLocation();
   const isLabelSelectorOpen = Boolean(matchPath("/:projectId/issues/:issueId/labels", location.pathname));
   return issue ? (
@@ -132,7 +155,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
         <section id={styles.content}>
           <section>
             <label>Description</label>
-            <section id={styles.description} contentEditable suppressContentEditableWarning>
+            <section ref={descriptionRef} id={styles.description} contentEditable suppressContentEditableWarning onKeyDown={updateDescription} onKeyUp={updateDescription} onBlur={updateDescription}>
               <p placeholder="This issue has no description">
                 <br />
               </p>
