@@ -51,11 +51,15 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
             const descriptionComponents = [];
             for (const paragraph of newIssue.description.split("\n")) {
 
-              descriptionComponents.push(
-                <p key={descriptionComponents.length} placeholder="Add a description">
-                  {paragraph}
-                </p>
-              );
+              if (paragraph) {
+
+                descriptionComponents.push(
+                  <p key={descriptionComponents.length} placeholder="Add a description">
+                    {paragraph}
+                  </p>
+                );
+
+              }
 
             }
             setDescriptionComponents(descriptionComponents);
@@ -119,7 +123,11 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
       for (const node of descriptionRef.current.childNodes) {
 
-        description += `${node.textContent}\n`;
+        if (node.textContent?.trim()) {
+
+          description += `${node.textContent}\n`;
+        
+        }
 
       }
 
