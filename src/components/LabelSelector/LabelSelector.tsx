@@ -33,12 +33,30 @@ export default function LabelSelector({client, isOpen, project}: {client: Client
 
   useEffect(() => {
 
+    async function toggleLabel(label: Label, remove: boolean) {
+
+      // Update the label's projects.
+      const projects = remove ? (label.projects?.filter((projectId) => projectId !== project.id) || []) : [...(label.projects ?? []), project.id];
+      await label.update({projects});
+
+      // Update the checklist.
+      const newList = [...listItemInfo];
+      const listItem = newList.find((item) => item.label.id === label.id);
+      if (listItem) {
+
+        listItem.isSelected = !remove;
+
+      }
+      setListItemInfo(newList);
+
+    }
+
     const newLabelComponents = [];
     for (const result of listItemInfo.filter((item) => !query || item.label.name.includes(query))) {
 
       newLabelComponents.push(
         <li key={result.label.id}>
-          <button className={styles.option}>
+          <button className={styles.option} onClick={() => toggleLabel(result.label, result.isSelected)}>
             <span className={`${styles.circle} ${result.isSelected ? styles.selected : ""} material-icons-round`}>
               check
             </span>
