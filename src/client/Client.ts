@@ -135,10 +135,14 @@ export default class Client {
         const filterValue = filter[key];
         if (issueValue instanceof Array && filterValue instanceof Array) {
 
-          const includesKey = issueValue.includes(key);
-          if (exclusiveKeys.includes(key) ? !includesKey : includesKey) {
+          for (const item of filterValue) {
 
-            return false;
+            const includesKey = issueValue.includes(item);
+            if (exclusiveKeys.includes(key) ? includesKey : !includesKey) {
+
+              return false;
+
+            }
 
           }
 
@@ -150,15 +154,19 @@ export default class Client {
 
       }
 
+      console.warn("yes")
       return true;
 
     });
+
 
     for (const properties of issuePropertiesArray) {
 
       issues.push(new Issue(properties, this));
 
     }
+    
+    console.log(issues);
 
     return issues;
 

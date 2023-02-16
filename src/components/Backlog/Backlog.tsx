@@ -54,12 +54,16 @@ export default function Backlog({client, project}: {client: Client, project: Pro
 
   async function createIssue() {
 
-    const issue = await client.createIssue({
-      name: "Unnamed issue",
-      projects: []
-    });
+    if (project) {
 
-    setIssues([...issues, issue]);
+      const issue = await client.createIssue({
+        name: "Unnamed issue",
+        projects: [project.id]
+      });
+
+      setIssues([...issues, issue]);
+
+    }
 
   }
 
