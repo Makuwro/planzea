@@ -70,9 +70,15 @@
   font-weight: 200;
 }
 
-#description p:empty[placeholder]::before {
+#description p {
+  position: relative;
+}
+
+.empty [placeholder]::after {
   content: attr(placeholder);
   cursor: text;
+  position: absolute;
+  top: 0;
 }
 
 #firstRow {

@@ -16,6 +16,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  const [isDescriptionEmpty, setIsDescriptionEmpty] = useState<boolean>(true);
   useEffect(() => {
 
     (async () => {
@@ -54,7 +55,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               if (paragraph) {
 
                 descriptionComponents.push(
-                  <p key={descriptionComponents.length} placeholder="Add a description">
+                  <p key={descriptionComponents.length} tabIndex={-1} placeholder="Add a description...">
                     {paragraph}
                   </p>
                 );
@@ -62,6 +63,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               }
 
             }
+            setIsDescriptionEmpty(!descriptionComponents[0]);
             setDescriptionComponents(descriptionComponents);
 
           } 
@@ -117,23 +119,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
   const descriptionRef = useRef<HTMLElement>(null);
   async function updateDescription(event: React.FocusEvent | React.KeyboardEvent) {
 
-    
     if (issue && descriptionRef.current) {
-
-      if (event.type === "keydown" && "key" in event && event.key === "Backspace") {
-
-        // Check if the user is selecting multiple paragraphs.
-        const selection = document.getSelection();
-        const anchorParentElement = selection?.anchorNode?.parentElement;
-        const focusParentElement = selection?.focusNode?.parentElement;
-        if (anchorParentElement && anchorParentElement === focusParentElement && (descriptionRef.current === anchorParentElement || [...descriptionRef.current.children].indexOf(anchorParentElement) === 0 && selection?.anchorOffset === 0 && selection.focusOffset === 0)) {
-
-          event.preventDefault();
-          return;
-
-        }
-
-      }
 
       let description = "";
 
@@ -143,6 +129,25 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
           description += `${node.textContent}\n`;
         
+        }
+
+      }
+      setIsDescriptionEmpty(!description);
+
+      if (event.type === "keydown" && "key" in event && event.key === "Backspace") {
+
+        const selection = document.getSelection();
+        const anchorNode = selection?.anchorNode;
+        const anchorParentElement = anchorNode?.parentElement;
+        const focusParentElement = selection?.focusNode?.parentElement;
+        if (
+          anchorParentElement && anchorParentElement === focusParentElement && // Is the user selecting multiple paragraphs?
+          descriptionRef.current === anchorParentElement && anchorNode instanceof Element && [...descriptionRef.current.children].indexOf(anchorNode) === 0 && selection?.anchorOffset === 0 && selection.focusOffset === 0
+        ) {
+
+          event.preventDefault();
+          return;
+
         }
 
       }
@@ -199,8 +204,8 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
         <section id={styles.content}>
           <section>
             <label>Description</label>
-            <section ref={descriptionRef} id={styles.description} contentEditable suppressContentEditableWarning onKeyDown={updateDescription} onKeyUp={updateDescription} onBlur={updateDescription}>
-              {descriptionComponents[0] ? descriptionComponents : <p placeholder="Add a description"><br /></p>}
+            <section tabIndex={-1} className={isDescriptionEmpty ? styles.empty : undefined} ref={descriptionRef} id={styles.description} contentEditable suppressContentEditableWarning onKeyDown={updateDescription} onKeyUp={updateDescription} onBlur={updateDescription}>
+              {descriptionComponents[0] ? descriptionComponents : <p placeholder="Add a description..."><br /></p>}
             </section>
           </section>
           <section>
