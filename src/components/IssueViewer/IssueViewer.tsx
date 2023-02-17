@@ -123,11 +123,10 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
       if (event.type === "keydown" && "key" in event && event.key === "Backspace") {
 
         // Check if the user is selecting multiple paragraphs.
-        // TODO: Don't delete first paragraph
         const selection = document.getSelection();
         const anchorParentElement = selection?.anchorNode?.parentElement;
         const focusParentElement = selection?.focusNode?.parentElement;
-        if (anchorParentElement && anchorParentElement === focusParentElement && [...descriptionRef.current.children].indexOf(anchorParentElement) === 0 && selection?.anchorOffset === 0 && selection.focusOffset === 0) {
+        if (anchorParentElement && anchorParentElement === focusParentElement && (descriptionRef.current === anchorParentElement || [...descriptionRef.current.children].indexOf(anchorParentElement) === 0 && selection?.anchorOffset === 0 && selection.focusOffset === 0)) {
 
           event.preventDefault();
           return;
