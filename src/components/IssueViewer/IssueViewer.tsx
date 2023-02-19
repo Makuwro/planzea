@@ -119,11 +119,12 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
   const descriptionRef = useRef<HTMLElement>(null);
   async function updateDescription(event: React.FocusEvent | React.KeyboardEvent) {
 
-    if (issue && descriptionRef.current) {
+    const descriptionContainer = descriptionRef.current;
+    if (issue && descriptionContainer) {
 
       let description = "";
 
-      for (const node of descriptionRef.current.childNodes) {
+      for (const node of descriptionContainer.childNodes) {
 
         if (node.textContent?.trim()) {
 
@@ -136,22 +137,50 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
       if (event.type === "keydown" && "key" in event && event.key === "Backspace") {
 
+        // Check if the user is at the beginning of the first paragraph.
         const selection = document.getSelection();
-        const anchorNode = selection?.anchorNode;
-        const anchorParentElement = anchorNode?.parentElement;
-        const focusParentElement = selection?.focusNode?.parentElement;
-        if (
-          anchorParentElement && anchorParentElement === focusParentElement && // Is the user selecting multiple paragraphs?
-          descriptionRef.current === anchorParentElement && anchorNode instanceof Element && [...descriptionRef.current.children].indexOf(anchorNode) === 0 && selection?.anchorOffset === 0 && selection.focusOffset === 0
-        ) {
+        const range = selection?.getRangeAt(0);
+        const startContainer = range?.startContainer;
+        const startParent = startContainer?.parentElement;
+        const startIndex = startParent && [...descriptionContainer.children].indexOf(startContainer instanceof Element ? startContainer : startParent);
+        const isFirstParagraphSelected = startIndex === 0;
+        const endParent = range?.endContainer?.parentElement;
+        if (startParent && isFirstParagraphSelected && range?.startOffset === 0) {
 
+          // Prevent the user from deleting the first paragraph.
+          // TODO: Fix this
           event.preventDefault();
+
+          if (endParent && startParent !== endParent) {
+
+            // Splice first paragraph and end paragraph text.
+            const preCaretRange = range.cloneRange();
+            preCaretRange.selectNodeContents(startParent);
+            preCaretRange.setEnd(range.startContainer, range.startOffset);
+            const startOffset = preCaretRange.toString().length;
+            preCaretRange.selectNodeContents(endParent);
+            preCaretRange.setEnd(range.endContainer, range.endOffset);
+            const endOffset = preCaretRange.toString().length;
+            startParent.textContent = `${startParent.textContent?.slice(0, startOffset) ?? ""}${endParent.textContent?.slice(endOffset + 1) ?? ""}`;
+            console.log(startParent.textContent);
+
+            // Remove the other elements.
+            const descriptionChildren = [...descriptionRef.current.children];
+            const endIndex = endParent && descriptionChildren.indexOf(endParent);
+            for (let i = startIndex + 1; endIndex > i; i++) {
+
+              descriptionChildren[i].remove();
+
+            }
+
+          }
+
           return;
 
         }
 
       }
-
+      
       if (description !== issue.description) {
 
         await issue.update({description});
