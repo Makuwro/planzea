@@ -149,7 +149,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
           if (endParent && startParent !== endParent) {
 
-            // Splice first paragraph and end paragraph text.
+            // Splice the first paragraph and end paragraph text.
             const preCaretRange = range.cloneRange();
             preCaretRange.selectNodeContents(startParent);
             preCaretRange.setEnd(range.startContainer, range.startOffset);
@@ -157,13 +157,12 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
             preCaretRange.selectNodeContents(endParent);
             preCaretRange.setEnd(range.endContainer, range.endOffset);
             const endOffset = preCaretRange.toString().length;
-            startParent.textContent = `${startParent.textContent?.slice(0, startOffset) ?? ""}${endParent.textContent?.slice(endOffset + 1) ?? ""}`;
-            console.log(startParent.textContent);
+            startParent.textContent = `${startParent.textContent?.slice(0, startOffset) ?? ""}${endParent.textContent?.slice(endOffset) ?? ""}`;
 
             // Remove the other elements.
             const descriptionChildren = [...descriptionRef.current.children];
             const endIndex = endParent && descriptionChildren.indexOf(endParent);
-            for (let i = startIndex + 1; endIndex > i; i++) {
+            for (let i = startIndex + 1; endIndex >= i; i++) {
 
               descriptionChildren[i].remove();
 
