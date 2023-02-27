@@ -117,9 +117,80 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
   const descriptionRef = useRef<HTMLElement>(null);
   async function updateDescription(event: React.FocusEvent | React.KeyboardEvent | React.FormEvent) {
 
+    // Ensure that the issue loaded in.
     const descriptionContainer = descriptionRef.current;
     if (issue && descriptionContainer) {
 
+      if (event.type === "keydown" && "key" in event && event.key === "Backspace") {
+
+        // Check if the user is at the beginning of the first paragraph.
+        const selection = document.getSelection();
+        if (!selection) return;
+        const range = selection.getRangeAt(0);
+        const startContainer = range.startContainer;
+        if (startContainer === descriptionContainer && range.startOffset === 0 && range.endOffset === 1) {
+
+          event.preventDefault();
+          descriptionContainer.childNodes[0].textContent = "";
+
+          // Reset selection.
+          const newRange = document.createRange();
+          newRange.setStart(descriptionContainer.childNodes[0], 0);
+          newRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+
+          return;
+
+        }
+
+        const startParent = startContainer.parentElement;
+        const startIndex = startParent && [...descriptionContainer.children].indexOf(startContainer instanceof Element ? startContainer : startParent);
+        const isFirstParagraphSelected = startIndex === 0;
+        if (startParent && isFirstParagraphSelected && range.startOffset === 0) {
+
+          // Prevent the user from deleting the first paragraph.
+          event.preventDefault();
+
+          const endParent = range.endContainer.parentElement;
+          // Splice the first paragraph and end paragraph text.
+          const preCaretRange = range.cloneRange();
+          preCaretRange.selectNodeContents(startParent);
+          preCaretRange.setEnd(range.startContainer, range.startOffset);
+          const startOffset = preCaretRange.toString().length;
+          preCaretRange.selectNodeContents(endParent ?? startParent);
+          preCaretRange.setEnd(range.endContainer, range.endOffset);
+          const endOffset = preCaretRange.toString().length;
+          const startText = startParent.textContent?.slice(0, startOffset) ?? "";
+          startParent.textContent = `${startText}${(endParent ?? startParent).textContent?.slice(endOffset) ?? ""}`;
+
+          if (endParent && startParent !== endParent) {
+
+            // Remove the other elements.
+            const descriptionChildren = [...descriptionRef.current.children];
+            const endIndex = descriptionChildren.indexOf(endParent);
+            for (let i = startIndex + 1; endIndex >= i; i++) {
+
+              descriptionChildren[i].remove();
+
+            }
+
+            // Reset selection.
+            const newRange = document.createRange();
+            newRange.setStart(startParent.childNodes[0], startText.length);
+            newRange.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+
+          }
+
+          return;
+
+        }
+
+      }
+      
+      // Update the issue description if it changed.
       let description = "";
 
       for (const node of descriptionContainer.childNodes) {
@@ -132,56 +203,13 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
       }
 
-      if (event.type === "keydown" && "key" in event && event.key === "Backspace") {
-
-        // Check if the user is at the beginning of the first paragraph.
-        const selection = document.getSelection();
-        const range = selection?.getRangeAt(0);
-        const startContainer = range?.startContainer;
-        const startParent = startContainer?.parentElement;
-        const startIndex = startParent && [...descriptionContainer.children].indexOf(startContainer instanceof Element ? startContainer : startParent);
-        const isFirstParagraphSelected = startIndex === 0;
-        const endParent = range?.endContainer?.parentElement;
-        if (startParent && isFirstParagraphSelected && range?.startOffset === 0) {
-
-          // Prevent the user from deleting the first paragraph.
-          event.preventDefault();
-
-          if (endParent && startParent !== endParent) {
-
-            // Splice the first paragraph and end paragraph text.
-            const preCaretRange = range.cloneRange();
-            preCaretRange.selectNodeContents(startParent);
-            preCaretRange.setEnd(range.startContainer, range.startOffset);
-            const startOffset = preCaretRange.toString().length;
-            preCaretRange.selectNodeContents(endParent);
-            preCaretRange.setEnd(range.endContainer, range.endOffset);
-            const endOffset = preCaretRange.toString().length;
-            startParent.textContent = `${startParent.textContent?.slice(0, startOffset) ?? ""}${endParent.textContent?.slice(endOffset) ?? ""}`;
-
-            // Remove the other elements.
-            const descriptionChildren = [...descriptionRef.current.children];
-            const endIndex = endParent && descriptionChildren.indexOf(endParent);
-            for (let i = startIndex + 1; endIndex >= i; i++) {
-
-              descriptionChildren[i].remove();
-
-            }
-
-          }
-
-          return;
-
-        }
-
-      }
-      
       if (description !== issue.description) {
 
         await issue.update({description});
 
       }
 
+      // Add a placeholder to the first paragraph if necessary.
       if (descriptionContainer.textContent) {
 
         for (const child of descriptionContainer.children) {
@@ -252,7 +280,13 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               onKeyUp={updateDescription} 
               onBlur={updateDescription}
               onInput={updateDescription}>
-              {descriptionComponents[0] ? descriptionComponents : <p placeholder="Add a description..."><br /></p>}
+              {
+                descriptionComponents[0] ? descriptionComponents : (
+                  <p placeholder="Add a description...">
+                    <br />
+                  </p>
+                )
+              }
             </section>
           </section>
           <section>
