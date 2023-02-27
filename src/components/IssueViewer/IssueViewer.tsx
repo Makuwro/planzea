@@ -252,7 +252,6 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               onKeyDown={updateDescription} 
               onKeyUp={updateDescription} 
               onBlur={updateDescription}
-              onBeforeInput={updateDescription}
               onInput={updateDescription}>
               {descriptionComponents[0] ? descriptionComponents : <p placeholder="Add a description..."><br /></p>}
             </section>
