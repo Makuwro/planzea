@@ -74,7 +74,7 @@
   position: relative;
 }
 
-.empty [placeholder]::after {
+[placeholder]::after {
   content: attr(placeholder);
   cursor: text;
   position: absolute;

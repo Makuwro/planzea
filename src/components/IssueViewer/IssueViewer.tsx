@@ -16,7 +16,6 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const [isDescriptionEmpty, setIsDescriptionEmpty] = useState<boolean>(true);
   useEffect(() => {
 
     (async () => {
@@ -55,7 +54,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               if (paragraph) {
 
                 descriptionComponents.push(
-                  <p key={descriptionComponents.length} tabIndex={-1} placeholder="Add a description...">
+                  <p key={descriptionComponents.length} tabIndex={-1}>
                     {paragraph}
                   </p>
                 );
@@ -63,7 +62,6 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               }
 
             }
-            setIsDescriptionEmpty(!descriptionComponents[0]);
             setDescriptionComponents(descriptionComponents);
 
           } 
@@ -117,7 +115,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
   }
 
   const descriptionRef = useRef<HTMLElement>(null);
-  async function updateDescription(event: React.FocusEvent | React.KeyboardEvent) {
+  async function updateDescription(event: React.FocusEvent | React.KeyboardEvent | React.FormEvent) {
 
     const descriptionContainer = descriptionRef.current;
     if (issue && descriptionContainer) {
@@ -133,7 +131,6 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
         }
 
       }
-      setIsDescriptionEmpty(!description);
 
       if (event.type === "keydown" && "key" in event && event.key === "Backspace") {
 
@@ -148,7 +145,6 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
         if (startParent && isFirstParagraphSelected && range?.startOffset === 0) {
 
           // Prevent the user from deleting the first paragraph.
-          // TODO: Fix this
           event.preventDefault();
 
           if (endParent && startParent !== endParent) {
@@ -184,6 +180,20 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
       if (description !== issue.description) {
 
         await issue.update({description});
+
+      }
+
+      if (descriptionContainer.textContent) {
+
+        for (const child of descriptionContainer.children) {
+
+          child.removeAttribute("placeholder");
+
+        }
+
+      } else {
+
+        descriptionContainer.children[0].setAttribute("placeholder", "Add a description...");
 
       }
 
@@ -233,7 +243,17 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
         <section id={styles.content}>
           <section>
             <label>Description</label>
-            <section tabIndex={-1} className={isDescriptionEmpty ? styles.empty : undefined} ref={descriptionRef} id={styles.description} contentEditable suppressContentEditableWarning onKeyDown={updateDescription} onKeyUp={updateDescription} onBlur={updateDescription}>
+            <section 
+              tabIndex={-1} 
+              ref={descriptionRef} 
+              id={styles.description} 
+              contentEditable 
+              suppressContentEditableWarning 
+              onKeyDown={updateDescription} 
+              onKeyUp={updateDescription} 
+              onBlur={updateDescription}
+              onBeforeInput={updateDescription}
+              onInput={updateDescription}>
               {descriptionComponents[0] ? descriptionComponents : <p placeholder="Add a description..."><br /></p>}
             </section>
           </section>
