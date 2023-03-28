@@ -121,12 +121,12 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
     const descriptionContainer = descriptionRef.current;
     if (issue && descriptionContainer) {
 
+      const selection = document.getSelection();
+      if (!selection) return;
+      const range = selection.getRangeAt(0);
       if (event.type === "keydown" && "key" in event && event.key === "Backspace") {
 
         // Check if the user is at the beginning of the first paragraph.
-        const selection = document.getSelection();
-        if (!selection) return;
-        const range = selection.getRangeAt(0);
         const startContainer = range.startContainer;
         if (startContainer === descriptionContainer && range.startOffset === 0 && range.endOffset === 1) {
 
@@ -152,8 +152,8 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
           // Prevent the user from deleting the first paragraph.
           event.preventDefault();
 
-          const endParent = range.endContainer.parentElement;
           // Splice the first paragraph and end paragraph text.
+          const endParent = range.endContainer.parentElement;
           const preCaretRange = range.cloneRange();
           preCaretRange.selectNodeContents(startParent);
           preCaretRange.setEnd(range.startContainer, range.startOffset);
@@ -189,6 +189,10 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
         }
 
       }
+
+      // For some reason, Firefox prevents users from typing after they replace a chunk of the text.
+      // It probably has something to do with the range because this line fixes the problem.
+      range.setEnd(range.endContainer, range.endOffset);
       
       // Update the issue description if it changed.
       let description = "";
@@ -205,6 +209,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
       if (description !== issue.description) {
 
+        console.log(2);
         await issue.update({description});
 
       }
