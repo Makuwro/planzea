@@ -209,7 +209,6 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
       if (description !== issue.description) {
 
-        console.log(2);
         await issue.update({description});
 
       }
