@@ -5,7 +5,8 @@ import Label, { InitialLabelProperties } from "./Label";
 export interface StatusProperties {
   id: string;
   name: string;
-  color: number;
+  backgroundColor: number;
+  textColor: number;
   nextStatusId: string;
 }
 
@@ -13,19 +14,22 @@ export const defaultStatuses: StatusProperties[] = [
   {
     id: "dns",
     name: "Not Started",
-    color: 15527148,
+    backgroundColor: 15527148,
+    textColor: 6251368,
     nextStatusId: "dip"
   },
   {
     id: "dip",
     name: "In Progress",
-    color: 5412849,
+    backgroundColor: 5412849,
+    textColor: 16777215,
     nextStatusId: "dc"
   },
   {
     id: "dc",
     name: "Completed",
-    color: 3055966,
+    backgroundColor: 3055966,
+    textColor: 16777215,
     nextStatusId: "dns"
   }
 ];

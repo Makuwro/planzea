@@ -236,7 +236,8 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
   const location = useLocation();
   const isLabelSelectorOpen = Boolean(matchPath("/:projectId/issues/:issueId/labels", location.pathname));
   const status = issue ? project.statuses.find((status) => status.id === issue.statusId) : undefined;
-  const statusHex = status ? `#${status.color.toString(16)}` : undefined;
+  const statusHexBG = status ? `#${status.backgroundColor.toString(16)}` : undefined;
+  const statusHexFG = status ? `#${status.textColor.toString(16)}` : undefined;
 
   return issue && status ? (
     <section id={styles.background} className={isOpen ? styles.open : undefined}>
@@ -260,10 +261,10 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
                 issue.statusId = nextStatusId;
                 setIssue(new Issue(structuredClone(issue), client));
 
-              }} style={{backgroundColor: statusHex}}>
+              }} style={{backgroundColor: statusHexBG, color: statusHexFG}}>
                 {status.name}
               </button>
-              <button style={{backgroundColor: statusHex}}>
+              <button style={{backgroundColor: statusHexBG, color: statusHexFG}}>
                 <Icon name="expand_more" />
               </button>
             </section>
