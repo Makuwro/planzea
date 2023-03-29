@@ -169,6 +169,10 @@
   left: 0;
   position: fixed;
   z-index: 2;
+  display: none;
+}
+
+#statusSelector.visible {
   display: flex;
 }
 
@@ -177,11 +181,26 @@
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
   width: 100%;
   align-self: flex-end;
+  border-radius: 15px;
+  overflow: hidden;
+  margin: 15px;
 }
 
 #statusSelector p {
   margin: 0;
   padding: 15px;
+}
+
+#statusSelector ul {
+  padding: 0;
+  list-style-type: none;
+  margin: 0;
+}
+
+#statusSelector ul button {
+  width: 100%;
+  justify-content: space-between;
+  border-radius: 0;
 }
 
 @media screen and (min-width: 720px) {

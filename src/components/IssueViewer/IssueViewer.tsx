@@ -269,14 +269,20 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
                   <button style={{backgroundColor: statusHexBG, color: statusHexFG}} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)}>
                     <Icon name="expand_more" />
                   </button>
-                  <section id={styles.statusSelector}>
-                    <section>
+                  <section id={styles.statusSelector} className={isStatusSelectorOpen ? styles.visible : null} onClick={() => setIsStatusSelectorOpen(false)}>
+                    <section onClick={(event) => event.stopPropagation()}>
                       <p>Select a status</p>
                       <ul>
                         {project.statuses.map((statusInfo) => (
                           <li key={statusInfo.id}>
-                            <button onClick={async () => await updateStatus(statusInfo.id)}>
-                              {statusInfo.name}
+                            <button onClick={async () => {
+
+                              await updateStatus(statusInfo.id);
+                              setIsStatusSelectorOpen(false);
+
+                            }}>
+                              <span>{statusInfo.name}</span>
+                              {statusInfo.id === status.id ? <Icon name="done" /> : null}
                             </button>
                           </li>
                         ))}
