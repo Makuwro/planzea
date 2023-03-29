@@ -258,7 +258,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
                 // Update the current view.
                 issue.statusId = nextStatusId;
-                setIssue(issue);
+                setIssue(new Issue(structuredClone(issue), client));
 
               }} style={{backgroundColor: statusHex}}>
                 {status.name}
