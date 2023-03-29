@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Issue from "../../client/Issue";
 import Project from "../../client/Project";
 
@@ -32,6 +33,8 @@ export default function TaskSection({project, issue}: {project: Project, issue: 
 
   }, [project, issue]);
   
+  const navigate = useNavigate();
+  
   return (
     <section>
       <label>Tasks</label>
@@ -41,7 +44,7 @@ export default function TaskSection({project, issue}: {project: Project, issue: 
           {
             tasks.map((task) => (
               <li key={task.id}>
-                <button>{task.name}</button>
+                <Link to={`/${project.id}/issues/${task.id}`}>{task.name}</Link>
               </li>
             ))
           }
