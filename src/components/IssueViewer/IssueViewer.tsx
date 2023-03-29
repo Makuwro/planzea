@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation, matchPath } from "react-router-dom
 import Client from "../../client/Client";
 import Issue from "../../client/Issue";
 import Project from "../../client/Project";
+import Icon from "../Icon/Icon";
 import LabelSelector from "../LabelSelector/LabelSelector";
 import styles from "./IssueViewer.module.css";
 
@@ -242,29 +243,24 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
           <section id={styles.firstRow}>
             <section id={styles.options}>
               <button onClick={() => navigate(`/${project.id}/issues`)}>
-                <span className="material-icons-round">
-                  arrow_back_ios
-                </span>
+                <Icon name="arrow_back_ios" />
               </button>
             </section>
-            <ul id={styles.assignees}>
-              <li>
-                <button>
-                  <span className="material-icons-round">
-                    person_add_alt
-                  </span>
-                </button>
-              </li>
-            </ul>
+            <section id={styles.statusButtons}>
+              <button>
+                Not Started
+              </button>
+              <button>
+                <Icon name="expand_more" />
+              </button>
+            </section>
           </section>
           <section id={styles.details}>
             <ul id={styles.labels}>
               {labelComponents}
               <li>
                 <button id={styles.labelAddButton} onClick={() => navigate(`/${project.id}/issues/${issue.id}/labels`)}>
-                  <span className="material-icons-round">
-                    add
-                  </span>
+                  <Icon name="add" />
                 </button>
               </li>
             </ul>

@@ -134,6 +134,29 @@
   cursor: pointer;
 }
 
+#statusButtons {
+  display: flex;
+  align-items: center;
+}
+
+#statusButtons button {
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#statusButtons button:first-of-type {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+
+#statusButtons button:last-of-type {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  width: 40px;
+}
+
 @media screen and (min-width: 720px) {
 
   #background.open {
