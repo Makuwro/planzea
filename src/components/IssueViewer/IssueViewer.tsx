@@ -262,7 +262,12 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
                 </button>
               </section>
               <section id={styles.statusButtons}>
-                <button onClick={async () => await updateStatus(status.nextStatusId)} style={{backgroundColor: statusHexBG, color: statusHexFG}}>
+                <button onClick={async () => {
+                  
+                  await updateStatus(status.nextStatusId);
+                  setIsStatusSelectorOpen(false);
+                  
+                }} style={{backgroundColor: statusHexBG, color: statusHexFG}}>
                   {status.name}
                 </button>
                 <section>
