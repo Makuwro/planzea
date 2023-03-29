@@ -29,7 +29,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
           const newIssue = await client.getIssue(issueId);
           const projectLabels = await project.getLabels();
           const newLabelComponents = [];
-          for (const labelId of (newIssue.labels ?? [])) {
+          for (const labelId of (newIssue.labelIds ?? [])) {
 
             const label = projectLabels.find((possibleLabel) => possibleLabel.id === labelId);
             if (label) {
@@ -235,7 +235,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
   const location = useLocation();
   const isLabelSelectorOpen = Boolean(matchPath("/:projectId/issues/:issueId/labels", location.pathname));
-  const status = issue ? project.statuses.find((status) => status.id === issue.status) : undefined;
+  const status = issue ? project.statuses.find((status) => status.id === issue.statusId) : undefined;
   const statusHex = status ? `#${status.color.toString(16)}` : undefined;
   return issue && status ? (
     <section id={styles.background} className={isOpen ? styles.open : undefined}>

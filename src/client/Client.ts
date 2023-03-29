@@ -27,7 +27,7 @@ export default class Client {
       ...props,
       id: await this.#getUnusedId(tableName), 
       statuses: isProject ? defaultStatuses : undefined,
-      defaultStatus: isProject ? "dns" : undefined
+      defaultStatusId: isProject ? "dns" : undefined
     } as PlanzeaObjectProperties, this);
 
     await clientDatabase[tableName].add(content as unknown as PlanzeaObjectProperties);
