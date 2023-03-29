@@ -4,10 +4,10 @@ export interface IssueProperties {
   id: string;
   name: string;
   description?: string;
-  projects: string[];
-  labels?: string[];
+  projectId: string;
+  labelIds?: string[];
   isLocked?: boolean;
-  status?: string;
+  statusId: string;
 }
 
 export type InitialIssueProperties = Omit<IssueProperties, "id">;
@@ -20,20 +20,20 @@ export default class Issue {
   readonly id: string;
   name: string;
   description?: string;
-  projects: string[];
-  labels?: string[];
+  projectId: string;
+  labelIds?: string[];
   isLocked?: boolean;
-  status?: string;
+  statusId: string;
 
   constructor(props: IssueProperties, client: Client) {
 
     this.id = props.id;
     this.name = props.name;
     this.description = props.description;
-    this.projects = props.projects;
-    this.labels = props.labels;
+    this.projectId = props.projectId;
+    this.labelIds = props.labelIds;
     this.isLocked = props.isLocked;
-    this.status = props.status;
+    this.statusId = props.statusId;
     this.#client = client;
 
   }

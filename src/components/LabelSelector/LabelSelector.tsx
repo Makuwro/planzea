@@ -19,7 +19,7 @@ export default function LabelSelector({isOpen, project, issue}: {isOpen: boolean
       for (const label of await project.getLabels()) {
 
         newListItemInfo.push({
-          isSelected: Boolean(issue.labels?.includes(label.id)),
+          isSelected: Boolean(issue.labelIds?.includes(label.id)),
           label
         });
 
@@ -36,8 +36,8 @@ export default function LabelSelector({isOpen, project, issue}: {isOpen: boolean
     async function toggleLabel(label: Label, remove: boolean) {
 
       // Update the label's issues.
-      const labels = remove ? (issue.labels?.filter((labelId) => labelId !== label.id) || []) : [...(issue.labels ?? []), label.id];
-      await issue.update({labels});
+      const labelIds = remove ? (issue.labelIds?.filter((labelId) => labelId !== label.id) || []) : [...(issue.labelIds ?? []), label.id];
+      await issue.update({labelIds});
 
       // Update the checklist.
       const newList = [...listItemInfo];
@@ -78,7 +78,7 @@ export default function LabelSelector({isOpen, project, issue}: {isOpen: boolean
     if (name) {
 
       const label = await project.createLabel({name});
-      issue.update({labels: [...(issue.labels ?? []), label.id]});
+      await issue.update({labelIds: [...(issue.labelIds ?? []), label.id]});
       setListItemInfo([...listItemInfo, {isSelected: true, label}]);
 
     }
