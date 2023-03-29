@@ -236,85 +236,106 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
   const location = useLocation();
   const isLabelSelectorOpen = Boolean(matchPath("/:projectId/issues/:issueId/labels", location.pathname));
   const status = issue ? project.statuses.find((status) => status.id === issue.statusId) : undefined;
-  const statusHexBG = status ? `#${status.backgroundColor.toString(16)}` : undefined;
-  const statusHexFG = status ? `#${status.textColor.toString(16)}` : undefined;
+  const [isStatusSelectorOpen, setIsStatusSelectorOpen] = useState<boolean>(false);
+  if (issue && status) {
 
-  return issue && status ? (
-    <section id={styles.background} className={isOpen ? styles.open : undefined}>
-      <LabelSelector isOpen={isLabelSelectorOpen} project={project} issue={issue} />
-      <section id={styles.box}>
-        <section id={styles.header}>
-          <section id={styles.firstRow}>
-            <section id={styles.options}>
-              <button onClick={() => navigate(`/${project.id}/issues`)}>
-                <Icon name="arrow_back_ios" />
-              </button>
+    const statusHexBG = status ? `#${status.backgroundColor.toString(16)}` : undefined;
+    const statusHexFG = status ? `#${status.textColor.toString(16)}` : undefined;
+
+    const updateStatus = async (newStatusId: string) => {
+
+      // Update the current view.
+      issue.statusId = newStatusId;
+      setIssue(new Issue(structuredClone(issue), client));
+
+    };
+
+    return (
+      <section id={styles.background} className={isOpen ? styles.open : undefined}>
+        <LabelSelector isOpen={isLabelSelectorOpen} project={project} issue={issue} />
+        <section id={styles.box}>
+          <section id={styles.header}>
+            <section id={styles.firstRow}>
+              <section id={styles.options}>
+                <button onClick={() => navigate(`/${project.id}/issues`)}>
+                  <Icon name="arrow_back_ios" />
+                </button>
+              </section>
+              <section id={styles.statusButtons}>
+                <button onClick={async () => await updateStatus(status.nextStatusId)} style={{backgroundColor: statusHexBG, color: statusHexFG}}>
+                  {status.name}
+                </button>
+                <section>
+                  <button style={{backgroundColor: statusHexBG, color: statusHexFG}} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)}>
+                    <Icon name="expand_more" />
+                  </button>
+                  <section id={styles.statusSelector}>
+                    <section>
+                      <p>Select a status</p>
+                      <ul>
+                        {project.statuses.map((statusInfo) => (
+                          <li key={statusInfo.id}>
+                            <button onClick={async () => await updateStatus(statusInfo.id)}>
+                              {statusInfo.name}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  </section>
+                </section>
+              </section>
             </section>
-            <section id={styles.statusButtons}>
-              <button onClick={async () => {
-                
-                // Update the issue status in the database.
-                const {nextStatusId} = status;
-                await issue.update({statusId: nextStatusId});
-
-                // Update the current view.
-                issue.statusId = nextStatusId;
-                setIssue(new Issue(structuredClone(issue), client));
-
-              }} style={{backgroundColor: statusHexBG, color: statusHexFG}}>
-                {status.name}
-              </button>
-              <button style={{backgroundColor: statusHexBG, color: statusHexFG}}>
-                <Icon name="expand_more" />
-              </button>
+            <section id={styles.details}>
+              <ul id={styles.labels}>
+                {labelComponents}
+                <li>
+                  <button id={styles.labelAddButton} onClick={() => navigate(`/${project.id}/issues/${issue.id}/labels`)}>
+                    <Icon name="add" />
+                  </button>
+                </li>
+              </ul>
+              <input type="text" value={newIssueName} onBlur={changeIssueName} onInput={(event: React.ChangeEvent<HTMLInputElement>) => setNewIssueName(event.target.value)} onKeyDown={(event) => event.key === "Enter" ? event.currentTarget.blur() : undefined} placeholder={issue.name} />
             </section>
           </section>
-          <section id={styles.details}>
-            <ul id={styles.labels}>
-              {labelComponents}
+          <section id={styles.content}>
+            <section>
+              <label>Description</label>
+              <section 
+                tabIndex={-1} 
+                ref={descriptionRef} 
+                id={styles.description} 
+                contentEditable 
+                suppressContentEditableWarning 
+                onKeyDown={updateDescription} 
+                onKeyUp={updateDescription} 
+                onBlur={updateDescription}
+                onInput={updateDescription}>
+                {
+                  descriptionComponents[0] ? descriptionComponents : (
+                    <p placeholder="Add a description...">
+                      <br />
+                    </p>
+                  )
+                }
+              </section>
+            </section>
+            <section>
+              <label>ID</label>
+              <p>{issue.id}</p>
+            </section>
+            <ul id={styles.actions}>
               <li>
-                <button id={styles.labelAddButton} onClick={() => navigate(`/${project.id}/issues/${issue.id}/labels`)}>
-                  <Icon name="add" />
-                </button>
+                <button className="destructive" onClick={deleteIssue}>Delete</button>
               </li>
             </ul>
-            <input type="text" value={newIssueName} onBlur={changeIssueName} onInput={(event: React.ChangeEvent<HTMLInputElement>) => setNewIssueName(event.target.value)} onKeyDown={(event) => event.key === "Enter" ? event.currentTarget.blur() : undefined} placeholder={issue.name} />
           </section>
-        </section>
-        <section id={styles.content}>
-          <section>
-            <label>Description</label>
-            <section 
-              tabIndex={-1} 
-              ref={descriptionRef} 
-              id={styles.description} 
-              contentEditable 
-              suppressContentEditableWarning 
-              onKeyDown={updateDescription} 
-              onKeyUp={updateDescription} 
-              onBlur={updateDescription}
-              onInput={updateDescription}>
-              {
-                descriptionComponents[0] ? descriptionComponents : (
-                  <p placeholder="Add a description...">
-                    <br />
-                  </p>
-                )
-              }
-            </section>
-          </section>
-          <section>
-            <label>ID</label>
-            <p>{issue.id}</p>
-          </section>
-          <ul id={styles.actions}>
-            <li>
-              <button className="destructive" onClick={deleteIssue}>Delete</button>
-            </li>
-          </ul>
         </section>
       </section>
-    </section>
-  ) : null;
+    );
+
+  }
+
+  return null;
 
 }
