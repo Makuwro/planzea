@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Issue from "../../client/Issue";
 import Project from "../../client/Project";
 
@@ -32,8 +32,6 @@ export default function TaskSection({project, issue}: {project: Project, issue: 
     })();
 
   }, [project, issue]);
-  
-  const navigate = useNavigate();
   
   return (
     <section>
