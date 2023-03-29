@@ -1,16 +1,42 @@
-import Client, { PropertiesUpdate } from "./Client";
+import Client, { Optional, PropertiesUpdate } from "./Client";
 import Issue, { InitialIssueProperties } from "./Issue";
 import Label, { InitialLabelProperties } from "./Label";
+
+export interface StatusProperties {
+  id: string;
+  name: string;
+  color: number;
+}
+
+export const defaultStatuses: StatusProperties[] = [
+  {
+    id: "dns",
+    name: "Not Started",
+    color: 15527148
+  },
+  {
+    id: "dip",
+    name: "In Progress",
+    color: 5412849
+  },
+  {
+    id: "dc",
+    name: "Completed",
+    color: 3055966
+  }
+];
 
 export interface ProjectProperties {
   id: string;
   name: string;
+  defaultStatus: string;
   description?: string;
   isArchived?: boolean;
   isRecycled?: boolean;
+  statuses: StatusProperties[];
 }
 
-export type InitialProjectProperties = Omit<ProjectProperties, "id">;
+export type InitialProjectProperties = Omit<ProjectProperties, "id" | "statuses" | "defaultStatus">;
 
 export default class Project {
 
@@ -18,9 +44,11 @@ export default class Project {
   
   readonly id: string;
   name: string;
+  defaultStatus: string;
   description?: string;
   isArchived?: boolean;
   isRecycled?: boolean;
+  statuses: StatusProperties[];
   #client: Client;
 
   constructor(props: ProjectProperties, client: Client) {
@@ -28,15 +56,21 @@ export default class Project {
     this.id = props.id;
     this.name = props.name;
     this.description = props.description;
+    this.defaultStatus = props.defaultStatus;
     this.isArchived = props.isArchived;
     this.isRecycled = props.isRecycled;
+    this.statuses = props.statuses;
     this.#client = client;
 
   }
 
-  async createIssue(props: Omit<InitialIssueProperties, "projects">): Promise<Issue> {
+  async createIssue(props: Optional<Omit<InitialIssueProperties, "projects">, "status">): Promise<Issue> {
 
-    return await this.#client.createIssue({...props, projects: [this.id]});
+    return await this.#client.createIssue({
+      ...props, 
+      status: props.status ?? this.defaultStatus, 
+      projects: [this.id]
+    });
 
   }
 

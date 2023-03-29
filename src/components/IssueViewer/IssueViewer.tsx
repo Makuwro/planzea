@@ -235,7 +235,9 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
   const location = useLocation();
   const isLabelSelectorOpen = Boolean(matchPath("/:projectId/issues/:issueId/labels", location.pathname));
-  return issue ? (
+  const status = issue ? project.statuses.find((status) => status.id === issue.status) : undefined;
+  const statusHex = status ? `#${status.color.toString(16)}` : undefined;
+  return issue && status ? (
     <section id={styles.background} className={isOpen ? styles.open : undefined}>
       <LabelSelector isOpen={isLabelSelectorOpen} project={project} issue={issue} />
       <section id={styles.box}>
@@ -247,10 +249,10 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               </button>
             </section>
             <section id={styles.statusButtons}>
-              <button onClick={() => null}>
-                Not Started
+              <button onClick={() => null} style={{backgroundColor: statusHex}}>
+                {status.name}
               </button>
-              <button>
+              <button style={{backgroundColor: statusHex}}>
                 <Icon name="expand_more" />
               </button>
             </section>

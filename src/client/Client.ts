@@ -2,8 +2,9 @@ import ObjectID from "bson-objectid";
 import { ClientDatabase } from "./ClientDatabase";
 import Issue, { InitialIssueProperties, IssueProperties } from "./Issue";
 import Label, { InitialLabelProperties, LabelProperties } from "./Label";
-import Project, { InitialProjectProperties, ProjectProperties } from "./Project";
+import Project, { defaultStatuses, InitialProjectProperties, ProjectProperties } from "./Project";
 
+export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
 export type PlanzeaObject = Issue | Label | Project;
 export type PlanzeaObjectConstructor = typeof Issue | typeof Label | typeof Project;
@@ -21,11 +22,15 @@ export default class Client {
   async #createObject(constructor: PlanzeaObjectConstructor, props: InitialIssueProperties | InitialLabelProperties | InitialProjectProperties): Promise<PlanzeaObject> {
 
     const { tableName } = constructor;
+    const isProject = constructor === Project;
     const content = new constructor({
+      ...props,
       id: await this.#getUnusedId(tableName), 
-      ...props
+      statuses: isProject ? defaultStatuses : undefined,
+      defaultStatus: isProject ? "dns" : undefined
     } as PlanzeaObjectProperties, this);
-    await clientDatabase[tableName].add(content as PlanzeaObjectProperties);
+
+    await clientDatabase[tableName].add(content as unknown as PlanzeaObjectProperties);
     return content;
 
   }

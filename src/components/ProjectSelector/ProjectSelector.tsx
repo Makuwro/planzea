@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Client from "../../client/Client";
-import Project from "../../client/Project";
 
 export default function ProjectSelector({client}: {client: Client}) {
 

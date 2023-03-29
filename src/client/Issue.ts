@@ -7,7 +7,7 @@ export interface IssueProperties {
   projects: string[];
   labels?: string[];
   isLocked?: boolean;
-  status?: string;
+  status: string;
 }
 
 export type InitialIssueProperties = Omit<IssueProperties, "id">;
@@ -23,7 +23,7 @@ export default class Issue {
   projects: string[];
   labels?: string[];
   isLocked?: boolean;
-  status?: string;
+  status: string;
 
   constructor(props: IssueProperties, client: Client) {
 
