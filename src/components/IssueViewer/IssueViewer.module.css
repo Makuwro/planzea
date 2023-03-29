@@ -210,6 +210,22 @@
     backdrop-filter: blur(3px);
   }
 
+  #statusSelector {
+    background-color: transparent;
+    left: initial;
+    top: initial;
+    height: initial;
+    position: relative;
+  }
+
+  #statusSelector > section {
+    align-self: auto;
+    right: 0;
+    position: absolute;
+    width: 250px;
+    margin: 15px 0 15px;
+  }
+
   #box {
     width: 80%;
     max-width: 1080px;
