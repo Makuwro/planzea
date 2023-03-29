@@ -247,7 +247,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               </button>
             </section>
             <section id={styles.statusButtons}>
-              <button>
+              <button onClick={() => null}>
                 Not Started
               </button>
               <button>

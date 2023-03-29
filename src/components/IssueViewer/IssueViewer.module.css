@@ -146,6 +146,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: var(--background-label);
+  color: var(--text);
 }
 
 #statusButtons button:first-of-type {
