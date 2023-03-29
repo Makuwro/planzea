@@ -237,6 +237,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
   const isLabelSelectorOpen = Boolean(matchPath("/:projectId/issues/:issueId/labels", location.pathname));
   const status = issue ? project.statuses.find((status) => status.id === issue.statusId) : undefined;
   const statusHex = status ? `#${status.color.toString(16)}` : undefined;
+
   return issue && status ? (
     <section id={styles.background} className={isOpen ? styles.open : undefined}>
       <LabelSelector isOpen={isLabelSelectorOpen} project={project} issue={issue} />
@@ -249,7 +250,17 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               </button>
             </section>
             <section id={styles.statusButtons}>
-              <button onClick={() => null} style={{backgroundColor: statusHex}}>
+              <button onClick={async () => {
+                
+                // Update the issue status in the database.
+                const {nextStatusId} = status;
+                await issue.update({statusId: nextStatusId});
+
+                // Update the current view.
+                issue.statusId = nextStatusId;
+                setIssue(issue);
+
+              }} style={{backgroundColor: statusHex}}>
                 {status.name}
               </button>
               <button style={{backgroundColor: statusHex}}>
