@@ -52,24 +52,31 @@ export default function AttachmentSection({issue}: {issue: Issue}) {
       </section>
       <ul>
         {
-          attachments.map((attachment) => (
-            <li key={attachment.id}>
-              <section>
+          attachments.map((attachment) => {
+
+            const blob = new Blob([attachment.arrayBuffer], {type: attachment.type});
+            const url = URL.createObjectURL(blob);
+
+            return (
+              <li key={attachment.id}>
                 <section>
-                  <a href="#">{attachment.name}</a>
-                  <label>0 KB</label>
-                </section>
-                <button onClick={async () => {
+                  <section>
+                    <a href={url} target="_blank" rel="noreferrer">{attachment.name}</a>
+                    <label>{blob.size / 1000} KB</label>
+                  </section>
+                  <button onClick={async () => {
+                    
+                    await attachment.delete();
+                    setAttachments(attachments.filter((possibleAttachment) => possibleAttachment.id !== attachment.id));
                   
-                  await attachment.delete();
-                  setAttachments(attachments.filter((possibleAttachment) => possibleAttachment.id !== attachment.id));
-                
-                }}>
-                  <Icon name="close" />
-                </button>
-              </section>
-            </li>
-          ))
+                  }}>
+                    <Icon name="close" />
+                  </button>
+                </section>
+              </li>
+            );
+
+          })
         }
       </ul>
     </section>
