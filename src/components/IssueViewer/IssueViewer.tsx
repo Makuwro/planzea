@@ -245,6 +245,9 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
     const updateStatus = async (newStatusId: string) => {
 
+      // Update the status.
+      await issue.update({statusId: newStatusId});
+
       // Update the current view.
       issue.statusId = newStatusId;
       setIssue(new Issue(structuredClone(issue), client));
