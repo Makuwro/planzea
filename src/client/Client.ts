@@ -179,6 +179,12 @@ export default class Client {
 
   }
 
+  async deleteAttachment(attachmentId: string): Promise<void> {
+
+    await this.#db.attachments.delete(attachmentId);
+
+  }
+
   /**
    * Deletes an issue from the database.
    * @param issueId The issue's ID.

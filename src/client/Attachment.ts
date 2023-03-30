@@ -32,4 +32,10 @@ export default class Attachment {
     
   }
 
+  async delete() {
+    
+    await this.#client.deleteAttachment(this.id);
+
+  }
+
 }

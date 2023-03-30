@@ -59,7 +59,12 @@ export default function AttachmentSection({issue}: {issue: Issue}) {
                   <a href="#">{attachment.name}</a>
                   <label>0 KB</label>
                 </section>
-                <button>
+                <button onClick={async () => {
+                  
+                  await attachment.delete();
+                  setAttachments(attachments.filter((possibleAttachment) => possibleAttachment.id !== attachment.id))
+                
+                }}>
                   <Icon name="close" />
                 </button>
               </section>
