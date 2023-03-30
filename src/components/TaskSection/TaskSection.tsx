@@ -35,6 +35,17 @@ export default function TaskSection({project, issue}: {project: Project, issue: 
     })();
 
   }, [project, issue]);
+
+  async function deleteTask(task: Issue) {
+
+    if (confirm("Are you sure you want to delete this task?")) {
+
+      await task.delete();
+      setTasks(tasks.filter((possibleTask) => possibleTask.id !== task.id));
+
+    }
+    
+  }
   
   return (
     <section>
@@ -52,7 +63,7 @@ export default function TaskSection({project, issue}: {project: Project, issue: 
                     <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
                     <Link to={`/${project.id}/issues/${task.id}`}>{task.name}</Link>
                   </span>
-                  <button>
+                  <button onClick={async () => await deleteTask(task)}>
                     <Icon name="close" />
                   </button>
                 </li>
