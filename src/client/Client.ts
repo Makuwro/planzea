@@ -152,6 +152,20 @@ export default class Client {
    */
   async deleteIssue(issueId: string): Promise<void> {
 
+    // Delete all tasks.
+    await this.#db.issues.bulkDelete((await this.#db.issues.toArray()).reduce((ids, possibleIssue) => {
+      
+      if (possibleIssue.parentIssueId === issueId) {
+
+        ids.push(possibleIssue.id);
+
+      }
+
+      return ids;
+      
+    }, [] as string[]));
+
+    // Delete the issue.
     await this.#db.issues.delete(issueId);
 
   }
