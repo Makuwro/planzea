@@ -96,6 +96,17 @@ html, body, button, input, textarea {
   font-family: "Lexend Deca";
 }
 
+input {
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  padding: var(--input-padding);
+  box-sizing: border-box;
+  background-color: var(--background-input);
+  font-weight: 100;
+  font-size: 16px;
+}
+
 p, li {
   font-weight: 100;
   color: var(--text);

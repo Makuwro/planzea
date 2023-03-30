@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Issue from "../../client/Issue";
 import Project from "../../client/Project";
+import Icon from "../Icon/Icon";
+import styles from "./TaskSection.module.css";
 
 export default function TaskSection({project, issue}: {project: Project, issue: Issue}) {
 
@@ -38,13 +40,24 @@ export default function TaskSection({project, issue}: {project: Project, issue: 
       <label>Tasks</label>
       <section>
         <input type="text" placeholder="Add a task..." value={newTaskName} onChange={(event) => setNewTaskName(event.target.value)} onKeyDown={createTask} />
-        <ul>
+        <ul id={styles.tasks}>
           {
-            tasks.map((task) => (
-              <li key={task.id}>
-                <Link to={`/${project.id}/issues/${task.id}`}>{task.name}</Link>
-              </li>
-            ))
+            tasks.map((task) => {
+
+              const status = project.statuses.find((status) => status.id === task.statusId);
+              return (
+                <li key={task.id}>
+                  <span>
+                    <span style={{backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
+                    <Link to={`/${project.id}/issues/${task.id}`}>{task.name}</Link>
+                  </span>
+                  <button>
+                    <Icon name="close" />
+                  </button>
+                </li>
+              );
+
+            })
           }
         </ul>
       </section>
