@@ -38,7 +38,7 @@ export default function TaskSection({project, issue}: {project: Project, issue: 
   return (
     <section>
       <label>Tasks</label>
-      <section>
+      <section style={{marginTop: "16px"}}>
         <input type="text" placeholder="Add a task..." value={newTaskName} onChange={(event) => setNewTaskName(event.target.value)} onKeyDown={createTask} />
         <ul id={styles.tasks}>
           {
@@ -48,7 +48,7 @@ export default function TaskSection({project, issue}: {project: Project, issue: 
               return (
                 <li key={task.id}>
                   <span>
-                    <span style={{backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
+                    <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
                     <Link to={`/${project.id}/issues/${task.id}`}>{task.name}</Link>
                   </span>
                   <button>

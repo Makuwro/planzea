@@ -39,4 +39,6 @@
 #tasks li > span > span {
   padding: 5px;
   border-radius: 5px;
+  font-weight: 400;
+  flex-shrink: 0;
 }
