@@ -214,7 +214,6 @@ export default class Client {
 
       } else {
 
-        console.log("Deleting attachment...");
         await attachment.delete();
 
       }
