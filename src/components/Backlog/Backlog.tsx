@@ -17,7 +17,7 @@ export default function Backlog({client, project}: {client: Client, project: Pro
       
       if (project) {
 
-        setIssues(await project.getIssues());
+        setIssues((await project.getIssues()).filter((issue) => !issue.parentIssueId));
 
       }
       
