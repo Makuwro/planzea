@@ -1,3 +1,4 @@
+import Attachment, { AttachmentProperties, InitialAttachmentProperties } from "./Attachment";
 import Client, { PropertiesUpdate } from "./Client";
 
 export interface IssueProperties {
@@ -38,6 +39,19 @@ export default class Issue {
     this.isLocked = props.isLocked;
     this.statusId = props.statusId;
     this.#client = client;
+
+  }
+
+  async createAttachment(props: Omit<InitialAttachmentProperties, "issueIds">): Promise<Attachment> {
+
+    return await this.#client.createAttachment({...props, issueIds: [this.id]});
+
+  }
+
+  async getAttachments(): Promise<Attachment[]> {
+
+    // return await this.#client.getAttachments({issueIds: [this.id]});
+    return await this.#client.getAttachments();
 
   }
 

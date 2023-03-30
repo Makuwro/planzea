@@ -1,4 +1,5 @@
 import ObjectID from "bson-objectid";
+import Attachment, { AttachmentProperties, InitialAttachmentProperties } from "./Attachment";
 import { ClientDatabase } from "./ClientDatabase";
 import Issue, { InitialIssueProperties, IssueProperties } from "./Issue";
 import Label, { InitialLabelProperties, LabelProperties } from "./Label";
@@ -6,9 +7,32 @@ import Project, { defaultStatuses, InitialProjectProperties, ProjectProperties }
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
-export type PlanzeaObject = Issue | Label | Project;
-export type PlanzeaObjectConstructor = typeof Issue | typeof Label | typeof Project;
-export type PlanzeaObjectProperties = IssueProperties & LabelProperties & ProjectProperties;
+export type PlanzeaObject = Attachment | Issue | Label | Project;
+export type PlanzeaObjectConstructor = typeof Attachment | typeof Issue | typeof Label | typeof Project;
+export type PlanzeaObjectProperties = AttachmentProperties & IssueProperties & LabelProperties & ProjectProperties;
+
+export async function convertBlobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
+
+  return new Promise((resolve, reject) => {
+
+    const reader = new FileReader();
+    reader.addEventListener("loadend", () => {
+
+      if (reader.result instanceof ArrayBuffer) {
+
+        resolve(reader.result);
+
+      }
+
+      reject(reader.result);
+
+    });
+    reader.addEventListener("error", reject);
+    reader.readAsArrayBuffer(blob);
+
+  });
+
+}
 
 const clientDatabase = new ClientDatabase();
 
@@ -16,10 +40,11 @@ export default class Client {
 
   readonly #db = clientDatabase;
 
+  async #createObject(constructor: typeof Attachment, props: InitialAttachmentProperties): Promise<Attachment>;
   async #createObject(constructor: typeof Issue, props: InitialIssueProperties): Promise<Issue>;
   async #createObject(constructor: typeof Label, props: InitialLabelProperties): Promise<Label>;
   async #createObject(constructor: typeof Project, props: InitialProjectProperties): Promise<Project>;
-  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialIssueProperties | InitialLabelProperties | InitialProjectProperties): Promise<PlanzeaObject> {
+  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialIssueProperties | InitialLabelProperties | InitialProjectProperties): Promise<PlanzeaObject> {
 
     const { tableName } = constructor;
     const isProject = constructor === Project;
@@ -35,6 +60,7 @@ export default class Client {
 
   }
 
+  async #getObject(constructor: typeof Attachment, objectId: string): Promise<Attachment>;
   async #getObject(constructor: typeof Issue, objectId: string): Promise<Issue>;
   async #getObject(constructor: typeof Label, objectId: string): Promise<Label>;
   async #getObject(constructor: typeof Project, objectId: string): Promise<Project>;
@@ -52,6 +78,7 @@ export default class Client {
 
   }
 
+  async #getObjects(constructor: typeof Attachment, filter?: Partial<AttachmentProperties>, exclusiveKeys?: [(keyof AttachmentProperties)?]): Promise<Attachment[]>;
   async #getObjects(constructor: typeof Issue, filter?: Partial<IssueProperties>, exclusiveKeys?: [(keyof IssueProperties)?]): Promise<Issue[]>;
   async #getObjects(constructor: typeof Label, filter?: Partial<LabelProperties>, exclusiveKeys?: [(keyof LabelProperties)?]): Promise<Label[]>;
   async #getObjects(constructor: typeof Project, filter?: Partial<ProjectProperties>, exclusiveKeys?: [(keyof ProjectProperties)?]): Promise<Project[]>;
@@ -105,7 +132,7 @@ export default class Client {
    * @param tableName The name of the table.
    * @returns An unused ID string.
    */
-  async #getUnusedId(tableName: "issues" | "labels" | "projects"): Promise<string> {
+  async #getUnusedId(tableName: "attachments" | "issues" | "labels" | "projects"): Promise<string> {
 
     let id = null;
     do {
@@ -123,6 +150,12 @@ export default class Client {
 
   }
 
+  async createAttachment(props: InitialAttachmentProperties): Promise<Attachment> {
+
+    return await this.#createObject(Attachment, props);
+
+  }
+
   /**
    * Adds an issue to the database.
    * @param props Issue properties.
@@ -130,19 +163,19 @@ export default class Client {
    */
   async createIssue(props: InitialIssueProperties): Promise<Issue> {
 
-    return this.#createObject(Issue, props);
+    return await this.#createObject(Issue, props);
     
   }
 
   async createLabel(props: InitialLabelProperties): Promise<Label> {
 
-    return this.#createObject(Label, props);
+    return await this.#createObject(Label, props);
 
   }
 
   async createProject(props: InitialProjectProperties): Promise<Project> {
 
-    return this.#createObject(Project, props);
+    return await this.#createObject(Project, props);
 
   }
 
@@ -179,6 +212,18 @@ export default class Client {
   async deleteProject(projectId: string): Promise<void> {
 
     await this.#db.projects.delete(projectId);
+
+  }
+
+  async getAttachment(attachmentId: string): Promise<Attachment> {
+
+    return await this.#getObject(Attachment, attachmentId);
+
+  }
+
+  async getAttachments(filter: Partial<AttachmentProperties> = {}, exclusiveKeys: [(keyof AttachmentProperties)?] = []): Promise<Attachment[]> {
+
+    return await this.#getObjects(Attachment, filter, exclusiveKeys);
 
   }
 

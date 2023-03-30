@@ -5,6 +5,7 @@ import { ProjectProperties } from "./Project.js";
 
 export class ClientDatabase extends Dexie {
 
+  readonly attachments!: Table<IssueProperties>;
   readonly issues!: Table<IssueProperties>;
   readonly labels!: Table<LabelProperties>;
   readonly projects!: Table<ProjectProperties>;
@@ -13,6 +14,7 @@ export class ClientDatabase extends Dexie {
 
     super("contents");
     this.version(1).stores({
+      attachments: "&id, name, description",
       issues: "&id, name, description, status",
       labels: "&id, name, description",
       projects: "&id, name, description"

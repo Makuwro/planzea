@@ -57,7 +57,7 @@ export default class Project {
   isArchived?: boolean;
   isRecycled?: boolean;
   statuses: StatusProperties[];
-  #client: Client;
+  readonly #client: Client;
 
   constructor(props: ProjectProperties, client: Client) {
 
