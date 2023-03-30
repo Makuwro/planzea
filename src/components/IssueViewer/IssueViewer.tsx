@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation, matchPath } from "react-router-dom
 import Client from "../../client/Client";
 import Issue from "../../client/Issue";
 import Project from "../../client/Project";
+import AttachmentSection from "../AttachmentSection/AttachmentSection";
 import Icon from "../Icon/Icon";
 import LabelSelector from "../LabelSelector/LabelSelector";
 import TaskSection from "../TaskSection/TaskSection";
@@ -336,6 +337,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               </section>
             </section>
             <TaskSection project={project} issue={issue} />
+            <AttachmentSection issue={issue} />
             <section>
               <label>ID</label>
               <p>{issue.id}</p>
