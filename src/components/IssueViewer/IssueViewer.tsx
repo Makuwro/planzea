@@ -5,6 +5,7 @@ import Issue from "../../client/Issue";
 import Project from "../../client/Project";
 import Icon from "../Icon/Icon";
 import LabelSelector from "../LabelSelector/LabelSelector";
+import TaskSection from "../TaskSection/TaskSection";
 import styles from "./IssueViewer.module.css";
 
 export default function IssueViewer({ client, onIssueDelete, project }: { client: Client; onIssueDelete: (issueId: string) => void; project: Project }) {
@@ -244,6 +245,9 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
 
     const updateStatus = async (newStatusId: string) => {
 
+      // Update the status.
+      await issue.update({statusId: newStatusId});
+
       // Update the current view.
       issue.statusId = newStatusId;
       setIssue(new Issue(structuredClone(issue), client));
@@ -331,6 +335,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
                 }
               </section>
             </section>
+            <TaskSection project={project} issue={issue} />
             <section>
               <label>ID</label>
               <p>{issue.id}</p>
