@@ -3,6 +3,7 @@ import Attachment from "../../client/Attachment";
 import { convertBlobToArrayBuffer } from "../../client/Client";
 import Issue from "../../client/Issue";
 import Icon from "../Icon/Icon";
+import styles from "./AttachmentSection.module.css";
 
 export default function AttachmentSection({issue}: {issue: Issue}) {
 
@@ -47,10 +48,10 @@ export default function AttachmentSection({issue}: {issue: Issue}) {
     <section>
       <label>Attachments</label>
       <section>
-        <button onClick={() => fileInputRef.current?.click()}>Add attachment</button>
+        <button id={styles.button} onClick={() => fileInputRef.current?.click()}>Add attachment</button>
         <input type="file" ref={fileInputRef} onChange={(event) => setFiles(event.target.files)} multiple />
       </section>
-      <ul>
+      <ul id={styles.attachments}>
         {
           attachments.map((attachment) => {
 
