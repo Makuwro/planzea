@@ -37,6 +37,12 @@ export default function AttachmentSection({issue}: {issue: Issue}) {
 
   }, [files]);
 
+  useEffect(() => {
+
+    (async () => setAttachments(await issue.getAttachments()))();
+
+  }, [issue]);
+
   return (
     <section>
       <label>Attachments</label>
