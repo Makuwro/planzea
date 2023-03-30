@@ -46,11 +46,11 @@ export default function AttachmentSection({issue}: {issue: Issue}) {
   return (
     <section>
       <label>Attachments</label>
+      <section>
+        <button onClick={() => fileInputRef.current?.click()}>Add attachment</button>
+        <input type="file" ref={fileInputRef} onChange={(event) => setFiles(event.target.files)} multiple />
+      </section>
       <ul>
-        <li>
-          <button onClick={() => fileInputRef.current?.click()}>Add attachment</button>
-          <input type="file" ref={fileInputRef} onChange={(event) => setFiles(event.target.files)} multiple />
-        </li>
         {
           attachments.map((attachment) => (
             <li key={attachment.id}>
@@ -62,7 +62,7 @@ export default function AttachmentSection({issue}: {issue: Issue}) {
                 <button onClick={async () => {
                   
                   await attachment.delete();
-                  setAttachments(attachments.filter((possibleAttachment) => possibleAttachment.id !== attachment.id))
+                  setAttachments(attachments.filter((possibleAttachment) => possibleAttachment.id !== attachment.id));
                 
                 }}>
                   <Icon name="close" />
