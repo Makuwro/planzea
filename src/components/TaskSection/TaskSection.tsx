@@ -20,6 +20,7 @@ export default function TaskSection({project, issue}: {project: Project, issue: 
       });
 
       setTasks([...tasks, task]);
+      setNewTaskName("");
 
     }
 
