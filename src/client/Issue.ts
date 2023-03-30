@@ -50,8 +50,7 @@ export default class Issue {
 
   async getAttachments(): Promise<Attachment[]> {
 
-    // return await this.#client.getAttachments({issueIds: [this.id]});
-    return await this.#client.getAttachments();
+    return await this.#client.getAttachments({issueIds: [this.id]});
 
   }
 
