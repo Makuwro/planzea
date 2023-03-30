@@ -1,4 +1,4 @@
-import Client from "./Client";
+import Client, { PropertiesUpdate } from "./Client";
 
 export interface AttachmentProperties {
   arrayBuffer: ArrayBuffer;
@@ -35,6 +35,12 @@ export default class Attachment {
   async delete() {
     
     await this.#client.deleteAttachment(this.id);
+
+  }
+
+  async update(newProperties: PropertiesUpdate<AttachmentProperties>): Promise<void> {
+
+    await this.#client.updateAttachment(this.id, newProperties);
 
   }
 

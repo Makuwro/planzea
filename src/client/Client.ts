@@ -204,6 +204,23 @@ export default class Client {
       
     }, [] as string[]));
 
+    // Get all associated attachments.
+    for (const attachment of await this.getAttachments()) {
+
+      attachment.issueIds = attachment.issueIds.filter((possibleIssueId) => possibleIssueId === issueId);
+      if (attachment.issueIds[0]) {
+
+        await attachment.update(attachment);
+
+      } else {
+
+        console.log("Deleting attachment...");
+        await attachment.delete();
+
+      }
+
+    }
+
     // Delete the issue.
     await this.#db.issues.delete(issueId);
 
@@ -268,6 +285,12 @@ export default class Client {
   async getProjects(filter: Partial<ProjectProperties> = {}, exclusiveKeys: [(keyof ProjectProperties)?] = []): Promise<Project[]> {
 
     return await this.#getObjects(Project, filter, exclusiveKeys);
+
+  }
+
+  async updateAttachment(attachmentId: string, newProperties: PropertiesUpdate<AttachmentProperties>): Promise<void> {
+
+    await this.#db.attachments.update(attachmentId, newProperties);
 
   }
 
