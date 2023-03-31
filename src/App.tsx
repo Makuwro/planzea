@@ -3,6 +3,7 @@ import { Location, matchPath, Route, Routes, useLocation } from "react-router-do
 import Client from "./client/Client";
 import Project from "./client/Project";
 import Backlog from "./components/Backlog/Backlog";
+import Calendar from "./components/Calendar/Calendar";
 import ProjectSelector from "./components/ProjectSelector/ProjectSelector";
 import "./global.css";
 
@@ -38,6 +39,7 @@ export default function App() {
     <>
       <Routes location={currentLocation}>
         <Route path="/" element={<ProjectSelector client={client} />} />
+        <Route path="/calendar" element={<Calendar client={client} />} />
         <Route path="/:projectId/issues" element={<Backlog client={client} project={project} />} />
         <Route path="/:projectId/issues/:issueId" element={<Backlog client={client} project={project} />} />
         <Route path="/:projectId/issues/:issueId/labels" element={<Backlog client={client} project={project} />} />
