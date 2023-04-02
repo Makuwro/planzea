@@ -57,12 +57,12 @@ export default function Calendar({client}: {client: Client}) {
         }
 
         hours.push(
-          <section>
+          <li>
             <span>{hour + 1} {x === 0 ? "AM" : "PM"}</span>
             <ul key={hour}>
               {blocks}
             </ul>
-          </section>
+          </li>
         );
 
       }
@@ -113,9 +113,9 @@ export default function Calendar({client}: {client: Client}) {
             <p>No planned events</p>
           </section>
         </section>
-        <section id={styles.timeLists}>
+        <ul id={styles.timeLists}>
           {timeLists}
-        </section>
+        </ul>
       </section>
     </main>
   );

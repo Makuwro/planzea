@@ -82,25 +82,37 @@ button.selected {
 #timeLists {
   overflow: auto;
   height: calc(100% - 92px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-#timeLists > section {
+#timeLists > li {
   display: flex;
   gap: 20px;
+  height: 50px;
 }
 
-#timeLists > section > span {
+#timeLists > li > span {
   flex-shrink: 0;
   width: 50px;
 }
 
-#timeLists ul {
+#timeLists > li > ul {
   margin: 0;
   padding: 0;
   list-style: none;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgb(168, 168, 168);
 }
 
-#timeLists li, #timeLists button {
+#timeLists > li > ul > li, #timeLists button {
   width: 100%;
+  height: 100%;
+  border-radius: 0;
+  display: flex;
+  padding: 0;
+  align-items: center;
 }
