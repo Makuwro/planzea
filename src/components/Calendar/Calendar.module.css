@@ -77,6 +77,8 @@ button.selected {
 #schedule {
   margin: 15px;
   height: calc(100% - 357.25px);
+  display: flex;
+  flex-direction: column;
 }
 
 #timeLists {
@@ -108,11 +110,11 @@ button.selected {
 }
 
 #timeLists > li > ul > li {
-  border-top: 1px solid rgb(224, 224, 224);
+  border-top: 1px dashed rgb(205, 205, 205);
 }
 
 #timeLists > li > ul > li:first-of-type {
-  border-top: 1px solid rgb(168, 168, 168);
+  border-top: 1px solid rgb(191, 191, 191);
 }
 
 #timeLists > li > ul > li, #timeLists button {
@@ -124,4 +126,22 @@ button.selected {
   align-items: center;
   background-color: transparent;
   box-shadow: none;
+}
+
+@media screen and (min-width: 670px) {
+
+  #calendar {
+    flex-direction: row;
+  }
+
+  #schedule {
+    flex-grow: 1;
+    height: initial;
+    margin: 0;
+  }
+
+  #timeLists {
+    height: initial;
+  }
+
 }
