@@ -1,4 +1,4 @@
-#calendar > button {
+#smallCalendar > button {
   box-shadow: none;
   background-color: transparent;
   padding: 0;
@@ -8,13 +8,14 @@
   margin: 26px 26px 0;
 }
 
-#calendar > button > span {
+#smallCalendar > button > span {
   font-weight: 300;
 }
 
 #days {
   border-radius: 5px;
   margin: 15px;
+  box-shadow: var(--box-shadow-default);
 }
 
 #days ul {
@@ -34,7 +35,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: transparent;
   box-shadow: none;
   font-weight: 100;
   color: var(--text);
@@ -56,8 +56,18 @@
 button#today {
   background-color: var(--button);
   color: white;
+  box-shadow: var(--box-shadow-default);
+}
+
+button.selected {
+  background-color: #cacaca;
+  color: white;
 }
 
 #days .dateOutsideMonth {
   color: rgb(168, 168, 168);
+}
+
+#schedule {
+  margin: 15px;
 }

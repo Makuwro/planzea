@@ -34,57 +34,49 @@ export default function Calendar({client}: {client: Client}) {
 
   }, []);
 
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [selectedTimes, setSelectedTimes] = useState<number[]>([]);
-
   return (
     <main id={styles.calendar}>
-      <button>{["January", "February", "March", "April"][date.getMonth()]} <span>{date.getFullYear()}</span></button>
-      <ul id={styles.labels}>
-        {
-          ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((letter) => <li key={letter}>{letter}</li>)
-        }
-      </ul>
-      <section id={styles.days}>
-        {
-          timeArrays.map((array, index) => (
-            <ul key={index}>
-              {array.map((number) => {
+      <section id={styles.smallCalendar}>
+        <button>{["January", "February", "March", "April"][date.getMonth()]} <span>{date.getFullYear()}</span></button>
+        <ul id={styles.labels}>
+          {
+            ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((letter) => <li key={letter}>{letter}</li>)
+          }
+        </ul>
+        <section id={styles.days}>
+          {
+            timeArrays.map((array, index) => (
+              <ul key={index}>
+                {array.map((number) => {
 
-                const selectedDate = new Date(number);
-                const isSelectedDateToday = selectedDate.getFullYear() === date.getFullYear() && selectedDate.getMonth() === date.getMonth() && selectedDate.getDate() === date.getDate();
-                const isSelectedDateInMonth = selectedDate.getMonth() === date.getMonth();
+                  const selectedDate = new Date(number);
+                  const isSelectedDateToday = selectedDate.getFullYear() === date.getFullYear() && selectedDate.getMonth() === date.getMonth() && selectedDate.getDate() === date.getDate();
+                  const isSelectedDateInMonth = selectedDate.getMonth() === date.getMonth();
 
-                return (
-                  <li key={number}>
-                    <button id={isSelectedDateToday ? styles.today : undefined} className={!isSelectedDateInMonth ? styles.dateOutsideMonth : undefined} onMouseEnter={() => {
+                  return (
+                    <li key={number}>
+                      <button id={isSelectedDateToday ? styles.today : undefined} className={!isSelectedDateInMonth ? styles.dateOutsideMonth : undefined}>
+                        {selectedDate.getDate()}
+                      </button>
+                    </li>
+                  );
 
-                      if (selectedTimes[0]) {
+                })}
+              </ul>
+            ))
+          }
+        </section>
+      </section> 
+      <section id={styles.schedule}>
+        <section id={styles.allDay}>
+          <label>All day</label>
+          <section>
+            <p>No planned events</p>
+          </section>
+        </section>
+        <section>
 
-                        setSelectedTimes([...selectedTimes, number]);
-
-                      }
-
-                    }} onMouseDown={() => {
-
-                      if (!startTime) {
-
-                        setStartTime(number);
-
-                      }
-
-                      setSelectedTimes([...selectedTimes, number]);
-
-                    }}>
-                      {selectedDate.getDate()}
-                    </button>
-                  </li>
-                );
-
-              })}
-            </ul>
-          ))
-        }
+        </section>
       </section>
     </main>
   );
