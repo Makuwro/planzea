@@ -38,6 +38,11 @@
   box-shadow: none;
   font-weight: 100;
   color: var(--text);
+  background-color: var(--background);
+}
+
+#days button.hover {
+  filter: brightness(1.1);
 }
 
 #labels {
