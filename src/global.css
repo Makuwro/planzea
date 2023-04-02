@@ -4,7 +4,7 @@
 
 :root {
   --article: #313237;
-  --background: #ffffff;
+  --background: #f1f1f1;
   --background-box: #fffffff0;
   --background-header: #f5f4f4b8;
   --background-label: rgb(236, 236, 236);
@@ -61,6 +61,7 @@ html {
 
 body {
   margin: 0;
+  background-color: var(--background);
 }
 
 body, #root {
