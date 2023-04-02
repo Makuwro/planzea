@@ -26,6 +26,7 @@
   border-radius: 5px;
   margin: 15px;
   box-shadow: var(--box-shadow-default);
+  background-color: white;
 }
 
 #days ul {
@@ -48,7 +49,7 @@
   box-shadow: none;
   font-weight: 100;
   color: var(--text);
-  background-color: var(--background);
+  background-color: white;
 }
 
 #days button.hover {
@@ -79,10 +80,11 @@ button.selected {
 }
 
 #schedule {
-  margin: 15px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  background-color: white;
 }
 
 #timeLists {
@@ -148,6 +150,10 @@ button.selected {
   overflow: auto;
 }
 
+.selectedDate {
+  display: none;
+}
+
 @media screen and (min-width: 670px) {
 
   #calendar {
@@ -158,6 +164,7 @@ button.selected {
     flex-grow: 1;
     height: initial;
     margin: 0;
+    box-shadow: var(--box-shadow-default);
   }
 
   #timeLists {
@@ -166,6 +173,12 @@ button.selected {
 
   #eventButtonContainer {
     display: block;
+  }
+
+  .selectedDate {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
   }
 
 }

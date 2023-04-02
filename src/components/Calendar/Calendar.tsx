@@ -127,6 +127,10 @@ export default function Calendar({client}: {client: Client}) {
         </section>
       </section> 
       <section id={styles.schedule}>
+        <section className={styles.selectedDate}>
+          <label className={styles.dayName}>{["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][date.getDay()]}</label>
+          <label className={styles.dateNumber}>{date.getDate()}</label>
+        </section>
         <section id={styles.allDay}>
           <label>All day</label>
           <section>
