@@ -4,7 +4,11 @@
   height: 100%;
 }
 
-#smallCalendar > button {
+#eventButtonContainer {
+  display: none;
+}
+
+#month {
   box-shadow: none;
   background-color: transparent;
   padding: 0;
@@ -14,7 +18,7 @@
   margin: 26px 26px 0;
 }
 
-#smallCalendar > button > span {
+#month > span {
   font-weight: 300;
 }
 
@@ -76,13 +80,12 @@ button.selected {
 
 #schedule {
   margin: 15px;
-  height: calc(100% - 357.25px);
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 #timeLists {
-  overflow: auto;
   height: calc(100% - 92px);
   margin: 0;
   padding: 0;
@@ -128,6 +131,25 @@ button.selected {
   box-shadow: none;
 }
 
+#timeOverlay {
+  position: fixed;
+  width: calc(100% - 70px);
+  margin-left: 70px;
+  height: 100%;
+  pointer-events: none;
+}
+
+#currentTimeBar {
+  height: 2px;
+  width: 100%;
+  background-color: rgb(0, 157, 255);
+  position: relative;
+}
+
+#timeEvents {
+  overflow: auto;
+}
+
 @media screen and (min-width: 670px) {
 
   #calendar {
@@ -142,6 +164,10 @@ button.selected {
 
   #timeLists {
     height: initial;
+  }
+
+  #eventButtonContainer {
+    display: block;
   }
 
 }

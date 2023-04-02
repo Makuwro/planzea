@@ -20,7 +20,7 @@ export default function App() {
 
     (async () => {
 
-      const matchedPath = matchPath("/:projectId/*", newLocation.pathname);
+      const matchedPath = !matchPath("/calendar", newLocation.pathname) ? matchPath("/:projectId/*", newLocation.pathname) : undefined;
       const desiredProjectId = matchedPath?.params.projectId;
       if (desiredProjectId && desiredProjectId !== project?.id) {
 

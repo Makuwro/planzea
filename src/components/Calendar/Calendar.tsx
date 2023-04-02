@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Client from "../../client/Client";
 import styles from "./Calendar.module.css";
 
 export default function Calendar({client}: {client: Client}) {
 
   const [timeArrays, setTimeArrays] = useState<number[][]>([]);
-  const date = new Date();
+  const [date, setDate] = useState<Date>(new Date());
+
+  useEffect(() => {
+
+    setTimeout(() => setDate(new Date()), 1000);
+
+  }, [date]);
 
   useEffect(() => {
 
@@ -57,9 +63,9 @@ export default function Calendar({client}: {client: Client}) {
         }
 
         hours.push(
-          <li>
+          <li key={`${x}.${hour}`}>
             <span>{hour === 0 ? 12 : hour} {x === 0 ? "AM" : "PM"}</span>
-            <ul key={hour}>
+            <ul>
               {blocks}
             </ul>
           </li>
@@ -73,10 +79,24 @@ export default function Calendar({client}: {client: Client}) {
 
   }, [minuteSpacing]);
 
+  const today = new Date(date);
+  today.setHours(0);
+  today.setMinutes(0);
+  today.setSeconds(0);
+  today.setMilliseconds(0);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const timeListContainerRef = useRef<HTMLUListElement>(null);
+
   return (
     <main id={styles.calendar}>
       <section id={styles.smallCalendar}>
-        <button>{["January", "February", "March", "April"][date.getMonth()]} <span>{date.getFullYear()}</span></button>
+        <section id={styles.eventButtonContainer}>
+          <button>New event</button>
+        </section>
+        <button id={styles.month}>{["January", "February", "March", "April"][date.getMonth()]} <span>{date.getFullYear()}</span></button>
         <ul id={styles.labels}>
           {
             ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((letter) => <li key={letter}>{letter}</li>)
@@ -113,9 +133,14 @@ export default function Calendar({client}: {client: Client}) {
             <p>No planned events</p>
           </section>
         </section>
-        <ul id={styles.timeLists}>
-          {timeLists}
-        </ul>
+        <section id={styles.timeEvents}>
+          <section id={styles.timeOverlay}>
+            <section id={styles.currentTimeBar} style={{top: ((date.getTime() - today.getTime()) / (tomorrow.getTime() - today.getTime())) * (timeListContainerRef.current?.scrollHeight ?? 0)}} />
+          </section>
+          <ul id={styles.timeLists} ref={timeListContainerRef}>
+            {timeLists}
+          </ul>
+        </section>
       </section>
     </main>
   );
