@@ -1,3 +1,9 @@
+#calendar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 #smallCalendar > button {
   box-shadow: none;
   background-color: transparent;
@@ -70,4 +76,31 @@ button.selected {
 
 #schedule {
   margin: 15px;
+  height: calc(100% - 357.25px);
+}
+
+#timeLists {
+  overflow: auto;
+  height: calc(100% - 92px);
+}
+
+#timeLists > section {
+  display: flex;
+  gap: 20px;
+}
+
+#timeLists > section > span {
+  flex-shrink: 0;
+  width: 50px;
+}
+
+#timeLists ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex-grow: 1;
+}
+
+#timeLists li, #timeLists button {
+  width: 100%;
 }

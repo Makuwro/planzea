@@ -34,6 +34,45 @@ export default function Calendar({client}: {client: Client}) {
 
   }, []);
 
+  const [minuteSpacing] = useState<number>(30);
+  const [timeLists, setTimeLists] = useState<React.ReactElement[]>([]);
+
+  useEffect(() => {
+
+    const intervals = 60 / minuteSpacing;
+    const hours = [];
+    for (let x = 0; 1 >= x; x++) {
+
+      for (let hour = 0; 24 > hour; hour++) {
+
+        const blocks = [];
+        for (let interval = 0; intervals > interval; interval++) {
+
+          blocks.push(
+            <li key={interval}>
+              <button></button>
+            </li>
+          );
+
+        }
+
+        hours.push(
+          <section>
+            <span>{hour + 1} {x === 0 ? "AM" : "PM"}</span>
+            <ul key={hour}>
+              {blocks}
+            </ul>
+          </section>
+        );
+
+      }
+      
+    }
+
+    setTimeLists(hours);
+
+  }, [minuteSpacing]);
+
   return (
     <main id={styles.calendar}>
       <section id={styles.smallCalendar}>
@@ -74,8 +113,8 @@ export default function Calendar({client}: {client: Client}) {
             <p>No planned events</p>
           </section>
         </section>
-        <section>
-
+        <section id={styles.timeLists}>
+          {timeLists}
         </section>
       </section>
     </main>
