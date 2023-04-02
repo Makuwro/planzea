@@ -132,11 +132,9 @@ button.selected {
 }
 
 #timeOverlay {
-  position: fixed;
+  position: relative;
   width: calc(100% - 70px);
   margin-left: 70px;
-  height: 100%;
-  pointer-events: none;
 }
 
 #currentTimeBar {
