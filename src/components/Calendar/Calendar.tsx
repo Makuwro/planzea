@@ -43,7 +43,7 @@ export default function Calendar({client}: {client: Client}) {
     const hours = [];
     for (let x = 0; 1 >= x; x++) {
 
-      for (let hour = 0; 24 > hour; hour++) {
+      for (let hour = 0; 12 > hour; hour++) {
 
         const blocks = [];
         for (let interval = 0; intervals > interval; interval++) {
@@ -58,7 +58,7 @@ export default function Calendar({client}: {client: Client}) {
 
         hours.push(
           <li>
-            <span>{hour + 1} {x === 0 ? "AM" : "PM"}</span>
+            <span>{hour === 0 ? 12 : hour} {x === 0 ? "AM" : "PM"}</span>
             <ul key={hour}>
               {blocks}
             </ul>
