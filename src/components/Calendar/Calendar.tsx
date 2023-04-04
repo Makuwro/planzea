@@ -55,9 +55,7 @@ export default function Calendar({client}: {client: Client}) {
         for (let interval = 0; intervals > interval; interval++) {
 
           blocks.push(
-            <li key={interval}>
-              <button></button>
-            </li>
+            <li key={interval} />
           );
 
         }
