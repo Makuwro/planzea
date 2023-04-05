@@ -154,6 +154,10 @@ button.selected {
   display: none;
 }
 
+#timeLists li.backgroundSelected {
+  background-color: #f1f1f1;
+}
+
 @media screen and (min-width: 670px) {
 
   #calendar {

@@ -2,6 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import Client from "../../client/Client";
 import styles from "./Calendar.module.css";
 
+interface HourMinute {
+  hour: number;
+  minute: number;
+}
+
 export default function Calendar({client}: {client: Client}) {
 
   const [timeArrays, setTimeArrays] = useState<number[][]>([]);
@@ -42,6 +47,7 @@ export default function Calendar({client}: {client: Client}) {
 
   const [minuteSpacing] = useState<number>(30);
   const [timeLists, setTimeLists] = useState<React.ReactElement[]>([]);
+  const [selectedTimeRange, setSelectedTimeRange] = useState<{startTime: HourMinute; endTime: HourMinute} | null>(null);
 
   useEffect(() => {
 
@@ -54,8 +60,10 @@ export default function Calendar({client}: {client: Client}) {
         const blocks = [];
         for (let interval = 0; intervals > interval; interval++) {
 
+          const isWithin = selectedTimeRange && selectedTimeRange.startTime.hour <= hour && selectedTimeRange.endTime.hour >= hour;
+
           blocks.push(
-            <li key={interval} />
+            <li className={isWithin ? styles.backgroundSelected : undefined} onClick={() => setSelectedTimeRange({startTime: {hour, minute: interval * minuteSpacing}, endTime: {hour, minute: (interval + 1) * minuteSpacing}})} key={interval} />
           );
 
         }
@@ -75,8 +83,9 @@ export default function Calendar({client}: {client: Client}) {
 
     setTimeLists(hours);
 
-  }, [minuteSpacing]);
+  }, [minuteSpacing, selectedTimeRange]);
 
+  // Configure the current time bar.
   const today = new Date(date);
   today.setHours(0);
   today.setMinutes(0);
