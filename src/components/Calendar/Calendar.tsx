@@ -60,10 +60,21 @@ export default function Calendar({client}: {client: Client}) {
         const blocks = [];
         for (let interval = 0; intervals > interval; interval++) {
 
-          const isWithin = selectedTimeRange && selectedTimeRange.startTime.hour <= hour && selectedTimeRange.endTime.hour >= hour;
+          const startHour = (x === 1 ? 12 : 0) + hour;
+          let endHour = startHour;
+          let endMinute = (interval + 1) * minuteSpacing;
+          if (endMinute === 60) {
+
+            endHour += 1;
+            endMinute = 0;
+
+          }
+          
+          const startMinute = interval * minuteSpacing;
+          const isWithin = selectedTimeRange && selectedTimeRange.startTime.hour <= startHour && selectedTimeRange.endTime.hour >= endHour && selectedTimeRange.startTime.minute <= startMinute;
 
           blocks.push(
-            <li className={isWithin ? styles.backgroundSelected : undefined} onClick={() => setSelectedTimeRange({startTime: {hour, minute: interval * minuteSpacing}, endTime: {hour, minute: (interval + 1) * minuteSpacing}})} key={interval} />
+            <li className={isWithin ? styles.backgroundSelected : undefined} onClick={() => setSelectedTimeRange({startTime: {hour: startHour, minute: startMinute}, endTime: {hour: endHour, minute: endMinute}})} key={interval} />
           );
 
         }
