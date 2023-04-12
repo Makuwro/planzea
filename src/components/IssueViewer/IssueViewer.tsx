@@ -8,6 +8,7 @@ import Icon from "../Icon/Icon";
 import LabelSelector from "../LabelSelector/LabelSelector";
 import TaskSection from "../TaskSection/TaskSection";
 import styles from "./IssueViewer.module.css";
+import completeSound from "../../complete.ogg";
 
 export default function IssueViewer({ client, onIssueDelete, project }: { client: Client; onIssueDelete: (issueId: string) => void; project: Project }) {
 
@@ -252,6 +253,14 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
       // Update the current view.
       issue.statusId = newStatusId;
       setIssue(new Issue(structuredClone(issue), client));
+
+      // Make a sound if the issue is completed.
+      if (newStatusId === "dc") {
+
+        const audio = new Audio(completeSound);
+        audio.play();
+
+      }
 
     };
 
