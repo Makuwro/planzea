@@ -4,6 +4,7 @@ import { ClientDatabase } from "./ClientDatabase";
 import Issue, { InitialIssueProperties, IssueProperties } from "./Issue";
 import Label, { InitialLabelProperties, LabelProperties } from "./Label";
 import Project, { defaultStatuses, InitialProjectProperties, ProjectProperties } from "./Project";
+import "dexie-export-import";
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
@@ -234,6 +235,30 @@ export default class Client {
   async deleteProject(projectId: string): Promise<void> {
 
     await this.#db.projects.delete(projectId);
+
+  }
+
+  async export(): Promise<Blob> {
+
+    return await this.#db.export();
+
+  }
+
+  async import(blob: Blob): Promise<void> {
+
+    const backup = await this.#db.export();
+    try {
+
+      this.#db.delete();
+      this.#db.open();
+      await this.#db.import(blob);
+      
+    } catch (err) {
+
+      alert(err);
+      this.#db.import(backup);
+
+    }
 
   }
 

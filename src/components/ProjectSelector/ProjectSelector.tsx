@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Client from "../../client/Client";
+import styles from "./ProjectSelector.module.css";
+import Exporter from "../Exporter/Exporter";
 
 export default function ProjectSelector({client}: {client: Client}) {
 
   const [projectComponents, setProjectComponents] = useState<React.ReactElement[]>([]);
+  const [isExporterOpen, setIsExporterOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
   async function createProject() {
@@ -42,8 +45,15 @@ export default function ProjectSelector({client}: {client: Client}) {
   }, []);
 
   return (
-    <main>
-      <button onClick={createProject}>Create project</button>
+    <main id={styles.main}>
+      <Exporter client={client} isOpen={isExporterOpen} onClose={() => setIsExporterOpen(false)} />
+      <section id={styles.headingContainer}> 
+        <h1>Projects</h1>
+        <section>
+          <button onClick={() => setIsExporterOpen(true)}>Export projects</button>
+          <button onClick={createProject}>Create project</button>
+        </section>
+      </section>
       <ul>
         {projectComponents}
       </ul>

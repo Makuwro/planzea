@@ -4,6 +4,8 @@ import Client from "../../client/Client";
 import Issue from "../../client/Issue";
 import Project from "../../client/Project";
 import IssueViewer from "../IssueViewer/IssueViewer";
+import styles from "../ProjectSelector/ProjectSelector.module.css";
+import Icon from "../Icon/Icon";
 
 export default function Backlog({client, project}: {client: Client, project: Project | null}) {
 
@@ -66,9 +68,14 @@ export default function Backlog({client, project}: {client: Client, project: Pro
   return project ? (
     <>
       <IssueViewer client={client} onIssueDelete={(deletedIssueId) => setIssues(issues.filter((issue) => issue.id !== deletedIssueId))} project={project} />
-      <main>
-        <h1>{project.name}</h1>
-        <button onClick={createIssue}>Create issue</button>
+      <main id={styles.main}>
+        <section id={styles.headingContainer}>
+          <button onClick={() => navigate("/")}>
+            <Icon name="arrow_back_ios" />
+          </button>
+          <h1>{project.name}</h1>
+          <button onClick={createIssue}>Create issue</button>
+        </section>
         <ul>
           {issueComponents}
         </ul>

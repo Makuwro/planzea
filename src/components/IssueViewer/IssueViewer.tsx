@@ -9,6 +9,7 @@ import LabelSelector from "../LabelSelector/LabelSelector";
 import TaskSection from "../TaskSection/TaskSection";
 import styles from "./IssueViewer.module.css";
 import completeSound from "../../complete.ogg";
+import Popup from "../Popup/Popup";
 
 export default function IssueViewer({ client, onIssueDelete, project }: { client: Client; onIssueDelete: (issueId: string) => void; project: Project }) {
 
@@ -265,7 +266,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
     };
 
     return (
-      <section id={styles.background} className={isOpen ? styles.open : undefined}>
+      <Popup isOpen={isOpen}>
         <LabelSelector isOpen={isLabelSelectorOpen} project={project} issue={issue} />
         <section id={styles.box}>
           <section id={styles.header}>
@@ -312,14 +313,14 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
               </section>
             </section>
             <section id={styles.details}>
-              <ul id={styles.labels}>
+              {/* <ul id={styles.labels}>
                 {labelComponents}
                 <li>
                   <button id={styles.labelAddButton} onClick={() => navigate(`/${project.id}/issues/${issue.id}/labels`)}>
                     <Icon name="add" />
                   </button>
                 </li>
-              </ul>
+              </ul> */}
               <input type="text" value={newIssueName} onBlur={changeIssueName} onInput={(event: React.ChangeEvent<HTMLInputElement>) => setNewIssueName(event.target.value)} onKeyDown={(event) => event.key === "Enter" ? event.currentTarget.blur() : undefined} placeholder={issue.name} />
             </section>
           </section>
@@ -358,7 +359,7 @@ export default function IssueViewer({ client, onIssueDelete, project }: { client
             </ul>
           </section>
         </section>
-      </section>
+      </Popup>
     );
 
   }

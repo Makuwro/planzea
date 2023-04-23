@@ -115,8 +115,11 @@ input[type="file"] {
 p, li {
   font-weight: 100;
   color: var(--text);
+  line-height: 1.5rem;
+
 }
 
 h1 {
   color: var(--text-important);
+  font-weight: 500;
 }
