@@ -20,11 +20,11 @@
   --button-hover: #69b65c;
   --button-disabled: #b8b8b8;
   --grid: #f8f9fb;
-  --height-header: 51px;
+  --height-header: 60px;
   --link: #2e871e;
   --text: #5f6368;
   --text-important: #101010;
-  --box-shadow-default: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  --box-shadow-default: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   --formatter-selected: #aae9ba;
   --placeholder: #6c6c6e;
   --input-min-height: 47.2px;
@@ -71,7 +71,6 @@ body, #root {
 }
 
 button {
-  box-shadow: var(--box-shadow-default);
   background-color: var(--button);
   border: none;
   padding: 10px 15px;
@@ -79,10 +78,12 @@ button {
   font-size: 16px;
   cursor: pointer;
   color: var(--button-text);
+  transition: 0.05s;
 }
 
 button:hover {
   filter: brightness(0.9);
+  box-shadow: var(--box-shadow-default);
 }
 
 button:hover:active {
@@ -121,5 +122,18 @@ p, li {
 
 h1 {
   color: var(--text-important);
-  font-weight: 500;
+  font-weight: 400;
+  margin: 0;
+}
+
+main {
+  padding: 0 15px;
+  text-align: center;
+  position: relative;
+  top: calc(0px - var(--height-header));
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 0;
 }
