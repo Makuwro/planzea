@@ -4,6 +4,7 @@ import Client from "./client/Client";
 import Project from "./client/Project";
 import "./global.css";
 import Header from "./components/Header/Header";
+import Backlog from "./components/Backlog/Backlog";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -14,13 +15,7 @@ export default function App() {
   return (
     <>
       <Header />
-      <main>
-        <section>
-          <h1>You don't have any projects</h1>
-          <p>Why don't we change that?</p>
-          <button>Create project</button>
-        </section>
-      </main>
+      <Backlog />
     </>
   );
 

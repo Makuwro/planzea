@@ -1,9 +1,9 @@
 import React, { ComponentPropsWithoutRef } from "react";
 
-export default function Icon({name, ...props}: {name: "add" | "arrow_back_ios" | "close" | "done" | "expand_more"} & ComponentPropsWithoutRef<"section">) {
+export default function Icon({name, ...props}: {name: "add" | "arrow_back_ios" | "close" | "done" | "expand_more" | "delete_forever" | "star" | "star_border" | "more_vert"} & ComponentPropsWithoutRef<"section">) {
 
   return (
-    <span className="material-icons-round" {...props}>
+    <span className="material-icons" {...props}>
       {name}
     </span>
   );

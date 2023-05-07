@@ -1,0 +1,57 @@
+#columnTitles {
+  display: none;
+}
+
+#main {
+  padding: 0 15px;
+  position: relative;
+  top: calc(0px - var(--height-header));
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 0;
+}
+
+#noTasksMessage {
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  display: flex;
+  text-align: center;
+  gap: 10px;
+}
+
+#taskList {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0 -15px;
+  list-style-type: none;
+}
+
+#taskListContainer {
+  margin-top: var(--height-header);
+  display: flex;
+  flex-direction: column;
+}
+
+@media screen and (min-width: 720px) {
+
+  #columnTitles {
+    display: flex;
+    font-weight: 400;
+    padding: 10px 15px 10px;
+    justify-content: space-between;
+  }
+
+  #taskListContainer {
+    background-color: white;
+    border-radius: 5px;
+    padding: 5px;
+  }
+
+  #taskList {
+    margin: 0;
+  }
+
+}

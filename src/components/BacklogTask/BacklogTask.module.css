@@ -1,0 +1,28 @@
+.task > button {
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  font-weight: 300;
+  background-color: transparent;
+  border-radius: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task > button:hover {
+  background-color: rgb(244, 243, 243);
+  box-shadow: none;
+  border-radius: 5px;
+}
+
+.taskOptions > button {
+  border-radius: 100%;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  color: var(--text);
+}
