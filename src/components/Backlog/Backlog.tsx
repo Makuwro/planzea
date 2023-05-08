@@ -32,15 +32,15 @@ export default function Backlog({client}: {client: Client}) {
 
   return project ? (
     <main id={styles.main}>
-      <BacklogViewModificationOptions project={project} />
+      <BacklogViewModificationOptions project={project} onTaskCreate={(task) => setTasks([...tasks, task])} />
       {
         tasks[0] ? (
           <>
             <section id={styles.taskListContainer}>
               <ul id={styles.taskList}>
-                <BacklogTask name="Publish The Showrunners" />
-                <BacklogTask name="Design Siletrus' character reference sheet" />
-                <BacklogTask name="Do something with Lithicus Drakarox" />
+                {
+                  tasks.map((task) => <BacklogTask key={task.id} name={task.name} />)
+                }
               </ul>
             </section>
           </>

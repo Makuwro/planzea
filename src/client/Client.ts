@@ -278,7 +278,6 @@ export default class Client {
     }
 
     this.personalProjectId = personalProjectId;
-    console.log(this.personalProjectId);
   }
 
   async getAttachment(attachmentId: string): Promise<Attachment> {
