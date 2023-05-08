@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./BacklogTask.module.css";
 import Icon from "../Icon/Icon";
 
@@ -12,6 +12,26 @@ interface BacklogTaskComponentProperties {
 export default function BacklogTask({name, isSelected, onClick, onDelete}: BacklogTaskComponentProperties) {
 
   const [isStatusSelectorOpen, setIsStatusSelectorOpen] = useState<boolean>(false);
+  const statusButtonRef = useRef<HTMLButtonElement>(null);
+  const statusSelectorRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+
+    const checkForOutsideClick = (event: MouseEvent) => {
+
+      if (event.target && !statusSelectorRef.current?.contains(event.target as Node) && !statusButtonRef.current?.contains(event.target as Node)) {
+
+        setIsStatusSelectorOpen(false);
+
+      }
+
+    };
+
+    window.addEventListener("click", checkForOutsideClick);
+
+    return () => window.removeEventListener("click", checkForOutsideClick);
+
+  }, []);
 
   return (
     <li className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`}>
@@ -19,7 +39,7 @@ export default function BacklogTask({name, isSelected, onClick, onDelete}: Backl
       <section>
         <span>
           <section className={styles.statusContainer}>
-            <button className={styles.status} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} />
+            <button className={styles.status} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} ref={statusButtonRef} />
           </section>
           <span>{name}</span>
         </span>
@@ -30,10 +50,10 @@ export default function BacklogTask({name, isSelected, onClick, onDelete}: Backl
         </span>
       </section>
       <section className={`${styles.statusSelectorContainer}${isStatusSelectorOpen ? ` ${styles.open}` : ""}`}>
-        <section className={styles.statusSelector}>
+        <section className={styles.statusSelector} ref={statusSelectorRef}>
           <ul>
             <li>
-              <button>Not Started</button>
+              <button onClick={() => setIsStatusSelectorOpen(false)}>Not Started</button>
             </li>
             <li>
               <button>In Progress</button>
