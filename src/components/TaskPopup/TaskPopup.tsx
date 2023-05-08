@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./TaskPopup.module.css";
 import Icon from "../Icon/Icon";
 import Task from "../../client/Task";
@@ -15,9 +15,50 @@ export default function TaskPopup({task}: {task: Task | null}) {
 
   const [doesTaskLackDescription, setDoesTaskLackDescription] = useState<boolean>(true);
 
-  function updateDescription() {
+  const descriptionRef = useRef<HTMLElement>(null);
+  async function updateDescription() {
 
-    
+    const descriptionInput = descriptionRef.current;
+    if (descriptionInput) {
+
+      // Convert the description to Markdown.
+      let newDescription = "";
+      for (const element of descriptionInput.children) {
+
+        // Add a line break, if necessary.
+        if (newDescription.trim()) {
+
+          newDescription += "\n";
+
+        }
+
+        // Determine the type of element we're on.
+        switch (element.tagName) {
+
+          case "P":
+            newDescription += element.textContent;
+            break;
+
+          default:
+            console.warn("Found an unknown tag while trying to convert description to Markdown. Skipping it.");
+            break;
+
+        }
+
+      }
+
+      // Save the new description.
+      console.log(newDescription);
+      // await task?.update({description: newDescription});
+
+      // Update the description view.
+      if (!newDescription) {
+
+        setDoesTaskLackDescription(true);
+
+      }
+
+    }
 
   }
 
@@ -44,11 +85,14 @@ export default function TaskPopup({task}: {task: Task | null}) {
           <section id={styles.details}>
             <section 
               id={styles.description} 
+              ref={descriptionRef}
               contentEditable 
-              suppressContentEditableWarning>
+              suppressContentEditableWarning
+              onClick={() => setDoesTaskLackDescription(false)} 
+              onBlur={updateDescription}>
               {
                 doesTaskLackDescription ? (
-                  <p id={styles.placeholder} onClick={() => setDoesTaskLackDescription(false)} placeholder="This task doesn't have a description." />
+                  <p id={styles.placeholder} placeholder="What's this task about?" />
                 ) : null
               }
               <p>

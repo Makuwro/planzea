@@ -21,6 +21,16 @@
   gap: 15px;
 }
 
+#description [placeholder]:empty::before {
+  content: attr(placeholder);
+  color: #b8b8b8; 
+  cursor: text;
+}
+
+#description [placeholder]:empty:focus::before {
+  content: "";
+}
+
 #details {
   display: flex;
   flex-direction: column;
