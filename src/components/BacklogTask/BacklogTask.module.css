@@ -7,11 +7,17 @@
 }
 
 .labels > li {
+  display: flex;
+}
+
+.labels > li > button {
   padding: 0px 10px;
   background-color: var(--button);
   border-radius: 30px;
   font-size: 13px;
   color: var(--background);
+  pointer-events: all;
+  height: 24px;
 }
 
 .status {

@@ -98,6 +98,15 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
 
   }
 
+  async function removeLabel(labelId: string) {
+
+    // Remove the label from the task.
+    task.labelIds = task.labelIds.filter((possibleLabelId) => possibleLabelId !== labelId);
+    await task.update({labelIds: task.labelIds});
+    onUpdate(new Task(structuredClone(task), client));
+
+  }
+
   return (
     <li className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`}>
       <button onClick={onClick} />
@@ -111,7 +120,13 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
           </span>
           <ul className={styles.labels}>
             {
-              labels.map((label) => <li key={label.id}>{label.name}</li>)
+              labels.map((label) => (
+                <li key={label.id}>
+                  <button onClick={async () => await removeLabel(label.id)}>
+                    {label.name}
+                  </button>
+                </li>
+              ))
             }
           </ul>
         </span>
