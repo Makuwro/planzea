@@ -97,6 +97,7 @@
   padding: 0 15px;
   height: 100%;
   box-sizing: border-box;
+  justify-content: space-between;
 }
 
 .task > section:first-of-type > span {
@@ -115,7 +116,7 @@
   border-color: var(--border);
 }
 
-.task button:hover .taskOptions > button {
+.task > button:hover + section .taskOptions > button {
   border-radius: 100%;
   height: 30px;
   width: 30px;
@@ -124,6 +125,7 @@
   align-items: center;
   background-color: transparent;
   color: var(--text);
+  pointer-events: all;
 }
 
 .taskOptions > button {
