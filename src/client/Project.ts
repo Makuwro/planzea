@@ -1,6 +1,7 @@
 import Client, { Optional, PropertiesUpdate } from "./Client";
-import Issue, { InitialIssueProperties } from "./Issue";
+import Issue, { InitialTaskProperties } from "./Task";
 import Label, { InitialLabelProperties } from "./Label";
+import Task from "./Task";
 
 export interface StatusProperties {
   id: string;
@@ -72,9 +73,9 @@ export default class Project {
 
   }
 
-  async createIssue(props: Optional<Omit<InitialIssueProperties, "projects">, "statusId" | "projectId">): Promise<Issue> {
+  async createTask(props: Optional<Omit<InitialTaskProperties, "projects">, "statusId" | "projectId">): Promise<Task> {
 
-    return await this.#client.createIssue({
+    return await this.#client.createTask({
       ...props, 
       statusId: props.statusId ?? this.defaultStatusId, 
       projectId: this.id
@@ -94,9 +95,9 @@ export default class Project {
 
   }
 
-  async getIssues(): Promise<Issue[]> {
+  async getTasks(): Promise<Issue[]> {
 
-    return this.#client.getIssues({projectId: this.id});
+    return this.#client.getTasks({projectId: this.id});
 
   }
 

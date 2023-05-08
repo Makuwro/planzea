@@ -1,28 +1,29 @@
 import React, { useState } from "react";
 import styles from "./Backlog.module.css";
-import Project from "../../client/Project";
-import Issue from "../../client/Issue";
-import Icon from "../Icon/Icon";
+import Issue from "../../client/Task";
 import BacklogTask from "../BacklogTask/BacklogTask";
+import Icon from "../Icon/Icon";
+import BacklogViewModificationOptions from "../BacklogViewModificationOptions/BacklogViewModificationOptions";
 
 export default function Backlog() {
 
   const [projects] = useState<Issue[]>([]);
+  const [selectedBacklogTaskId, setSelectedBacklogTaskId] = useState<string | null>(null);
 
   return (
     <main id={styles.main}>
+      <BacklogViewModificationOptions />
       {
-        !projects[0] ? (
-          <section id={styles.taskListContainer}>
-            <section id={styles.columnTitles}>
-              <label>Name</label>
-              <label>Status</label>
-              <label>Assignees</label>
+        projects[0] ? (
+          <>
+            <section id={styles.taskListContainer}>
+              <ul id={styles.taskList}>
+                <BacklogTask name="Publish The Showrunners" />
+                <BacklogTask name="Design Siletrus' character reference sheet" />
+                <BacklogTask name="Do something with Lithicus Drakarox" />
+              </ul>
             </section>
-            <ul id={styles.taskList}>
-              <BacklogTask name="Publish The Showrunners" />
-            </ul>
-          </section>
+          </>
         ) : (
           <section id={styles.noTasksMessage}>
             <h1>That's a wrap!</h1>

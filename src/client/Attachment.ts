@@ -3,7 +3,7 @@ import Client, { PropertiesUpdate } from "./Client";
 export interface AttachmentProperties {
   arrayBuffer: ArrayBuffer;
   id: string;
-  issueIds: string[];
+  taskIds: string[];
   name: string;
   type: string;
 }
@@ -17,7 +17,7 @@ export default class Attachment {
   readonly #client: Client;
   arrayBuffer: ArrayBuffer;
   id: string;
-  issueIds: string[];
+  taskIds: string[];
   name: string;
   type: string;
 
@@ -25,7 +25,7 @@ export default class Attachment {
 
     this.arrayBuffer = props.arrayBuffer;
     this.id = props.id;
-    this.issueIds = props.issueIds;
+    this.taskIds = props.taskIds;
     this.name = props.name;
     this.type = props.type;
     this.#client = client;

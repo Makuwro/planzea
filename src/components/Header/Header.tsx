@@ -8,16 +8,13 @@ export default function Header() {
   return (
     <header>
       <section id={styles.left}>
-        <button>Personal</button>
+        <button id={styles.projectSelector}>Personal</button>
         <nav>
           <Link to="/tasks" className={styles.selected}>Tasks</Link>
           <Link to="/calendar">Calendar</Link>
         </nav>
       </section>
       <section id={styles.right}>
-        <button id={styles.addIssueButton}>
-          <Icon name="add" />
-        </button>
         <button id={styles.accountButton}>
           <span id={styles.nameContainer}>Christian Toney</span>
           <span id={styles.avatarContainer}>

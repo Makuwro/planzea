@@ -1,16 +1,16 @@
 import ObjectID from "bson-objectid";
 import Attachment, { AttachmentProperties, InitialAttachmentProperties } from "./Attachment";
 import { ClientDatabase } from "./ClientDatabase";
-import Issue, { InitialIssueProperties, IssueProperties } from "./Issue";
+import Task, { InitialTaskProperties, TaskProperties } from "./Task";
 import Label, { InitialLabelProperties, LabelProperties } from "./Label";
 import Project, { defaultStatuses, InitialProjectProperties, ProjectProperties } from "./Project";
 import "dexie-export-import";
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
-export type PlanzeaObject = Attachment | Issue | Label | Project;
-export type PlanzeaObjectConstructor = typeof Attachment | typeof Issue | typeof Label | typeof Project;
-export type PlanzeaObjectProperties = AttachmentProperties & IssueProperties & LabelProperties & ProjectProperties;
+export type PlanzeaObject = Attachment | Task | Label | Project;
+export type PlanzeaObjectConstructor = typeof Attachment | typeof Task | typeof Label | typeof Project;
+export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties;
 
 export async function convertBlobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
 
@@ -42,10 +42,10 @@ export default class Client {
   readonly #db = clientDatabase;
 
   async #createObject(constructor: typeof Attachment, props: InitialAttachmentProperties): Promise<Attachment>;
-  async #createObject(constructor: typeof Issue, props: InitialIssueProperties): Promise<Issue>;
+  async #createObject(constructor: typeof Task, props: InitialTaskProperties): Promise<Task>;
   async #createObject(constructor: typeof Label, props: InitialLabelProperties): Promise<Label>;
   async #createObject(constructor: typeof Project, props: InitialProjectProperties): Promise<Project>;
-  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialIssueProperties | InitialLabelProperties | InitialProjectProperties): Promise<PlanzeaObject> {
+  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialTaskProperties | InitialLabelProperties | InitialProjectProperties): Promise<PlanzeaObject> {
 
     const { tableName } = constructor;
     const isProject = constructor === Project;
@@ -62,7 +62,7 @@ export default class Client {
   }
 
   async #getObject(constructor: typeof Attachment, objectId: string): Promise<Attachment>;
-  async #getObject(constructor: typeof Issue, objectId: string): Promise<Issue>;
+  async #getObject(constructor: typeof Task, objectId: string): Promise<Task>;
   async #getObject(constructor: typeof Label, objectId: string): Promise<Label>;
   async #getObject(constructor: typeof Project, objectId: string): Promise<Project>;
   async #getObject(constructor: PlanzeaObjectConstructor, objectId: string): Promise<PlanzeaObject> {
@@ -80,7 +80,7 @@ export default class Client {
   }
 
   async #getObjects(constructor: typeof Attachment, filter?: Partial<AttachmentProperties>, exclusiveKeys?: [(keyof AttachmentProperties)?]): Promise<Attachment[]>;
-  async #getObjects(constructor: typeof Issue, filter?: Partial<IssueProperties>, exclusiveKeys?: [(keyof IssueProperties)?]): Promise<Issue[]>;
+  async #getObjects(constructor: typeof Task, filter?: Partial<TaskProperties>, exclusiveKeys?: [(keyof TaskProperties)?]): Promise<Task[]>;
   async #getObjects(constructor: typeof Label, filter?: Partial<LabelProperties>, exclusiveKeys?: [(keyof LabelProperties)?]): Promise<Label[]>;
   async #getObjects(constructor: typeof Project, filter?: Partial<ProjectProperties>, exclusiveKeys?: [(keyof ProjectProperties)?]): Promise<Project[]>;
   async #getObjects(constructor: PlanzeaObjectConstructor, filter: Partial<PlanzeaObjectProperties> = {}, exclusiveKeys: [(keyof PlanzeaObjectProperties)?] = []): Promise<PlanzeaObject[]> {
@@ -88,7 +88,7 @@ export default class Client {
     const objects = [];
     const issuePropertiesArray = (await this.#db[constructor.tableName].toArray() as PlanzeaObjectProperties[]).filter((object) => {
 
-      for (const key of Object.keys(filter) as (keyof IssueProperties)[]) {
+      for (const key of Object.keys(filter) as (keyof TaskProperties)[]) {
 
         const issueValue = object[key];
         const filterValue = filter[key];
@@ -133,7 +133,7 @@ export default class Client {
    * @param tableName The name of the table.
    * @returns An unused ID string.
    */
-  async #getUnusedId(tableName: "attachments" | "issues" | "labels" | "projects"): Promise<string> {
+  async #getUnusedId(tableName: "attachments" | "tasks" | "labels" | "projects"): Promise<string> {
 
     let id = null;
     do {
@@ -162,9 +162,9 @@ export default class Client {
    * @param props Issue properties.
    * @returns An `Issue` object.
    */
-  async createIssue(props: InitialIssueProperties): Promise<Issue> {
+  async createTask(props: InitialTaskProperties): Promise<Task> {
 
-    return await this.#createObject(Issue, props);
+    return await this.#createObject(Task, props);
     
   }
 
@@ -187,17 +187,17 @@ export default class Client {
   }
 
   /**
-   * Deletes an issue from the database.
-   * @param issueId The issue's ID.
+   * Deletes a task from the database.
+   * @param taskId The task's ID.
    */
-  async deleteIssue(issueId: string): Promise<void> {
+  async deleteTask(taskId: string): Promise<void> {
 
     // Delete all tasks.
-    await this.#db.issues.bulkDelete((await this.#db.issues.toArray()).reduce((ids, possibleIssue) => {
+    await this.#db.tasks.bulkDelete((await this.#db.tasks.toArray()).reduce((ids, possibleTask) => {
       
-      if (possibleIssue.parentIssueId === issueId) {
+      if (possibleTask.parentTaskId === taskId) {
 
-        ids.push(possibleIssue.id);
+        ids.push(possibleTask.id);
 
       }
 
@@ -208,8 +208,8 @@ export default class Client {
     // Get all associated attachments.
     for (const attachment of await this.getAttachments()) {
 
-      attachment.issueIds = attachment.issueIds.filter((possibleIssueId) => possibleIssueId === issueId);
-      if (attachment.issueIds[0]) {
+      attachment.taskIds = attachment.taskIds.filter((possibleTaskId) => possibleTaskId === taskId);
+      if (attachment.taskIds[0]) {
 
         await attachment.update(attachment);
 
@@ -222,7 +222,7 @@ export default class Client {
     }
 
     // Delete the issue.
-    await this.#db.issues.delete(issueId);
+    await this.#db.tasks.delete(taskId);
 
   }
 
@@ -274,19 +274,19 @@ export default class Client {
 
   }
 
-  async getIssue(issueId: string): Promise<Issue> {
+  async getTask(taskId: string): Promise<Task> {
 
-    return await this.#getObject(Issue, issueId);
+    return await this.#getObject(Task, taskId);
 
   }
 
   /**
-   * Gets all client issues.
-   * @returns An array of `Issue` objects.
+   * Gets all client tasks.
+   * @returns An array of `Task` objects.
    */
-  async getIssues(filter: Partial<IssueProperties> = {}, exclusiveKeys: [(keyof IssueProperties)?] = []): Promise<Issue[]> {
+  async getTasks(filter: Partial<TaskProperties> = {}, exclusiveKeys: [(keyof TaskProperties)?] = []): Promise<Task[]> {
 
-    return await this.#getObjects(Issue, filter, exclusiveKeys);
+    return await this.#getObjects(Task, filter, exclusiveKeys);
 
   }
 
@@ -318,9 +318,9 @@ export default class Client {
 
   }
 
-  async updateIssue(labelId: string, newProperties: PropertiesUpdate<IssueProperties>): Promise<void> {
+  async updateTask(labelId: string, newProperties: PropertiesUpdate<TaskProperties>): Promise<void> {
 
-    await this.#db.issues.update(labelId, newProperties);
+    await this.#db.tasks.update(labelId, newProperties);
 
   }
 

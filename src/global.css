@@ -12,7 +12,7 @@
   --background-input: #eff1f3;
   --background-popup: #0000009f;
   --background-popup-box: #eaeaea;
-  --border: #e0e2e6;
+  --border: #d7d7d7;
   --border-default: 1px solid var(--border);
   --button: #5297f1;
   --button-text: white;
@@ -20,7 +20,7 @@
   --button-hover: #69b65c;
   --button-disabled: #b8b8b8;
   --grid: #f8f9fb;
-  --height-header: 60px;
+  --height-header: 50px;
   --link: #5297f1;
   --text: #5f6368;
   --text-important: #101010;
@@ -92,7 +92,6 @@ button {
 
 button:hover {
   filter: brightness(0.9);
-  box-shadow: var(--box-shadow-default);
 }
 
 button:hover:active {

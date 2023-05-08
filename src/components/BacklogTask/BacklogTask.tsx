@@ -11,7 +11,12 @@ export default function BacklogTask({name}: BacklogTaskComponentProperties) {
   return (
     <li className={styles.task}>
       <button>
-        <span>{name}</span>
+        <span>
+          <button className={styles.status}>
+
+          </button>
+          <span>{name}</span>
+        </span>
         <section className={styles.taskOptions}>
           <button>
             <Icon name="more_vert" />
