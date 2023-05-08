@@ -73,11 +73,12 @@ export default class Project {
 
   }
 
-  async createTask(props: Optional<Omit<InitialTaskProperties, "projects">, "statusId" | "projectId">): Promise<Task> {
+  async createTask(props: Optional<Omit<InitialTaskProperties, "projects">, "statusId" | "projectId" | "labelIds">): Promise<Task> {
 
     return await this.#client.createTask({
       ...props, 
       statusId: props.statusId ?? this.defaultStatusId, 
+      labelIds: props.labelIds ?? [],
       projectId: this.id
     });
 

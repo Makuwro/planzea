@@ -6,7 +6,7 @@ export interface TaskProperties {
   name: string;
   description?: string;
   isLocked?: boolean;
-  labelIds?: string[];
+  labelIds: string[];
   parentTaskId?: string;
   projectId: string;
   statusId: string;
@@ -23,7 +23,7 @@ export default class Task {
   name: string;
   description?: string;
   isLocked?: boolean;
-  labelIds?: string[];
+  labelIds: string[];
   parentTaskId?: string;
   projectId: string;
   statusId: string;
