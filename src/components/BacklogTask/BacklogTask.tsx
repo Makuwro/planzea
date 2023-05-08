@@ -5,6 +5,7 @@ import Project from "../../client/Project";
 import Task from "../../client/Task";
 import Client from "../../client/Client";
 import completeSound from "../../complete.ogg";
+import Label from "../../client/Label";
 
 interface BacklogTaskComponentProperties {
   client: Client;
@@ -65,6 +66,38 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
 
   }
 
+  const [labels, setLabels] = useState<Label[]>([]);
+  useEffect(() => {
+
+    (async () => {
+
+      const labelIds = task.labelIds ?? [];
+      const labels = (await project.getLabels()).filter((label) => labelIds.includes(label.id));
+      setLabels(labels);
+
+    })();
+
+  }, [task]);
+
+  async function addLabel() {
+
+    const labelName = prompt("Enter a label name.");
+    if (labelName) {
+
+      // Check if there's a similar label.
+      const projectLabels = await project.getLabels();
+      const label = projectLabels.find((label) => label.name === labelName) ?? await project.createLabel({name: labelName});
+    
+      // Add the label to the task.
+      task.labelIds = [...task.labelIds, label.id];
+      await task.update({labelIds: task.labelIds});
+      onUpdate(new Task(structuredClone(task), client));
+      
+
+    }
+
+  }
+
   return (
     <li className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`}>
       <button onClick={onClick} />
@@ -73,9 +106,19 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
           <section className={styles.statusContainer}>
             <button className={styles.status} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} ref={statusButtonRef} style={{backgroundColor: statusHexBG}} />
           </section>
-          <span style={task.statusId === "dc" ? {color: "#9d9d9d"} : undefined}>{task.name}</span>
+          <span style={task.statusId === "dc" ? {color: "#9d9d9d"} : undefined}>
+            {task.name}
+          </span>
+          <ul className={styles.labels}>
+            {
+              labels.map((label) => <li key={label.id}>{label.name}</li>)
+            }
+          </ul>
         </span>
         <span className={styles.taskOptions}>
+          <button onClick={addLabel}>
+            <Icon name="label" />
+          </button>
           <button onClick={onDelete}>
             <Icon name="delete_forever" />
           </button>
