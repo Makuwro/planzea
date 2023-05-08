@@ -6,6 +6,57 @@
   flex-shrink: 0;
 }
 
+.statusContainer {
+  display: flex;
+}
+
+.statusSelector {
+  border-radius: 5px;
+  box-shadow: var(--box-shadow-default);
+  overflow: hidden;
+  position: relative;
+  bottom: 0;
+  width: calc(100% - 25px);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.statusSelectorContainer {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: flex;
+  background-color: rgba(47, 47, 47, 0.679);
+  backdrop-filter: blur(5px);
+  width: 100%;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.statusSelector > ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.statusSelector button {
+  width: 100%;
+  text-align: left;
+  border-radius: 0;
+  font-weight: 300;
+  cursor: initial;
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.task {
+  display: flex;
+  width: 100%;
+  position: relative;
+}
+
 .task > button {
   width: 100%;
   text-align: left;
@@ -16,10 +67,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 15px;
   min-height: 40px;
   border: 1px solid transparent;
   box-sizing: border-box;
+  z-index: 0;
+  padding: 0;
 }
 
 .task > button:hover {
@@ -29,9 +81,21 @@
   cursor: initial;
 }
 
-.task > button > span {
+.task > section:first-of-type {
+  position: absolute;
+  width: 100%;
   display: flex;
+  padding: 0 15px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.task > section > span {
+  display: flex;
+  align-items: center;
   gap: 15px;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .task.selected > button {
@@ -39,7 +103,7 @@
   border-color: var(--border);
 }
 
-.task:hover .taskOptions > button {
+.task button:hover .taskOptions > button {
   border-radius: 100%;
   height: 30px;
   width: 30px;
@@ -52,4 +116,34 @@
 
 .taskOptions > button {
   display: none;
+}
+
+@media screen and (min-width: 720px) {
+  
+  .statusSelectorContainer {
+    background-color: transparent;
+    backdrop-filter: none;
+    top: initial;
+    left: initial;
+    position: fixed;
+    height: initial;
+    width: initial;
+    margin-top: 50px;
+    justify-content: initial;
+    align-items: initial;
+  }
+
+  .statusSelector {
+    bottom: initial;
+    position: relative;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  .task > button {
+    z-index: 1;
+  }
+
 }

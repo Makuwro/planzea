@@ -4,7 +4,6 @@ header {
   padding: 0 15px;
   height: var(--height-header);
   align-items: center;
-  z-index: 1;
   position: relative;
   border-bottom: 1px solid var(--border);
 }

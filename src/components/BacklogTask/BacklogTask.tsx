@@ -13,9 +13,12 @@ export default function BacklogTask({name, isSelected, onClick, onDelete}: Backl
 
   return (
     <li className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`}>
-      <button onClick={onClick}>
+      <button onClick={onClick} />
+      <section>
         <span>
-          <button className={styles.status} />
+          <section className={styles.statusContainer}>
+            <button className={styles.status} />
+          </section>
           <span>{name}</span>
         </span>
         <span className={styles.taskOptions}>
@@ -23,7 +26,22 @@ export default function BacklogTask({name, isSelected, onClick, onDelete}: Backl
             <Icon name="delete_forever" />
           </button>
         </span>
-      </button>
+      </section>
+      <section className={styles.statusSelectorContainer}>
+        <section className={styles.statusSelector}>
+          <ul>
+            <li>
+              <button>Not Started</button>
+            </li>
+            <li>
+              <button>In Progress</button>
+            </li>
+            <li>
+              <button>Completed</button>
+            </li>
+          </ul>
+        </section>
+      </section>
     </li>
   );
 
