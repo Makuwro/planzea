@@ -73,7 +73,7 @@ export default function Backlog({client}: {client: Client}) {
             <section id={styles.taskListContainer}>
               <ul id={styles.taskList}>
                 {
-                  tasks.map((task) => <BacklogTask key={task.id} name={task.name} isSelected={selectedBacklogTask?.id === task.id} onClick={() => setSelectedBacklogTask(task)} onDelete={async () => await deleteTask(task)} />)
+                  tasks.map((task) => <BacklogTask client={client} key={task.id} task={task} project={project} isSelected={selectedBacklogTask?.id === task.id} onClick={() => setSelectedBacklogTask(task)} onDelete={async () => await deleteTask(task)} onUpdate={(newTask) => setTasks(tasks.map((task) => task.id === newTask.id ? newTask : task))} />)
                 }
               </ul>
             </section>
