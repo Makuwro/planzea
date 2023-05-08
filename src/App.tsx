@@ -3,6 +3,7 @@ import Client from "./client/Client";
 import "./global.css";
 import Header from "./components/Header/Header";
 import Backlog from "./components/Backlog/Backlog";
+import TaskPopup from "./components/TaskPopup/TaskPopup";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -24,6 +25,8 @@ export default function App() {
 
   return client ? (
     <>
+    
+      <TaskPopup task={null} />
       <Header />
       <Backlog client={client} />
     </>
