@@ -40,6 +40,7 @@ const clientDatabase = new ClientDatabase();
 export default class Client {
 
   readonly #db = clientDatabase;
+  personalProjectId?: string;
 
   async #createObject(constructor: typeof Attachment, props: InitialAttachmentProperties): Promise<Attachment>;
   async #createObject(constructor: typeof Task, props: InitialTaskProperties): Promise<Task>;
@@ -260,6 +261,24 @@ export default class Client {
 
     }
 
+  }
+
+  async initialize(): Promise<void> {
+
+    // Make sure the user has a personal project.
+    let personalProjectId = await this.#db.settings.get("personalProjectId");
+
+    if (!personalProjectId) {
+
+      // Create a personal project.
+      const personalProject = await this.createProject({name: "Personal"});
+      this.#db.settings.put(personalProject.id, "personalProjectId");
+      personalProjectId = personalProject.id;
+
+    }
+
+    this.personalProjectId = personalProjectId;
+    
   }
 
   async getAttachment(attachmentId: string): Promise<Attachment> {

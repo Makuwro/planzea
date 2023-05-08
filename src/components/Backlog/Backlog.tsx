@@ -1,26 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Backlog.module.css";
-import Issue from "../../client/Task";
 import BacklogTask from "../BacklogTask/BacklogTask";
-import Icon from "../Icon/Icon";
 import BacklogViewModificationOptions from "../BacklogViewModificationOptions/BacklogViewModificationOptions";
+import Client from "../../client/Client";
+import Project from "../../client/Project";
+import Task from "../../client/Task";
 
-export default function Backlog() {
+export default function Backlog({client}: {client: Client}) {
 
-  const [projects] = useState<Issue[]>([]);
+  const [project, setProject] = useState<Project | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedBacklogTaskId, setSelectedBacklogTaskId] = useState<string | null>(null);
 
-  return (
+  useEffect(() => {
+
+    (async () => {
+
+      if (project) {
+
+        setTasks(await project.getTasks());
+
+      } else if (client.personalProjectId) {
+
+        setProject(await client.getProject(client.personalProjectId));
+
+      }
+
+    })();
+
+  }, [project]);
+
+  return project ? (
     <main id={styles.main}>
-      <BacklogViewModificationOptions />
+      <BacklogViewModificationOptions project={project} onTaskCreate={(task) => setTasks([...tasks, task])} />
       {
-        projects[0] ? (
+        tasks[0] ? (
           <>
             <section id={styles.taskListContainer}>
               <ul id={styles.taskList}>
-                <BacklogTask name="Publish The Showrunners" />
-                <BacklogTask name="Design Siletrus' character reference sheet" />
-                <BacklogTask name="Do something with Lithicus Drakarox" />
+                {
+                  tasks.map((task) => <BacklogTask key={task.id} name={task.name} />)
+                }
               </ul>
             </section>
           </>
@@ -32,6 +52,6 @@ export default function Backlog() {
         )
       }
     </main>
-  );
+  ) : null;
 
 }
