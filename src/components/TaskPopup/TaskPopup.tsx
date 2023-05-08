@@ -2,16 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "./TaskPopup.module.css";
 import Icon from "../Icon/Icon";
 import Task from "../../client/Task";
+import { useNavigate } from "react-router-dom";
 
-export default function TaskPopup({task}: {task: Task | null}) {
+export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onClose: () => void; task: Task}) {
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isShown, setIsShown] = useState<boolean>(false);
 
   useEffect(() => {
 
-    setIsOpen(true);
+    setTimeout(() => setIsShown(isOpen), 20);
 
-  }, []);
+  }, [isOpen]);
 
   const descriptionRef = useRef<HTMLElement>(null);
   async function updateDescription() {
@@ -150,8 +151,19 @@ export default function TaskPopup({task}: {task: Task | null}) {
     
   }
 
+  const navigate = useNavigate();
+
   return (
-    <section id={styles.popupContainer} className={isOpen ? styles.open : undefined}>
+    <section id={styles.popupContainer} className={isShown ? styles.open : undefined} onTransitionEnd={() => {
+      
+      if (!isShown) {
+
+        navigate("/personal/tasks");
+        onClose();
+
+      }
+    
+    }}>
       <section id={styles.popup}>
         <section id={styles.popupHeader}>
           <label>Project Name</label>
@@ -159,13 +171,13 @@ export default function TaskPopup({task}: {task: Task | null}) {
             <button>
               <Icon name="more_horiz" />
             </button>
-            <button id={styles.closeButton}>
+            <button id={styles.closeButton} onClick={() => setIsShown(false)}>
               <Icon name="close" />
             </button>
           </span>
         </section>
         <section id={styles.popupContent}>
-          <h1>Give collaborators access to the GitHub repository</h1>
+          <h1>{task.name}</h1>
           <nav>
             <button className={styles.selected}>Details</button>
             <button>Activity</button>

@@ -108,55 +108,53 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
   }
 
   return (
-    <>
-      <li className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`}>
-        <button onClick={onClick} />
-        <section>
-          <span>
-            <section className={styles.statusContainer}>
-              <button className={styles.status} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} ref={statusButtonRef} style={{backgroundColor: statusHexBG}} />
-            </section>
-            <span style={task.statusId === "dc" ? {color: "#9d9d9d"} : undefined}>
-              {task.name}
-            </span>
-            <ul className={styles.labels}>
-              {
-                labels.map((label) => (
-                  <li key={label.id}>
-                    <button onClick={async () => await removeLabel(label.id)}>
-                      {label.name}
-                    </button>
-                  </li>
-                ))
-              }
-            </ul>
-          </span>
-          <span className={styles.taskOptions}>
-            <button onClick={addLabel}>
-              <Icon name="label" />
-            </button>
-            <button onClick={onDelete}>
-              <Icon name="delete_forever" />
-            </button>
-          </span>
-        </section>
-        <section className={`${styles.statusSelectorContainer}${isStatusSelectorOpen ? ` ${styles.open}` : ""}`}>
-          <section className={styles.statusSelector} ref={statusSelectorRef}>
-            <ul>
-              {
-                project.statuses.map((status) => (
-                  <li key={status.id}>
-                    <button onClick={() => setStatus(status.id)}>
-                      {status.name}
-                    </button>
-                  </li>
-                ))
-              }
-            </ul>
+    <li className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`}>
+      <button onClick={onClick} />
+      <section>
+        <span>
+          <section className={styles.statusContainer}>
+            <button className={styles.status} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} ref={statusButtonRef} style={{backgroundColor: statusHexBG}} />
           </section>
+          <span style={task.statusId === "dc" ? {color: "#9d9d9d"} : undefined}>
+            {task.name}
+          </span>
+          <ul className={styles.labels}>
+            {
+              labels.map((label) => (
+                <li key={label.id}>
+                  <button onClick={async () => await removeLabel(label.id)}>
+                    {label.name}
+                  </button>
+                </li>
+              ))
+            }
+          </ul>
+        </span>
+        <span className={styles.taskOptions}>
+          <button onClick={addLabel}>
+            <Icon name="label" />
+          </button>
+          <button onClick={onDelete}>
+            <Icon name="delete_forever" />
+          </button>
+        </span>
+      </section>
+      <section className={`${styles.statusSelectorContainer}${isStatusSelectorOpen ? ` ${styles.open}` : ""}`}>
+        <section className={styles.statusSelector} ref={statusSelectorRef}>
+          <ul>
+            {
+              project.statuses.map((status) => (
+                <li key={status.id}>
+                  <button onClick={() => setStatus(status.id)}>
+                    {status.name}
+                  </button>
+                </li>
+              ))
+            }
+          </ul>
         </section>
-      </li>
-    </>
+      </section>
+    </li>
   );
 
 }

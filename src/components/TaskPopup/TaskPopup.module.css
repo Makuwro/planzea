@@ -45,9 +45,10 @@
 #popup {
   background-color: var(--background);
   overflow: hidden;
-  width: 80%;
-  height: 80%;
-  transition: 0.3s;
+  transform: scale(0.8);
+  height: 100%;
+  width: 100%;
+  transition: 0.15s;
   border-radius: 15px;
   max-height: 100%;
   max-width: 100%;
@@ -61,19 +62,22 @@
   width: 100%;
   height: 100%;
   transition: 0.15s;
+  opacity: 0;
+  display: flex;
+  pointer-events: none;
+  justify-content: center;
+  align-items: center;
 }
 
 #popupContainer.open {
   background-color: rgba(34, 34, 34, 0.752);
   backdrop-filter: blur(1px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  opacity: 1;
+  pointer-events: all;
 }
 
 #popupContainer.open #popup {
-  height: 100%;
-  width: 100%;
+  transform: scale(1);
   border-radius: 0;
 }
 
@@ -121,7 +125,7 @@
 
 @media screen and (min-width: 1080px) {
 
-  #popupContainer.open #popup {
+  #popupContainer #popup, #popupContainer.open #popup {
     border-radius: 5px;
     max-width: 1080px;
     max-height: 720px;
