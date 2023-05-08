@@ -65,6 +65,24 @@ export default function TaskPopup({task}: {task: Task | null}) {
 
   }
 
+  function verifyKey(event: React.KeyboardEvent) {
+
+    const selection = window.getSelection();
+    const range = selection?.getRangeAt(0);
+    if (range) {
+
+      // Get first element.
+      if (event.key === "Backspace" && range.startOffset === 0) {
+
+        event.preventDefault();
+        return;
+
+      }
+
+    }
+    
+  }
+
   return (
     <section id={styles.popupContainer} className={isOpen ? styles.open : undefined}>
       <section id={styles.popup}>
@@ -90,6 +108,7 @@ export default function TaskPopup({task}: {task: Task | null}) {
               id={styles.description} 
               ref={descriptionRef}
               contentEditable 
+              onKeyDown={verifyKey}
               suppressContentEditableWarning
               onBlur={updateDescription}>
               <p placeholder="What's this task about?" />
