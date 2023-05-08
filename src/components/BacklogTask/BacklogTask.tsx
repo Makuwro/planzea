@@ -19,11 +19,6 @@ export default function BacklogTask({name, isSelected, onClick}: BacklogTaskComp
           </button>
           <span>{name}</span>
         </span>
-        <section className={styles.taskOptions}>
-          <button>
-            <Icon name="more_vert" />
-          </button>
-        </section>
       </button>
     </li>
   );
