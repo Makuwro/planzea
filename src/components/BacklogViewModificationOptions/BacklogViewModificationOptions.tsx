@@ -8,8 +8,13 @@ export default function BacklogViewModificationOptions({project, onTaskCreate}: 
 
   async function createTask() {
 
-    const task = await project.createTask({name: "Unnamed task"});
-    onTaskCreate(task);
+    const taskName = prompt("Enter a task name.");
+    if (taskName) {
+
+      const task = await project.createTask({name: taskName});
+      onTaskCreate(task);
+
+    }
 
   }
 
