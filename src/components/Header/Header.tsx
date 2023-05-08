@@ -10,7 +10,7 @@ export default function Header() {
       <section id={styles.left}>
         <button id={styles.projectSelector}>Personal</button>
         <nav>
-          <Link to="/tasks" className={styles.selected}>Tasks</Link>
+          <Link to="/personal/tasks" className={styles.selected}>Tasks</Link>
           <Link to="/calendar">Calendar</Link>
         </nav>
       </section>
