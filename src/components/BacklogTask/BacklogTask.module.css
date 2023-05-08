@@ -10,6 +10,10 @@
   display: flex;
 }
 
+.statusContainer {
+  pointer-events: all;
+}
+
 .statusSelector {
   border-radius: 5px;
   box-shadow: var(--box-shadow-default);
@@ -22,6 +26,10 @@
 }
 
 .statusSelectorContainer {
+  display: none;
+}
+
+.statusSelectorContainer.open {
   position: fixed;
   z-index: 1;
   top: 0;
@@ -90,12 +98,15 @@
   box-sizing: border-box;
 }
 
+.task > section:first-of-type > span {
+  pointer-events: none;
+}
+
 .task > section > span {
   display: flex;
   align-items: center;
   gap: 15px;
   z-index: 1;
-  pointer-events: none;
 }
 
 .task.selected > button {
@@ -120,7 +131,7 @@
 
 @media screen and (min-width: 720px) {
   
-  .statusSelectorContainer {
+  .statusSelectorContainer.open {
     background-color: transparent;
     backdrop-filter: none;
     top: initial;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./BacklogTask.module.css";
 import Icon from "../Icon/Icon";
 
@@ -11,13 +11,15 @@ interface BacklogTaskComponentProperties {
 
 export default function BacklogTask({name, isSelected, onClick, onDelete}: BacklogTaskComponentProperties) {
 
+  const [isStatusSelectorOpen, setIsStatusSelectorOpen] = useState<boolean>(false);
+
   return (
     <li className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`}>
       <button onClick={onClick} />
       <section>
         <span>
           <section className={styles.statusContainer}>
-            <button className={styles.status} />
+            <button className={styles.status} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} />
           </section>
           <span>{name}</span>
         </span>
@@ -27,7 +29,7 @@ export default function BacklogTask({name, isSelected, onClick, onDelete}: Backl
           </button>
         </span>
       </section>
-      <section className={styles.statusSelectorContainer}>
+      <section className={`${styles.statusSelectorContainer}${isStatusSelectorOpen ? ` ${styles.open}` : ""}`}>
         <section className={styles.statusSelector}>
           <ul>
             <li>
