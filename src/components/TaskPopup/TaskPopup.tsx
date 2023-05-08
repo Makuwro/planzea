@@ -47,7 +47,7 @@ export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onC
       }
 
       // Save the new description.
-      // await task?.update({description: newDescription});
+      await task.update({description: newDescription});
 
       // Update the description view.
       if (!newDescription) {
@@ -151,6 +151,27 @@ export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onC
     
   }
 
+  const [descriptionComponents, setDescriptionComponents] = useState<React.ReactElement[]>([<p key={0} placeholder="What's this task about?" />]);
+  useEffect(() => {
+
+    if (task.description) {
+
+      const paragraphs = task.description.split("\n");
+      const descriptionComponents = [];
+      for (let i = 0; paragraphs.length > i; i++) {
+
+        descriptionComponents.push(
+          <p key={i}>
+            {paragraphs[i]}
+          </p>
+        );
+
+      }
+      setDescriptionComponents(descriptionComponents);
+
+    }
+
+  }, [task]);
   const navigate = useNavigate();
 
   return (
@@ -166,7 +187,7 @@ export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onC
     }}>
       <section id={styles.popup}>
         <section id={styles.popupHeader}>
-          <label>Project Name</label>
+          <label>Personal</label>
           <span id={styles.actions}>
             <button>
               <Icon name="more_horiz" />
@@ -190,7 +211,7 @@ export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onC
               onKeyDown={verifyKey}
               suppressContentEditableWarning
               onBlur={updateDescription}>
-              <p placeholder="What's this task about?" />
+              {descriptionComponents}
             </section>
             <section>
               <label>Labels</label>
