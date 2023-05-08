@@ -5,12 +5,14 @@ import BacklogViewModificationOptions from "../BacklogViewModificationOptions/Ba
 import Client from "../../client/Client";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
+import { useNavigate } from "react-router-dom";
 
 export default function Backlog({client}: {client: Client}) {
 
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [selectedBacklogTask, setSelectedBacklogTask] = useState<Task | null>(null);
+  const [taskSelection, setTaskSelection] = useState<{task: Task; time: number} | null>(null);
+  const [taskSelectionPrevious, setTaskSelectionPrevious] = useState<{task: Task; time: number} | null>(null);
 
   useEffect(() => {
 
@@ -36,21 +38,28 @@ export default function Backlog({client}: {client: Client}) {
 
       await task.delete();
       setTasks(tasks.filter((possibleTask) => possibleTask.id !== task.id));
-      setSelectedBacklogTask(null);
+      setTaskSelection(null);
 
     }
 
   };
 
+  const navigate = useNavigate();
   useEffect(() => {
 
-    if (selectedBacklogTask) {
+    if (taskSelection) {
+
+      if (taskSelectionPrevious && taskSelection.time - taskSelectionPrevious.time <= 500) {
+
+        navigate(`/personal/tasks/${taskSelection.task.id}`);
+
+      }
 
       const verifyDeleteButton = async (event: KeyboardEvent) => {
 
         if (event.key === "Delete") {
 
-          await deleteTask(selectedBacklogTask);
+          await deleteTask(taskSelection.task);
 
         }
 
@@ -62,7 +71,7 @@ export default function Backlog({client}: {client: Client}) {
 
     }
 
-  }, [selectedBacklogTask]);
+  }, [taskSelection]);
 
   return project ? (
     <main id={styles.main}>
@@ -73,7 +82,13 @@ export default function Backlog({client}: {client: Client}) {
             <section id={styles.taskListContainer}>
               <ul id={styles.taskList}>
                 {
-                  tasks.map((task) => <BacklogTask client={client} key={task.id} task={task} project={project} isSelected={selectedBacklogTask?.id === task.id} onClick={() => setSelectedBacklogTask(task)} onDelete={async () => await deleteTask(task)} onUpdate={(newTask) => setTasks(tasks.map((task) => task.id === newTask.id ? newTask : task))} />)
+                  tasks.map((task) => <BacklogTask client={client} key={task.id} task={task} project={project} isSelected={taskSelection?.task.id === task.id} onClick={() => {
+                    
+                    const newTaskSelection = {task, time: new Date().getTime()};
+                    setTaskSelection(newTaskSelection);
+                    setTaskSelectionPrevious(taskSelection);
+                  
+                  }} onDelete={async () => await deleteTask(task)} onUpdate={(newTask) => setTasks(tasks.map((task) => task.id === newTask.id ? newTask : task))} />)
                 }
               </ul>
             </section>

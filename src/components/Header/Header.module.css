@@ -77,7 +77,7 @@ header h1 {
   }
 
   .selected {
-    background-color: #d0dcff;
+    background-color: var(--link-selected);
     font-weight: 400;
   }
 
