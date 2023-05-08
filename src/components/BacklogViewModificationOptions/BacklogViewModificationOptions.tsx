@@ -19,8 +19,8 @@ export default function BacklogViewModificationOptions({project, onTaskCreate}: 
   }
 
   return (
-    <section id={styles.viewModificationOptions} onClick={createTask}>
-      <button id={styles.addIssueButton}>
+    <section id={styles.viewModificationOptions}>
+      <button id={styles.addIssueButton} onClick={createTask}>
         <Icon name="add" />
       </button>
       <span>
