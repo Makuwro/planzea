@@ -25,6 +25,7 @@
   content: attr(placeholder);
   color: #b8b8b8; 
   cursor: text;
+  pointer-events: none;
 }
 
 #description [placeholder]:empty:focus::before {

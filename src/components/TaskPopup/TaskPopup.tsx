@@ -13,8 +13,6 @@ export default function TaskPopup({task}: {task: Task | null}) {
 
   }, []);
 
-  const [doesTaskLackDescription, setDoesTaskLackDescription] = useState<boolean>(true);
-
   const descriptionRef = useRef<HTMLElement>(null);
   async function updateDescription() {
 
@@ -48,13 +46,18 @@ export default function TaskPopup({task}: {task: Task | null}) {
       }
 
       // Save the new description.
-      console.log(newDescription);
       // await task?.update({description: newDescription});
 
       // Update the description view.
       if (!newDescription) {
 
-        setDoesTaskLackDescription(true);
+        // Check if there's a BR in the first element.
+        const potentialBR = descriptionInput.children[0].children[0];
+        if (potentialBR.tagName === "BR") {
+
+          potentialBR.remove();
+
+        }
 
       }
 
@@ -88,16 +91,8 @@ export default function TaskPopup({task}: {task: Task | null}) {
               ref={descriptionRef}
               contentEditable 
               suppressContentEditableWarning
-              onClick={() => setDoesTaskLackDescription(false)} 
               onBlur={updateDescription}>
-              {
-                doesTaskLackDescription ? (
-                  <p id={styles.placeholder} placeholder="What's this task about?" />
-                ) : null
-              }
-              <p>
-                <br />
-              </p>
+              <p placeholder="What's this task about?" />
             </section>
             <section>
               <label>Labels</label>
