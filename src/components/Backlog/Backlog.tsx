@@ -30,25 +30,35 @@ export default function Backlog({client}: {client: Client}) {
 
   }, [project]);
 
+  const deleteTask = async (task: Task) => {
+
+    if (confirm("Are you sure you want to delete this task?")) {
+
+      await task.delete();
+      setTasks(tasks.filter((possibleTask) => possibleTask.id !== task.id));
+      setSelectedBacklogTask(null);
+
+    }
+
+  };
+
   useEffect(() => {
 
     if (selectedBacklogTask) {
 
-      const deleteTask = async (event: KeyboardEvent) => {
+      const verifyDeleteButton = async (event: KeyboardEvent) => {
 
-        if (event.key === "Delete" && confirm("Are you sure you want to delete this task?")) {
+        if (event.key === "Delete") {
 
-          await selectedBacklogTask.delete();
-          setTasks(tasks.filter((task) => task.id !== selectedBacklogTask.id));
-          setSelectedBacklogTask(null);
+          await deleteTask(selectedBacklogTask);
 
         }
 
       };
 
-      window.addEventListener("keydown", deleteTask);
+      window.addEventListener("keydown", verifyDeleteButton);
       
-      return () => window.removeEventListener("keydown", deleteTask);
+      return () => window.removeEventListener("keydown", verifyDeleteButton);
 
     }
 
@@ -63,7 +73,7 @@ export default function Backlog({client}: {client: Client}) {
             <section id={styles.taskListContainer}>
               <ul id={styles.taskList}>
                 {
-                  tasks.map((task) => <BacklogTask key={task.id} name={task.name} isSelected={selectedBacklogTask?.id === task.id} onClick={() => setSelectedBacklogTask(task)} />)
+                  tasks.map((task) => <BacklogTask key={task.id} name={task.name} isSelected={selectedBacklogTask?.id === task.id} onClick={() => setSelectedBacklogTask(task)} onDelete={async () => await deleteTask(task)} />)
                 }
               </ul>
             </section>

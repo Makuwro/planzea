@@ -6,18 +6,22 @@ interface BacklogTaskComponentProperties {
   isSelected: boolean;
   name: string;
   onClick: () => void;
+  onDelete: () => void;
 }
 
-export default function BacklogTask({name, isSelected, onClick}: BacklogTaskComponentProperties) {
+export default function BacklogTask({name, isSelected, onClick, onDelete}: BacklogTaskComponentProperties) {
 
   return (
     <li className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`}>
       <button onClick={onClick}>
         <span>
-          <button className={styles.status}>
-
-          </button>
+          <button className={styles.status} />
           <span>{name}</span>
+        </span>
+        <span className={styles.taskOptions}>
+          <button onClick={onDelete}>
+            <Icon name="delete_forever" />
+          </button>
         </span>
       </button>
     </li>
