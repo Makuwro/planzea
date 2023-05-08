@@ -10,6 +10,7 @@ export class ClientDatabase extends Dexie {
   readonly tasks!: Table<TaskProperties>;
   readonly labels!: Table<LabelProperties>;
   readonly projects!: Table<ProjectProperties>;
+  readonly settings!: Table<string>;
 
   constructor() {
 
@@ -18,7 +19,8 @@ export class ClientDatabase extends Dexie {
       attachments: "&id, name, description, issueIds",
       tasks: "&id, name, description, status",
       labels: "&id, name, description",
-      projects: "&id, name, description"
+      projects: "&id, name, description",
+      settings: ",personalProjectId"
     });
 
   }
