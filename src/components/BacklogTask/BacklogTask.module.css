@@ -12,11 +12,13 @@
   color: var(--text);
   font-weight: 300;
   background-color: transparent;
-  border-radius: 0;
+  border-radius: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 5px 15px;
+  border: 1px solid transparent;
+  box-sizing: border-box;
 }
 
 .task > button:hover {
@@ -29,6 +31,11 @@
 .task > button > span {
   display: flex;
   gap: 15px;
+}
+
+.task.selected > button {
+  background-color:rgb(228, 228, 228);
+  border-color: var(--border);
 }
 
 .taskOptions > button {

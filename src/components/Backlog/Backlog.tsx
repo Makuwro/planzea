@@ -10,7 +10,7 @@ export default function Backlog({client}: {client: Client}) {
 
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [selectedBacklogTaskId, setSelectedBacklogTaskId] = useState<string | null>(null);
+  const [selectedBacklogTask, setSelectedBacklogTask] = useState<Task | null>(null);
 
   useEffect(() => {
 
@@ -30,6 +30,30 @@ export default function Backlog({client}: {client: Client}) {
 
   }, [project]);
 
+  useEffect(() => {
+
+    if (selectedBacklogTask) {
+
+      const deleteTask = async (event: KeyboardEvent) => {
+
+        if (event.key === "Delete" && confirm("Are you sure you want to delete this task?")) {
+
+          await selectedBacklogTask.delete();
+          setTasks(tasks.filter((task) => task.id !== selectedBacklogTask.id));
+          setSelectedBacklogTask(null);
+
+        }
+
+      };
+
+      window.addEventListener("keydown", deleteTask);
+      
+      return () => window.removeEventListener("keydown", deleteTask);
+
+    }
+
+  }, [selectedBacklogTask]);
+
   return project ? (
     <main id={styles.main}>
       <BacklogViewModificationOptions project={project} onTaskCreate={(task) => setTasks([...tasks, task])} />
@@ -39,7 +63,7 @@ export default function Backlog({client}: {client: Client}) {
             <section id={styles.taskListContainer}>
               <ul id={styles.taskList}>
                 {
-                  tasks.map((task) => <BacklogTask key={task.id} name={task.name} />)
+                  tasks.map((task) => <BacklogTask key={task.id} name={task.name} isSelected={selectedBacklogTask?.id === task.id} onClick={() => setSelectedBacklogTask(task)} />)
                 }
               </ul>
             </section>
