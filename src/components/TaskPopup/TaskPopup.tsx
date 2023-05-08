@@ -67,17 +67,84 @@ export default function TaskPopup({task}: {task: Task | null}) {
 
   function verifyKey(event: React.KeyboardEvent) {
 
+    const descriptionInput = descriptionRef.current;
     const selection = window.getSelection();
     const range = selection?.getRangeAt(0);
-    if (range) {
+    if (descriptionInput && selection && range && event.key === "Backspace") {
 
-      // Get first element.
-      if (event.key === "Backspace" && range.startOffset === 0) {
+      // Check if the user is at the beginning of the first paragraph.
+      const { startContainer, endContainer } = range;
+      if (startContainer === descriptionInput && range.startOffset === 0 && range.endOffset === 1) {
+
+        event.preventDefault();
+        descriptionInput.childNodes[0].textContent = "";
+
+        // Reset selection.
+        const newRange = document.createRange();
+        newRange.setStart(descriptionInput.childNodes[0], 0);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+
+        return;
+
+      }
+
+      const startParent = startContainer.parentElement;
+      const startIndex = startParent && [...descriptionInput.children].indexOf(startContainer instanceof Element ? startContainer : startParent);
+      const isFirstParagraphSelected = startIndex === 0;
+
+      if (isFirstParagraphSelected && range.startOffset === 0 && range.endOffset === 0) {
 
         event.preventDefault();
         return;
 
       }
+
+      if (startParent && isFirstParagraphSelected && range.startOffset === 0) {
+
+        // Prevent the user from deleting the first paragraph.
+        event.preventDefault();
+
+        // Splice the first paragraph and end paragraph text.
+        const endParent = range.endContainer.parentElement;
+        const preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(startParent);
+        preCaretRange.setEnd(range.startContainer, range.startOffset);
+        const startOffset = preCaretRange.toString().length;
+        preCaretRange.selectNodeContents(endParent ?? startParent);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+        const endOffset = preCaretRange.toString().length;
+        const startText = startParent.textContent?.slice(0, startOffset) ?? "";
+        startParent.textContent = `${startText}${(endParent ?? startParent).textContent?.slice(endOffset) ?? ""}`;
+
+        if (endParent && startParent !== endParent) {
+
+          // Remove the other elements.
+          const descriptionChildren = [...descriptionRef.current.children];
+          const endIndex = descriptionChildren.indexOf(endParent);
+          for (let i = startIndex + 1; endIndex >= i; i++) {
+
+            descriptionChildren[i].remove();
+
+          }
+
+          // Reset selection.
+          const newRange = document.createRange();
+          newRange.setStart(startParent, startText.length);
+          newRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+
+        }
+
+        return;
+
+      }
+
+      // For some reason, Firefox prevents users from typing after they replace a chunk of the text.
+      // It probably has something to do with the range because this line fixes the problem.
+      range.setEnd(range.endContainer, range.endOffset);
 
     }
     
