@@ -215,7 +215,11 @@ export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onC
             </section>
             <section>
               <label>Labels</label>
-              <p>This task doesn't have any labels.</p>
+              <p>None</p>
+            </section>
+            <section>
+              <label>Due date</label>
+              <p>None</p>
             </section>
           </section>
         </section>
