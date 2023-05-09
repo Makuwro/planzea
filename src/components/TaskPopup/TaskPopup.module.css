@@ -38,6 +38,12 @@
   gap: 15px;
 }
 
+#details > section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 #placeholder {
   position: fixed;
 }

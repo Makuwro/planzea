@@ -1,0 +1,6 @@
+.toggleButton {
+  background-color: white;
+  border: 1px solid var(--border);
+  box-shadow: var(--box-shadow-default);
+  color: var(--text);
+}
