@@ -101,7 +101,7 @@
   min-height: 40px;
   border: 1px solid transparent;
   box-sizing: border-box;
-  z-index: 0;
+  z-index: 1;
   padding: 0;
 }
 
@@ -181,10 +181,6 @@
     border: 1px solid var(--border);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-  }
-
-  .task > button {
-    z-index: 1;
   }
 
 }
