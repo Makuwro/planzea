@@ -44,6 +44,17 @@
   gap: 5px;
 }
 
+#details > section > label {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 24px;
+}
+
+.expired {
+  color: #ff4545;
+}
+
 #placeholder {
   position: fixed;
 }

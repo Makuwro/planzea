@@ -92,6 +92,7 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate}: {cl
 
   async function updateDueDate(newDate: string) {
 
+    console.log(newDate);
     await task.update({dueDate: newDate});
     task.dueDate = newDate;
     onUpdate(new Task(structuredClone(task), client));
@@ -185,6 +186,15 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate}: {cl
 
   const navigate = useNavigate();
 
+  // Determine if the due date has expired.
+  const currentDate = new Date();
+  currentDate.setMilliseconds(0);
+  currentDate.setSeconds(0);
+  currentDate.setMinutes(0);
+  currentDate.setHours(0);
+  currentDate.setDate(currentDate.getDate() - 1);
+  const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
+
   return (
     <section id={styles.popupContainer} className={isShown ? styles.open : undefined} onTransitionEnd={() => {
       
@@ -229,7 +239,10 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate}: {cl
               <p>None</p>
             </section>
             <section>
-              <label>Due date</label>
+              <label className={isPastDue ? styles.expired : undefined}>
+                Due date
+                {isPastDue ? <Icon name="warning" /> : null}
+              </label>
               <span>
                 <DateInput date={task.dueDate} onChange={async (newDate) => await updateDueDate(newDate)} />
               </span>
