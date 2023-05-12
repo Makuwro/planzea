@@ -50,7 +50,7 @@ export default function App() {
 
   return client ? (
     <>
-      {task ? <TaskPopup task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
+      {task ? <TaskPopup client={client} onUpdate={(newTask) => setTask(newTask)} task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
       <Header />
       <Routes>
         <Route path="/:username/tasks" element={<Backlog client={client} />} />

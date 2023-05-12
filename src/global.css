@@ -24,8 +24,9 @@
   --link: #5297f1;
   --link-selected: #d0dcff;
   --text: #5f6368;
+  --text-red: #ff4545;
   --text-important: #101010;
-  --box-shadow-default: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  --box-shadow-default: rgba(0, 0, 0, 0.1) 0px 4px 12px;
   --formatter-selected: #aae9ba;
   --placeholder: #6c6c6e;
   --input-min-height: 47.2px;

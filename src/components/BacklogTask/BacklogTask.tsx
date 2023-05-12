@@ -107,6 +107,10 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
 
   }
 
+  // Make a due date.
+  const dueDate = task.dueDate ? new Date(task.dueDate) : undefined;
+  const dueMonth = dueDate ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][dueDate.getMonth()] : undefined;
+
   return (
     <li className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`}>
       <button onClick={onClick} />
@@ -130,12 +134,10 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
             }
           </ul>
         </span>
-        <span className={styles.taskOptions}>
-          <button onClick={addLabel}>
-            <Icon name="label" />
-          </button>
-          <button onClick={onDelete}>
-            <Icon name="delete_forever" />
+        <span>
+          {dueMonth && dueDate ? <span>{dueMonth} {dueDate.getDate() + 1}</span> : null}
+          <button className={styles.taskOptions} onClick={addLabel}>
+            <Icon name="more_horiz" />
           </button>
         </span>
       </section>

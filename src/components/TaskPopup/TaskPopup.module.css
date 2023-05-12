@@ -38,6 +38,23 @@
   gap: 15px;
 }
 
+#details > section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#details > section > label {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 24px;
+}
+
+.expired {
+  color: var(--text-red);
+}
+
 #placeholder {
   position: fixed;
 }

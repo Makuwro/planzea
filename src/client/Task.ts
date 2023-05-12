@@ -5,6 +5,7 @@ export interface TaskProperties {
   id: string;
   name: string;
   description?: string;
+  dueDate?: string;
   isLocked?: boolean;
   labelIds: string[];
   parentTaskId?: string;
@@ -22,6 +23,7 @@ export default class Task {
   readonly id: string;
   name: string;
   description?: string;
+  dueDate?: string;
   isLocked?: boolean;
   labelIds: string[];
   parentTaskId?: string;
@@ -33,6 +35,7 @@ export default class Task {
     this.id = props.id;
     this.name = props.name;
     this.description = props.description;
+    this.dueDate = props.dueDate;
     this.projectId = props.projectId;
     this.labelIds = props.labelIds;
     this.parentTaskId = props.parentTaskId;

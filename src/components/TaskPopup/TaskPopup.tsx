@@ -3,8 +3,10 @@ import styles from "./TaskPopup.module.css";
 import Icon from "../Icon/Icon";
 import Task from "../../client/Task";
 import { useNavigate } from "react-router-dom";
+import DateInput from "../DateInput/DateInput";
+import Client from "../../client/Client";
 
-export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onClose: () => void; task: Task}) {
+export default function TaskPopup({client, isOpen, onClose, task, onUpdate}: {client: Client; isOpen: boolean; onClose: () => void; task: Task; onUpdate: (newTask: Task) => void}) {
 
   const [isShown, setIsShown] = useState<boolean>(false);
 
@@ -13,6 +15,28 @@ export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onC
     setTimeout(() => setIsShown(isOpen), 20);
 
   }, [isOpen]);
+
+  const [descriptionComponents, setDescriptionComponents] = useState<React.ReactElement[]>([<p key={0} placeholder="What's this task about?" />]);
+  useEffect(() => {
+
+    if (task.description) {
+
+      const paragraphs = task.description.split("\n");
+      const descriptionComponents = [];
+      for (let i = 0; paragraphs.length > i; i++) {
+
+        descriptionComponents.push(
+          <p key={i}>
+            {paragraphs[i]}
+          </p>
+        );
+
+      }
+      setDescriptionComponents(descriptionComponents);
+
+    }
+
+  }, [task]);
 
   const descriptionRef = useRef<HTMLElement>(null);
   async function updateDescription() {
@@ -54,7 +78,7 @@ export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onC
 
         // Check if there's a BR in the first element.
         const potentialBR = descriptionInput.children[0].children[0];
-        if (potentialBR.tagName === "BR") {
+        if (potentialBR?.tagName === "BR") {
 
           potentialBR.remove();
 
@@ -63,6 +87,15 @@ export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onC
       }
 
     }
+
+  }
+
+  async function updateDueDate(newDate: string) {
+
+    console.log(newDate);
+    await task.update({dueDate: newDate});
+    task.dueDate = newDate;
+    onUpdate(new Task(structuredClone(task), client));
 
   }
 
@@ -151,28 +184,16 @@ export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onC
     
   }
 
-  const [descriptionComponents, setDescriptionComponents] = useState<React.ReactElement[]>([<p key={0} placeholder="What's this task about?" />]);
-  useEffect(() => {
-
-    if (task.description) {
-
-      const paragraphs = task.description.split("\n");
-      const descriptionComponents = [];
-      for (let i = 0; paragraphs.length > i; i++) {
-
-        descriptionComponents.push(
-          <p key={i}>
-            {paragraphs[i]}
-          </p>
-        );
-
-      }
-      setDescriptionComponents(descriptionComponents);
-
-    }
-
-  }, [task]);
   const navigate = useNavigate();
+
+  // Determine if the due date has expired.
+  const currentDate = new Date();
+  currentDate.setMilliseconds(0);
+  currentDate.setSeconds(0);
+  currentDate.setMinutes(0);
+  currentDate.setHours(0);
+  currentDate.setDate(currentDate.getDate() - 1);
+  const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
 
   return (
     <section id={styles.popupContainer} className={isShown ? styles.open : undefined} onTransitionEnd={() => {
@@ -215,7 +236,16 @@ export default function TaskPopup({isOpen, onClose, task}: {isOpen: boolean; onC
             </section>
             <section>
               <label>Labels</label>
-              <p>This task doesn't have any labels.</p>
+              <p>None</p>
+            </section>
+            <section>
+              <label className={isPastDue ? styles.expired : undefined}>
+                Due date
+                {isPastDue ? <Icon name="warning" /> : null}
+              </label>
+              <span>
+                <DateInput date={task.dueDate} onChange={async (newDate) => await updateDueDate(newDate)} />
+              </span>
             </section>
           </section>
         </section>
