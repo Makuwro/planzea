@@ -78,7 +78,7 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate}: {cl
 
         // Check if there's a BR in the first element.
         const potentialBR = descriptionInput.children[0].children[0];
-        if (potentialBR.tagName === "BR") {
+        if (potentialBR?.tagName === "BR") {
 
           potentialBR.remove();
 
