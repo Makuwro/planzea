@@ -52,7 +52,7 @@
 }
 
 .expired {
-  color: #ff4545;
+  color: var(--text-red);
 }
 
 #placeholder {
