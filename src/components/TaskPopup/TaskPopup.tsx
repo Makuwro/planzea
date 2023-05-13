@@ -247,6 +247,17 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate}: {cl
                 <DateInput date={task.dueDate} onChange={async (newDate) => await updateDueDate(newDate)} />
               </span>
             </section>
+            <section>
+              <label>Attachments</label>
+              <span>
+                <button>Attach file</button>
+              </span>
+              <ul>
+                <li>
+                  
+                </li>
+              </ul>
+            </section>
           </section>
         </section>
       </section>
