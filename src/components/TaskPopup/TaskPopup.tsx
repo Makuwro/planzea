@@ -5,6 +5,7 @@ import Task from "../../client/Task";
 import { useNavigate } from "react-router-dom";
 import DateInput from "../DateInput/DateInput";
 import Client from "../../client/Client";
+import TaskPopupAttachmentSection from "../TaskPopupAttachmentSection/TaskPopupAttachmentSection";
 
 export default function TaskPopup({client, isOpen, onClose, task, onUpdate}: {client: Client; isOpen: boolean; onClose: () => void; task: Task; onUpdate: (newTask: Task) => void}) {
 
@@ -247,17 +248,7 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate}: {cl
                 <DateInput date={task.dueDate} onChange={async (newDate) => await updateDueDate(newDate)} />
               </span>
             </section>
-            <section>
-              <label>Attachments</label>
-              <span>
-                <button>Attach file</button>
-              </span>
-              <ul>
-                <li>
-                  
-                </li>
-              </ul>
-            </section>
+            <TaskPopupAttachmentSection task={task} />
           </section>
         </section>
       </section>
