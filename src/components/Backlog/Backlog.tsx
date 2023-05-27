@@ -7,7 +7,7 @@ import Project from "../../client/Project";
 import Task from "../../client/Task";
 import { useNavigate } from "react-router-dom";
 
-export default function Backlog({client}: {client: Client}) {
+export default function Backlog({client, setCurrentProject}: {client: Client, setCurrentProject: (project: Project) => void}) {
 
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -21,6 +21,7 @@ export default function Backlog({client}: {client: Client}) {
       if (project) {
 
         setTasks(await project.getTasks());
+        setCurrentProject(project);
 
       } else if (client.personalProjectId) {
 

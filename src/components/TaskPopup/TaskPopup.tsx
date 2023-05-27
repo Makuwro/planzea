@@ -6,8 +6,10 @@ import { useNavigate } from "react-router-dom";
 import DateInput from "../DateInput/DateInput";
 import Client from "../../client/Client";
 import TaskPopupAttachmentSection from "../TaskPopupAttachmentSection/TaskPopupAttachmentSection";
+import TaskPopupSubTaskSection from "../TaskPopupSubTaskSection/TaskPopupSubTaskSection";
+import Project from "../../client/Project";
 
-export default function TaskPopup({client, isOpen, onClose, task, onUpdate}: {client: Client; isOpen: boolean; onClose: () => void; task: Task; onUpdate: (newTask: Task) => void}) {
+export default function TaskPopup({client, isOpen, onClose, task, onUpdate, project}: {client: Client; isOpen: boolean; onClose: () => void; task: Task; onUpdate: (newTask: Task) => void; project: Project}) {
 
   const [isShown, setIsShown] = useState<boolean>(false);
 
@@ -235,6 +237,7 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate}: {cl
               onBlur={updateDescription}>
               {descriptionComponents}
             </section>
+            <TaskPopupSubTaskSection task={task} project={project} />
             <section>
               <label>Labels</label>
               <p>None</p>
