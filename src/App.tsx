@@ -6,6 +6,7 @@ import Backlog from "./components/Backlog/Backlog";
 import TaskPopup from "./components/TaskPopup/TaskPopup";
 import { BrowserRouter, Route, Routes, matchPath, useLocation } from "react-router-dom";
 import Task from "./client/Task";
+import Project from "./client/Project";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -28,6 +29,7 @@ export default function App() {
   const [task, setTask] = useState<Task | null>(null);
   const [isTaskPopupOpen, setIsTaskPopupOpen] = useState<boolean>(false);
   const location = useLocation();
+
   useEffect(() => {
 
     (async () => {
@@ -48,13 +50,14 @@ export default function App() {
 
   }, [client, location]);
 
+  const [currentProject, setCurrentProject] = useState<Project | null>(null);
   return client ? (
     <>
-      {task ? <TaskPopup client={client} onUpdate={(newTask) => setTask(newTask)} task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
+      {task && currentProject ? <TaskPopup project={currentProject} client={client} onUpdate={(newTask) => setTask(newTask)} task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
       <Header />
       <Routes>
-        <Route path="/:username/tasks" element={<Backlog client={client} />} />
-        <Route path="/:username/tasks/:taskId" element={<Backlog client={client} />} />
+        <Route path="/:username/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
+        <Route path="/:username/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
       </Routes>
     </>
   ) : null;
