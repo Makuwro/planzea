@@ -71,6 +71,10 @@
   max-width: 100%;
 }
 
+#popup > section {
+  background-color: inherit;
+}
+
 #popupContainer {
   left: 0;
   top: 0;
