@@ -7,6 +7,7 @@ import TaskPopup from "./components/TaskPopup/TaskPopup";
 import { BrowserRouter, Route, Routes, matchPath, useLocation } from "react-router-dom";
 import Task from "./client/Task";
 import Project from "./client/Project";
+import SettingsPage from "./components/SettingsPage/SettingsPage";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -58,6 +59,7 @@ export default function App() {
       <Routes>
         <Route path="/:username/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
         <Route path="/:username/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
+        <Route path="/:username/settings" element={currentProject ? <SettingsPage client={client} project={currentProject} /> : null} />
       </Routes>
     </>
   ) : null;
