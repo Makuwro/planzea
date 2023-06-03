@@ -84,12 +84,12 @@ body, #root {
 button {
   background-color: var(--button);
   border: none;
-  padding: 10px 15px;
+  padding: 8px 20px;
   border-radius: 5px;
   font-size: 16px;
-  cursor: pointer;
   color: var(--button-text);
   transition: 0.05s;
+  font-weight: 300;
 }
 
 button:hover {
@@ -134,5 +134,6 @@ h1 {
   color: var(--text-important);
   font-weight: 400;
   margin: 0;
+  font-size: 22px;
 }
 

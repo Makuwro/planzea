@@ -8,6 +8,7 @@ import { BrowserRouter, Route, Routes, matchPath, useLocation } from "react-rout
 import Task from "./client/Task";
 import Project from "./client/Project";
 import SettingsPage from "./components/SettingsPage/SettingsPage";
+import HomePage from "./components/HomePage/HomePage";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
         <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
         <Route path="/:username/projects/:projectId/settings" element={currentProject ? <SettingsPage client={client} project={currentProject} /> : null} />
+        <Route path="/" element={<HomePage client={client} />} />
       </Routes>
     </>
   ) : null;
