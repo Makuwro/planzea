@@ -35,7 +35,7 @@ export default function App() {
 
     (async () => {
 
-      const taskId = matchPath("/:username/tasks/:taskId", location.pathname)?.params.taskId;
+      const taskId = matchPath("/:username/projects/:projectId/tasks/:taskId", location.pathname)?.params.taskId;
       if (client && taskId) {
 
         setTask(await client.getTask(taskId));
@@ -57,9 +57,9 @@ export default function App() {
       {task && currentProject ? <TaskPopup project={currentProject} client={client} onUpdate={(newTask) => setTask(newTask)} task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
       <Header />
       <Routes>
-        <Route path="/:username/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
-        <Route path="/:username/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
-        <Route path="/:username/settings" element={currentProject ? <SettingsPage client={client} project={currentProject} /> : null} />
+        <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
+        <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
+        <Route path="/:username/projects/:projectId/settings" element={currentProject ? <SettingsPage client={client} project={currentProject} /> : null} />
       </Routes>
     </>
   ) : null;

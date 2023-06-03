@@ -203,7 +203,7 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
       
       if (!isShown) {
 
-        navigate("/personal/tasks");
+        navigate("/personal/projects/projectId/tasks");
         onClose();
 
       }

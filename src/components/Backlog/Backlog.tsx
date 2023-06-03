@@ -52,7 +52,7 @@ export default function Backlog({client, setCurrentProject}: {client: Client, se
 
       if (taskSelectionPrevious && taskSelection.time - taskSelectionPrevious.time <= 500) {
 
-        navigate(`/personal/tasks/${taskSelection.task.id}`);
+        navigate(`/personal/projects/projectId/tasks/${taskSelection.task.id}`);
 
       }
 

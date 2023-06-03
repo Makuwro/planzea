@@ -8,11 +8,14 @@ export default function Header() {
   return (
     <header>
       <section id={styles.left}>
-        <button id={styles.projectSelector}>Personal</button>
+        {/* <button id={styles.projectSelector}>Personal</button>
         <nav>
-          <Link to="/personal/tasks" className={styles.selected}>Tasks</Link>
+          <Link to="/personal/projects/tasks" className={styles.selected}>Tasks</Link>
           <Link to="/calendar">Calendar</Link>
-        </nav>
+        </nav> */}
+        <Link to={"/"}>
+          Planzea
+        </Link>
       </section>
       <section id={styles.right}>
         <button id={styles.accountButton}>
