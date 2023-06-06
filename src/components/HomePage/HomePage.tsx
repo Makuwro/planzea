@@ -1,5 +1,6 @@
 import React from "react";
 import Client from "../../client/Client";
+import styles from "./HomePage.module.css";
 
 export default function HomePage({client}: {client: Client}) {
 
@@ -8,11 +9,9 @@ export default function HomePage({client}: {client: Client}) {
   }
 
   return (
-    <main>
-      <h1>Projects</h1>
-      <section>
+    <main id={styles.main}>
+      <section id={styles.noProjectsMessage}>
         <p>You don't have any projects yet. Want to change that?</p>
-        <button onClick={createProject}>Create project</button>
       </section>
     </main>
   );

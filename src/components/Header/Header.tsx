@@ -14,7 +14,7 @@ export default function Header() {
           <Link to="/calendar">Calendar</Link>
         </nav> */}
         <Link to={"/"}>
-          Planzea
+          Projects
         </Link>
       </section>
       <section id={styles.right}>
