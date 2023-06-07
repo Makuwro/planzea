@@ -51,7 +51,7 @@ export default function ProjectCreationPopup({client, documentTitle}: {client: C
       <p>A project serves as a container for all of your tasks.</p>
       <form onSubmit={(event) => {
         
-        event.stopPropagation();
+        event.preventDefault();
         setIsCreatingProject(true);
 
       }}>

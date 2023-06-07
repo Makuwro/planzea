@@ -4,7 +4,7 @@ import "./global.css";
 import Header from "./components/Header/Header";
 import Backlog from "./components/Backlog/Backlog";
 import TaskPopup from "./components/TaskPopup/TaskPopup";
-import { BrowserRouter, Route, Routes, matchPath, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, matchPath, useLocation, useNavigate, useParams } from "react-router-dom";
 import Task from "./client/Task";
 import Project from "./client/Project";
 import SettingsPage from "./components/SettingsPage/SettingsPage";
@@ -54,6 +54,9 @@ export default function App() {
 
   }, [client, location]);
 
+  const params = useParams();
+  console.log(params);
+
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   return client ? (
     <>
@@ -61,6 +64,12 @@ export default function App() {
       <ProjectCreationPopup client={client} documentTitle={documentTitle} />
       <Header />
       <Routes>
+        <Route path="/:username/projects/:projectId" element={<Navigate to={(() => {
+
+          const params = matchPath("/:username/projects/:projectId", location.pathname)?.params;
+          return params ? `/${params.username}/projects/${params.projectId}/tasks` : "/";
+
+        })()} replace />} />
         <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
         <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
         <Route path="/:username/projects/:projectId/settings" element={currentProject ? <SettingsPage client={client} project={currentProject} /> : null} />
