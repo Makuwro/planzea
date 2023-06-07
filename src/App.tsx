@@ -71,7 +71,7 @@ export default function App() {
         })()} replace />} />
         <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
-        <Route path="/:username/projects/:projectId/settings" element={currentProject ? <SettingsPage client={client} project={currentProject} /> : null} />
+        <Route path="/:username/projects/:projectId/settings" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} />} />
         <Route path="/" element={<HomePage client={client} setDocumentTitle={setDocumentTitle} />} />
       </Routes>
     </>

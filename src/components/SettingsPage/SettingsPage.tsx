@@ -1,18 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Client from "../../client/Client";
 import styles from "./SettingsPage.module.css";
 import Icon from "../Icon/Icon";
 import Project from "../../client/Project";
 import Label from "../../client/Label";
+import { useParams } from "react-router-dom";
 
-export default function SettingsPage({client, project}: {client: Client; project: Project}) {
+export default function SettingsPage({client, project, setCurrentProject}: {client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
   const [labels, setLabels] = useState<Label[]>([]);
+  const params = useParams<{projectId: string}>();
   useEffect(() => {
 
     (async () => {
 
-      setLabels(await project.getLabels());
+      if (project) {
+
+        setLabels(await project.getLabels());
+
+      } else if (params.projectId) {
+
+        const project = await client.getProject(params.projectId);
+        setCurrentProject(project);
+
+      }
 
     })();
 
