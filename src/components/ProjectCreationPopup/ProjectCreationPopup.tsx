@@ -47,7 +47,13 @@ export default function ProjectCreationPopup({client, documentTitle}: {client: C
   }, [isCreatingProject]);
 
   return (
-    <Popup name="New project" isOpen={isOpen} onClose={() => navigate("/", {replace: true})} maxHeight={250} maxWidth={420}>
+    <Popup name="New project" isOpen={isOpen} onClose={() => {
+      
+      navigate("/", {replace: true});
+      setProjectProperties({name: ""});
+      setIsCreatingProject(false);
+    
+    }} maxHeight={250} maxWidth={420}>
       <p>A project serves as a container for all of your tasks.</p>
       <form onSubmit={(event) => {
         

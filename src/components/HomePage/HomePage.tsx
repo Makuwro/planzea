@@ -9,6 +9,7 @@ export default function HomePage({setDocumentTitle}: {setDocumentTitle: (title: 
   useEffect(() => {
 
     setDocumentTitle("Home ▪ Planzea");
+    document.title = "Home ▪ Planzea";
 
   }, []);
 
