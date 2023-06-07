@@ -200,7 +200,7 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
   const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
 
   return (
-    <Popup name="Personal" onClose={() => {
+    <Popup isOpen name="Personal" onClose={() => {
 
       navigate("/personal/projects/projectId/tasks");
       onClose();

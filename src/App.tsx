@@ -16,6 +16,7 @@ export type SetState<T> = Dispatch<SetStateAction<T>>;
 export default function App() {
 
   const [client, setClient] = useState<Client | null>(null);
+  const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
 
   useEffect(() => {
 
@@ -57,13 +58,13 @@ export default function App() {
   return client ? (
     <>
       {task && currentProject ? <TaskPopup project={currentProject} client={client} onUpdate={(newTask) => setTask(newTask)} task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
-      <ProjectCreationPopup />
+      <ProjectCreationPopup client={client} documentTitle={documentTitle} />
       <Header />
       <Routes>
         <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
         <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
         <Route path="/:username/projects/:projectId/settings" element={currentProject ? <SettingsPage client={client} project={currentProject} /> : null} />
-        <Route path="/" element={<HomePage client={client} />} />
+        <Route path="/" element={<HomePage setDocumentTitle={(title: string) => setDocumentTitle(title)} />} />
       </Routes>
     </>
   ) : null;

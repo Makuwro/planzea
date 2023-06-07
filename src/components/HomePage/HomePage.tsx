@@ -1,16 +1,21 @@
-import React from "react";
-import Client from "../../client/Client";
+import React, { useEffect } from "react";
 import styles from "./HomePage.module.css";
 import { useNavigate } from "react-router-dom";
 
-export default function HomePage({client}: {client: Client}) {
+export default function HomePage({setDocumentTitle}: {setDocumentTitle: (title: string) => void}) {
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+
+    setDocumentTitle("Home ▪ Planzea");
+
+  }, []);
 
   return (
     <main id={styles.main}>
       <section id={styles.options}>
-        <button onClick={() => navigate("?create=project")}>Create project</button>
+        <button onClick={() => navigate("?create=project", {replace: true})}>New project</button>
       </section>
       <section id={styles.noProjectsMessage}>
         <p>You don't have any projects yet. Want to change that?</p>

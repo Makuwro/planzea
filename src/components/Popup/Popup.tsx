@@ -4,19 +4,22 @@ import Icon from "../Icon/Icon";
 
 interface PopupProperties {
   name?: string;
+  isOpen: boolean;
   onClose: () => void;
+  maxHeight?: number;
+  maxWidth?: number;
   children: ReactNode;
 }
 
-export default function Popup({name, onClose, children}: PopupProperties) {
+export default function Popup({name, isOpen, onClose, maxHeight, maxWidth, children}: PopupProperties) {
 
   const [isShown, setIsShown] = useState<boolean>(false);
 
   useEffect(() => {
 
-    setIsShown(true);
+    setIsShown(isOpen);
 
-  }, []);
+  }, [isOpen]);
 
   return (
     <section id={styles.popupContainer} className={isShown ? styles.open : undefined} onTransitionEnd={() => {
@@ -28,7 +31,10 @@ export default function Popup({name, onClose, children}: PopupProperties) {
       }
     
     }}>
-      <section id={styles.popup}>
+      <section id={styles.popup} style={{
+        maxHeight: maxHeight ? `${maxHeight}px` : undefined, 
+        maxWidth: maxWidth ? `${maxWidth}px` : undefined
+      }}>
         <section id={styles.popupHeader}>
           {
             name ? (
