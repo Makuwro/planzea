@@ -64,6 +64,8 @@ export default function App() {
       <ProjectCreationPopup client={client} documentTitle={documentTitle} />
       <Header />
       <Routes>
+        <Route path="/:username" element={<Navigate to="/" />} />
+        <Route path="/:username/projects" element={<Navigate to="/" />} />
         <Route path="/:username/projects/:projectId" element={<Navigate to={(() => {
 
           const params = matchPath("/:username/projects/:projectId", location.pathname)?.params;
