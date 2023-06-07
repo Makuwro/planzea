@@ -10,6 +10,7 @@ import Project from "./client/Project";
 import SettingsPage from "./components/SettingsPage/SettingsPage";
 import HomePage from "./components/HomePage/HomePage";
 import ProjectCreationPopup from "./components/ProjectCreationPopup/ProjectCreationPopup";
+import LabelCreationPopup from "./components/LabelCreationPopup/LabelCreationPopup";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -58,6 +59,7 @@ export default function App() {
   return client ? (
     <>
       {task && currentProject ? <TaskPopup project={currentProject} client={client} onUpdate={(newTask) => setTask(newTask)} task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
+      <LabelCreationPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <ProjectCreationPopup client={client} documentTitle={documentTitle} />
       <Header />
       <Routes>
@@ -71,7 +73,7 @@ export default function App() {
         })()} replace />} />
         <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
-        <Route path="/:username/projects/:projectId/settings" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} />} />
+        <Route path="/:username/projects/:projectId/settings" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/" element={<HomePage client={client} setDocumentTitle={setDocumentTitle} />} />
       </Routes>
     </>

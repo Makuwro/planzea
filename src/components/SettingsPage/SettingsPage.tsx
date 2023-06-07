@@ -4,9 +4,9 @@ import styles from "./SettingsPage.module.css";
 import Icon from "../Icon/Icon";
 import Project from "../../client/Project";
 import Label from "../../client/Label";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-export default function SettingsPage({client, project, setCurrentProject}: {client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
+export default function SettingsPage({client, project, setCurrentProject, setDocumentTitle}: {client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
 
   const [labels, setLabels] = useState<Label[]>([]);
   const params = useParams<{projectId: string}>();
@@ -17,6 +17,8 @@ export default function SettingsPage({client, project, setCurrentProject}: {clie
       if (project) {
 
         setLabels(await project.getLabels());
+        setDocumentTitle(`Labels ▪ ${project.name} ▪ Planzea`);
+        document.title = `Labels ▪ ${project.name} ▪ Planzea`;
 
       } else if (params.projectId) {
 
@@ -29,6 +31,8 @@ export default function SettingsPage({client, project, setCurrentProject}: {clie
 
   }, [project]);
 
+  const navigate = useNavigate();
+
   return (
     <main id={styles.main}>
       <section id={styles.info}>
@@ -37,7 +41,7 @@ export default function SettingsPage({client, project, setCurrentProject}: {clie
       </section>
       <section id={styles.listContainer}>
         <section>
-          <button>Create label</button>
+          <button onClick={() => navigate(`${location.pathname}?create=label`)}>Create label</button>
         </section>
         <ul id={styles.list}>
           {
