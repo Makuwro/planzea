@@ -59,7 +59,7 @@ export default function ProjectCreationPopup({client, documentTitle}: {client: C
           <input type="text" value={projectProperties.name} onChange={({target: {value}}) => setProjectProperties({name: value})} placeholder="World Domination Plans" />
         </FormSection>
         <section style={{flexDirection: "row"}}> 
-          <input type="submit" value="Create project" disabled={isCreatingProject} />
+          <input type="submit" value="Create project" disabled={isCreatingProject || !projectProperties.name} />
           <button>Cancel</button>
         </section>
       </form>
