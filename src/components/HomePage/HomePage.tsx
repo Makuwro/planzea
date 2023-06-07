@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { Dispatch, ReactElement, SetStateAction, useEffect, useState } from "react";
 import styles from "./HomePage.module.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Client from "../../client/Client";
 
-export default function HomePage({setDocumentTitle}: {setDocumentTitle: (title: string) => void}) {
+export default function HomePage({client, setDocumentTitle}: {client: Client; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
 
   const navigate = useNavigate();
 
@@ -13,14 +14,51 @@ export default function HomePage({setDocumentTitle}: {setDocumentTitle: (title: 
 
   }, []);
 
+  const [projectComponents, setProjectComponents] = useState<ReactElement[]>([]);
+  const [ready, setReady] = useState<boolean>(false);
+  useEffect(() => {
+
+    (async () => {
+
+      const comps = [];
+      for (const project of await client.getProjects()) {
+
+        comps.push(
+          <li key={project.id}>
+            <Link to={`/personal/projects/${project.id}/`}>
+              {project.name}
+            </Link>
+          </li>
+        );
+
+      }
+      setProjectComponents(comps);
+      setReady(true);
+
+    })();
+
+  }, []);
+
   return (
     <main id={styles.main}>
       <section id={styles.options}>
         <button onClick={() => navigate("?create=project", {replace: true})}>New project</button>
       </section>
-      <section id={styles.noProjectsMessage}>
-        <p>You don't have any projects yet. Want to change that?</p>
-      </section>
+      {
+        ready ? (
+          projectComponents[0] ? (
+            <section>
+              <ul>
+                {projectComponents}
+              </ul>
+            </section>
+          ) : (
+            <section id={styles.noProjectsMessage}>
+              <p>You don't have any projects yet. Want to change that?</p>
+            </section>
+          )
+        ) : null
+      }
     </main>
   );
 

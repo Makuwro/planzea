@@ -16,7 +16,6 @@ export type SetState<T> = Dispatch<SetStateAction<T>>;
 export default function App() {
 
   const [client, setClient] = useState<Client | null>(null);
-  const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
 
   useEffect(() => {
 
@@ -58,6 +57,7 @@ export default function App() {
   console.log(params);
 
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
+  const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
   return client ? (
     <>
       {task && currentProject ? <TaskPopup project={currentProject} client={client} onUpdate={(newTask) => setTask(newTask)} task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
@@ -72,10 +72,10 @@ export default function App() {
           return params ? `/${params.username}/projects/${params.projectId}/tasks` : "/";
 
         })()} replace />} />
-        <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
-        <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />
+        <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
+        <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/settings" element={currentProject ? <SettingsPage client={client} project={currentProject} /> : null} />
-        <Route path="/" element={<HomePage setDocumentTitle={(title: string) => setDocumentTitle(title)} />} />
+        <Route path="/" element={<HomePage client={client} setDocumentTitle={setDocumentTitle} />} />
       </Routes>
     </>
   ) : null;
