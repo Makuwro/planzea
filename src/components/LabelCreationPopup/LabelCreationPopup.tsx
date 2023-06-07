@@ -71,7 +71,7 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
   return (
     <Popup name="New label" isOpen={isOpen} onClose={() => {
       
-      navigate(project ? `/personal/projects/${project.id}/settings` : "/");
+      navigate(location.pathname, {replace: true});
       setLabelProperties({name: ""});
     
     }} maxHeight={250} maxWidth={420}>

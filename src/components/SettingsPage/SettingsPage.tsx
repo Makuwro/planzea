@@ -55,7 +55,7 @@ export default function SettingsPage({client, project, setCurrentProject, setDoc
                 </section>
                 <section className={styles.labelDescription}>
                   {label.description}
-                  <span>
+                  <span className={styles.labelActions}>
                     <button>Edit</button>
                     <button>Delete</button>
                   </span>

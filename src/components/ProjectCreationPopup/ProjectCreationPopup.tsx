@@ -60,7 +60,7 @@ export default function ProjectCreationPopup({client, documentTitle}: {client: C
 
       } else {
 
-        navigate("/", {replace: true});
+        navigate(location.pathname, {replace: true});
 
       }
       setProjectProperties({name: ""});

@@ -27,6 +27,11 @@
   gap: 5px;
 }
 
+.labelActions {
+  display: flex;
+  gap: 15px;
+}
+
 .labelBaseInfo {
   display: flex;
   justify-content: space-between;
