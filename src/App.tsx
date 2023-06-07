@@ -53,9 +53,6 @@ export default function App() {
 
   }, [client, location]);
 
-  const params = useParams();
-  console.log(params);
-
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
   return client ? (
