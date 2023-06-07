@@ -8,6 +8,7 @@ import Client from "../../client/Client";
 import TaskPopupAttachmentSection from "../TaskPopupAttachmentSection/TaskPopupAttachmentSection";
 import TaskPopupSubTaskSection from "../TaskPopupSubTaskSection/TaskPopupSubTaskSection";
 import Project from "../../client/Project";
+import Popup from "../Popup/Popup";
 
 export default function TaskPopup({client, isOpen, onClose, task, onUpdate, project}: {client: Client; isOpen: boolean; onClose: () => void; task: Task; onUpdate: (newTask: Task) => void; project: Project}) {
 
@@ -199,63 +200,44 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
   const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
 
   return (
-    <section id={styles.popupContainer} className={isShown ? styles.open : undefined} onTransitionEnd={() => {
-      
-      if (!isShown) {
+    <Popup name="Personal" onClose={() => {
 
-        navigate("/personal/projects/projectId/tasks");
-        onClose();
+      navigate("/personal/projects/projectId/tasks");
+      onClose();
 
-      }
-    
     }}>
-      <section id={styles.popup}>
-        <section id={styles.popupHeader}>
-          <label>Personal</label>
-          <span id={styles.actions}>
-            <button>
-              <Icon name="more_horiz" />
-            </button>
-            <button id={styles.closeButton} onClick={() => setIsShown(false)}>
-              <Icon name="close" />
-            </button>
+      <h1>{task.name}</h1>
+      <nav>
+        <button className={styles.selected}>Details</button>
+        <button>Activity</button>
+      </nav>
+      <section id={styles.details}>
+        <section 
+          id={styles.description} 
+          ref={descriptionRef}
+          contentEditable 
+          onKeyDown={verifyKey}
+          suppressContentEditableWarning
+          onBlur={updateDescription}>
+          {descriptionComponents}
+        </section>
+        <TaskPopupSubTaskSection task={task} project={project} />
+        <section>
+          <label>Labels</label>
+          <p>None</p>
+        </section>
+        <section>
+          <label className={isPastDue ? styles.expired : undefined}>
+            Due date
+            {isPastDue ? <Icon name="warning" /> : null}
+          </label>
+          <span>
+            <DateInput date={task.dueDate} onChange={async (newDate) => await updateDueDate(newDate)} />
           </span>
         </section>
-        <section id={styles.popupContent}>
-          <h1>{task.name}</h1>
-          <nav>
-            <button className={styles.selected}>Details</button>
-            <button>Activity</button>
-          </nav>
-          <section id={styles.details}>
-            <section 
-              id={styles.description} 
-              ref={descriptionRef}
-              contentEditable 
-              onKeyDown={verifyKey}
-              suppressContentEditableWarning
-              onBlur={updateDescription}>
-              {descriptionComponents}
-            </section>
-            <TaskPopupSubTaskSection task={task} project={project} />
-            <section>
-              <label>Labels</label>
-              <p>None</p>
-            </section>
-            <section>
-              <label className={isPastDue ? styles.expired : undefined}>
-                Due date
-                {isPastDue ? <Icon name="warning" /> : null}
-              </label>
-              <span>
-                <DateInput date={task.dueDate} onChange={async (newDate) => await updateDueDate(newDate)} />
-              </span>
-            </section>
-            <TaskPopupAttachmentSection task={task} />
-          </section>
-        </section>
+        <TaskPopupAttachmentSection task={task} />
       </section>
-    </section>
+    </Popup>
   );
 
 }

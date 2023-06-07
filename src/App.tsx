@@ -9,6 +9,7 @@ import Task from "./client/Task";
 import Project from "./client/Project";
 import SettingsPage from "./components/SettingsPage/SettingsPage";
 import HomePage from "./components/HomePage/HomePage";
+import ProjectCreationPopup from "./components/ProjectCreationPopup/ProjectCreationPopup";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -56,6 +57,7 @@ export default function App() {
   return client ? (
     <>
       {task && currentProject ? <TaskPopup project={currentProject} client={client} onUpdate={(newTask) => setTask(newTask)} task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
+      <ProjectCreationPopup />
       <Header />
       <Routes>
         <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} />} />

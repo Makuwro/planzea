@@ -20,4 +20,9 @@
   left: 0;
   padding: 0 15px;
   box-sizing: border-box;
+  z-index: -1;
+}
+
+#options {
+  margin-top: var(--height-header);
 }
