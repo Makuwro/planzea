@@ -2,6 +2,7 @@ import React, { Dispatch, ReactElement, SetStateAction, useEffect, useState } fr
 import styles from "./HomePage.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import Client from "../../client/Client";
+import Icon from "../Icon/Icon";
 
 export default function HomePage({client, setDocumentTitle}: {client: Client; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
 
@@ -42,7 +43,9 @@ export default function HomePage({client, setDocumentTitle}: {client: Client; se
   return (
     <main id={styles.main}>
       <section id={styles.options}>
-        <button onClick={() => navigate("?create=project", {replace: true})}>New project</button>
+        <button onClick={() => navigate("?create=project", {replace: true})}>
+          <Icon name="add" />
+        </button>
       </section>
       {
         ready ? (
