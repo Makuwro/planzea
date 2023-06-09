@@ -17,6 +17,7 @@ interface EventCallbacks {
   labelDelete: ((labelId: string) => void) | (() => void);
   labelUpdate: ((newLabel: Label, oldLabelProperties?: LabelProperties) => void) | ((newLabel: Label) => void) | (() => void);
   taskCreate: ((task: Task) => void) | (() => void);
+  taskUpdate: ((newTask: Task, oldTaskProperties?: TaskProperties) => void) | ((newTask: Task) => void) | (() => void);
 }
 
 interface EventCallbacksArray {
@@ -24,6 +25,7 @@ interface EventCallbacksArray {
   labelDelete: EventCallbacks["labelDelete"][];
   labelUpdate: EventCallbacks["labelUpdate"][];
   taskCreate: EventCallbacks["taskCreate"][];
+  taskUpdate: EventCallbacks["taskUpdate"][];
 }
 
 export async function convertBlobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
@@ -58,7 +60,8 @@ export default class Client {
     labelCreate: [],
     labelDelete: [],
     labelUpdate: [],
-    taskCreate: []
+    taskCreate: [],
+    taskUpdate: []
   };
   personalProjectId?: string;
 
@@ -376,6 +379,7 @@ export default class Client {
   addEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
   addEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
   addEventListener(eventName: "labelUpdate", callback: EventCallbacks["labelUpdate"]): void;
+  addEventListener(eventName: "taskUpdate", callback: EventCallbacks["taskUpdate"]): void;
   addEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
 
     this.eventCallbacks[eventName].push(callback as () => void);
@@ -385,6 +389,7 @@ export default class Client {
   removeEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
   removeEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
   removeEventListener(eventName: "labelUpdate", callback: EventCallbacks["labelUpdate"]): void;
+  removeEventListener(eventName: "taskUpdate", callback: EventCallbacks["taskUpdate"]): void;
   removeEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
 
     this.eventCallbacks[eventName] = (this.eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
@@ -419,9 +424,21 @@ export default class Client {
 
   }
 
-  async updateTask(labelId: string, newProperties: PropertiesUpdate<TaskProperties>): Promise<void> {
+  async updateTask(taskId: string, newProperties: PropertiesUpdate<TaskProperties>): Promise<void> {
 
-    await this.#db.tasks.update(labelId, newProperties);
+    // Get current task properties.
+    const oldTaskProperties = await this.#db.tasks.get(taskId);
+
+    // Update the task.
+    await this.#db.tasks.update(taskId, newProperties);
+
+    // Fire the event.
+    const task = await this.getTask(taskId);
+    for (const callback of this.eventCallbacks.taskUpdate) {
+
+      callback(task, oldTaskProperties);
+
+    }
 
   }
 
