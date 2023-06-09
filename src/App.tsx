@@ -11,6 +11,7 @@ import HomePage from "./components/HomePage/HomePage";
 import ProjectCreationPopup from "./components/ProjectCreationPopup/ProjectCreationPopup";
 import LabelCreationPopup from "./components/LabelCreationPopup/LabelCreationPopup";
 import LabelRemovalPopup from "./components/LabelRemovalPopup/LabelRemovalPopup";
+import TaskDeletionPopup from "./components/TaskDeletionPopup/TaskDeletionPopup";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -46,6 +47,7 @@ export default function App() {
   const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
   return client && isReady ? (
     <>
+      <TaskDeletionPopup client={client} />
       <TaskPopup project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
       <LabelRemovalPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <LabelCreationPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
