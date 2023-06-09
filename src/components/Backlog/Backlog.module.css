@@ -31,7 +31,9 @@
   flex-direction: column;
   padding: 0;
   list-style-type: none;
-  margin: 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1080px;
 }
 
 #taskListContainer {

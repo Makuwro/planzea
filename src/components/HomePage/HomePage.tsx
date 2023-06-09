@@ -50,7 +50,7 @@ export default function HomePage({client, setDocumentTitle}: {client: Client; se
       {
         ready ? (
           projectComponents[0] ? (
-            <section>
+            <section id={styles.projectListContainer}>
               <ul>
                 {projectComponents}
               </ul>
