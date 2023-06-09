@@ -88,7 +88,7 @@ export default function LabelRemovalPopup({client, documentTitle, project, setCu
       navigate(location.pathname, {replace: true});
       setLabel(null);
 
-    }} maxHeight={180} maxWidth={460}>
+    }} maxWidth={460}>
       <p>Are you sure you want to remove <b>{label.name}</b> from the project? This will remove this label from all tasks.</p>
       <form onSubmit={(event) => {
         

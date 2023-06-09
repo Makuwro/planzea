@@ -6,7 +6,6 @@ interface PopupProperties {
   name?: string;
   isOpen: boolean;
   onClose: () => void;
-  maxHeight?: number;
   maxWidth?: number;
   children: ReactNode;
 }

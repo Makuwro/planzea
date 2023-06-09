@@ -207,10 +207,10 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
 
     }}>
       <h1>{task.name}</h1>
-      <nav>
+      {/* <nav>
         <button className={styles.selected}>Details</button>
         <button>Activity</button>
-      </nav>
+      </nav> */}
       <section id={styles.details}>
         <section 
           id={styles.description} 

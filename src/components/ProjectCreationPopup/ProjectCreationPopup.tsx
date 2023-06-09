@@ -65,7 +65,7 @@ export default function ProjectCreationPopup({client, documentTitle}: {client: C
       }
       setProjectProperties({name: ""});
     
-    }} maxHeight={250} maxWidth={420}>
+    }} maxWidth={420}>
       <p>A project serves as a container for all of your tasks.</p>
       <form onSubmit={(event) => {
         
