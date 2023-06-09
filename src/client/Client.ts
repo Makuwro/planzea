@@ -256,7 +256,7 @@ export default class Client {
 
     }
 
-    // Delete or modify sub-tasks.
+    // Delete or promote sub-tasks.
     const subtasks = (await this.getTasks()).filter((possibleTask) => possibleTask.parentTaskId === taskId);
     for (const task of subtasks) {
 
