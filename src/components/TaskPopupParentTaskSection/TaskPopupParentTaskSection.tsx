@@ -4,6 +4,7 @@ import Client from "../../client/Client";
 import { Link } from "react-router-dom";
 import Icon from "../Icon/Icon";
 import Project from "../../client/Project";
+import styles from "./TaskPopupParentTaskSection.module.css";
 
 export default function TaskPopupParentTaskSection({childTask, client, parentTaskId, project}: {childTask: Task; client: Client; parentTaskId: string; project: Project}) {
 
@@ -26,7 +27,7 @@ export default function TaskPopupParentTaskSection({childTask, client, parentTas
     return (
       <section>
         <label>Parent task</label>
-        <section>
+        <section id={styles.task}>
           <span>
             <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
             <Link to={`/personal/projects/${parentTask.projectId}/tasks/${parentTask.id}`}>{parentTask.name}</Link>
