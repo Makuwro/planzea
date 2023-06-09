@@ -32,26 +32,6 @@
   gap: 15px;
 }
 
-.labelBaseInfo {
-  display: flex;
-  justify-content: space-between;
-}
-
-.labelBaseInfo > button {
-  padding: 0;
-  background-color: transparent;
-  color: var(--color-text);
-  border-radius: 0;
-  height: 24px;
-}
-
-.labelDescription {
-  margin: 0 -15px -15px;
-  padding: 15px;
-  border-top: 1px solid var(--border);
-  box-sizing: border-box;
-}
-
 #main {
   padding: 15px;
   box-sizing: border-box;
