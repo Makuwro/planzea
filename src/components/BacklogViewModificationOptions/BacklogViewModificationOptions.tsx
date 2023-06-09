@@ -3,6 +3,7 @@ import Icon from "../Icon/Icon";
 import styles from "./BacklogViewModificationOptions.module.css";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
+import { useNavigate } from "react-router-dom";
 
 export default function BacklogViewModificationOptions({project, onTaskCreate}: {project: Project, onTaskCreate: (task: Task) => void}) {
 
@@ -18,14 +19,17 @@ export default function BacklogViewModificationOptions({project, onTaskCreate}: 
 
   }
 
+  const navigate = useNavigate();
+
   return (
     <section id={styles.viewModificationOptions}>
       <button id={styles.addIssueButton} onClick={createTask}>
         <Icon name="add" />
       </button>
       <span>
-        <button>Group by: Nothing</button>
-        <button>Sort by: Custom</button>
+        <button onClick={() => navigate(`/personal/projects/${project.id}/settings`)}>
+          <Icon name="settings" />
+        </button>
       </span>
     </section>
   );

@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styles from "./Backlog.module.css";
 import BacklogTask from "../BacklogTask/BacklogTask";
 import BacklogViewModificationOptions from "../BacklogViewModificationOptions/BacklogViewModificationOptions";
 import Client from "../../client/Client";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-export default function Backlog({client, setCurrentProject}: {client: Client, setCurrentProject: (project: Project) => void}) {
+export default function Backlog({client, setCurrentProject, setDocumentTitle}: {client: Client; setCurrentProject: (project: Project) => void; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
 
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskSelection, setTaskSelection] = useState<{task: Task; time: number} | null>(null);
   const [taskSelectionPrevious, setTaskSelectionPrevious] = useState<{task: Task; time: number} | null>(null);
+  const params = useParams<{projectId: string}>();
 
   useEffect(() => {
 
@@ -22,6 +23,17 @@ export default function Backlog({client, setCurrentProject}: {client: Client, se
 
         setTasks(await project.getTasks());
         setCurrentProject(project);
+        setDocumentTitle(`${project.name} ▪ Planzea`);
+        document.title = `${project.name} ▪ Planzea`;
+
+      } else if (params.projectId) {
+
+        const project = await client.getProject(params.projectId);
+        if (project) {
+
+          setProject(project);
+
+        }
 
       } else if (client.personalProjectId) {
 
@@ -48,11 +60,11 @@ export default function Backlog({client, setCurrentProject}: {client: Client, se
   const navigate = useNavigate();
   useEffect(() => {
 
-    if (taskSelection) {
+    if (taskSelection && project) {
 
       if (taskSelectionPrevious && taskSelection.time - taskSelectionPrevious.time <= 500) {
 
-        navigate(`/personal/tasks/${taskSelection.task.id}`);
+        navigate(`/personal/projects/${project.id}/tasks/${taskSelection.task.id}`);
 
       }
 
