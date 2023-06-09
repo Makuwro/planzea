@@ -262,7 +262,7 @@ export default class Client {
 
       if (shouldDeleteSubtasks) {
 
-        await task.delete();
+        await task.delete(true);
 
       } else {
 
