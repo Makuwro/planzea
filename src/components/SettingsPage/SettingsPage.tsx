@@ -47,13 +47,21 @@ export default function SettingsPage({client, project, setCurrentProject, setDoc
 
       };
 
+      const onLabelUpdate = (newLabel: Label) => {
+
+        setLabels((labels) => labels.map((label) => label.id === newLabel.id ? newLabel : label));
+
+      }
+
       client.addEventListener("labelCreate", onLabelCreate);
       client.addEventListener("labelDelete", onLabelDelete);
+      client.addEventListener("labelUpdate", onLabelUpdate);
       
       return () => {
         
         client.removeEventListener("labelCreate", onLabelCreate);
         client.removeEventListener("labelDelete", onLabelDelete);
+        client.removeEventListener("labelUpdate", onLabelUpdate);
 
       };
 

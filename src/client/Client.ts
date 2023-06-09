@@ -14,13 +14,15 @@ export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & La
 
 interface EventCallbacks {
   labelCreate: ((label: Label) => void) | (() => void);
-  labelDelete: ((labelId: string) => void) | (() => void)
+  labelDelete: ((labelId: string) => void) | (() => void);
+  labelUpdate: ((newLabel: Label, oldLabelProperties?: LabelProperties) => void) | ((newLabel: Label) => void) | (() => void);
   taskCreate: ((task: Task) => void) | (() => void);
 }
 
 interface EventCallbacksArray {
   labelCreate: EventCallbacks["labelCreate"][];
   labelDelete: EventCallbacks["labelDelete"][];
+  labelUpdate: EventCallbacks["labelUpdate"][];
   taskCreate: EventCallbacks["taskCreate"][];
 }
 
@@ -55,6 +57,7 @@ export default class Client {
   eventCallbacks: EventCallbacksArray = {
     labelCreate: [],
     labelDelete: [],
+    labelUpdate: [],
     taskCreate: []
   };
   personalProjectId?: string;
@@ -374,6 +377,7 @@ export default class Client {
 
   addEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
   addEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
+  addEventListener(eventName: "labelUpdate", callback: EventCallbacks["labelUpdate"]): void;
   addEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
 
     this.eventCallbacks[eventName].push(callback as () => void);
@@ -382,6 +386,7 @@ export default class Client {
 
   removeEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
   removeEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
+  removeEventListener(eventName: "labelUpdate", callback: EventCallbacks["labelUpdate"]): void;
   removeEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
 
     this.eventCallbacks[eventName] = (this.eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
@@ -424,7 +429,19 @@ export default class Client {
 
   async updateLabel(labelId: string, newProperties: PropertiesUpdate<LabelProperties>): Promise<void> {
 
+    // Get current label properties.
+    const oldLabelProperties = await this.#db.labels.get(labelId);
+
+    // Update the label.
     await this.#db.labels.update(labelId, newProperties);
+
+    // Fire the event.
+    const label = await this.getLabel(labelId);
+    for (const callback of this.eventCallbacks.labelUpdate) {
+
+      callback(label, oldLabelProperties);
+
+    }
 
   }
 
