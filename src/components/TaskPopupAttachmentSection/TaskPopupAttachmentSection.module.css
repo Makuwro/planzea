@@ -8,6 +8,7 @@
 
 #attachments a {
   text-decoration: none;
+  word-break: break-word;
 }
 
 #attachments li > section {
@@ -28,8 +29,4 @@
   padding: 0;
   height: 24px;
   width: 24px;
-}
-
-#button {
-  margin-top: 15px;
 }

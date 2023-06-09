@@ -50,28 +50,32 @@ export default function TaskPopupSubTaskSection({project, task}: {project: Proje
   return (
     <section>
       <label>Sub-tasks</label>
-      <section style={{marginTop: "16px"}}>
+      <section>
         <input type="text" placeholder="Add a task..." value={newTaskName} onChange={(event) => setNewTaskName(event.target.value)} onKeyDown={createTask} />
-        <ul id={styles.tasks}>
-          {
-            subTasks.map((subTask) => {
+        {
+          subTasks[0] ? (
+            <ul id={styles.tasks}>
+              {
+                subTasks.map((subTask) => {
 
-              const status = project.statuses.find((status) => status.id === subTask.statusId);
-              return (
-                <li key={subTask.id}>
-                  <span>
-                    <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
-                    <Link to={`/${project.id}/issues/${subTask.id}`}>{subTask.name}</Link>
-                  </span>
-                  <button onClick={async () => await deleteSubTask(subTask)}>
-                    <Icon name="close" />
-                  </button>
-                </li>
-              );
+                  const status = project.statuses.find((status) => status.id === subTask.statusId);
+                  return (
+                    <li key={subTask.id}>
+                      <span>
+                        <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
+                        <Link to={`/${project.id}/issues/${subTask.id}`}>{subTask.name}</Link>
+                      </span>
+                      <button onClick={async () => await deleteSubTask(subTask)}>
+                        <Icon name="close" />
+                      </button>
+                    </li>
+                  );
 
-            })
-          }
-        </ul>
+                })
+              }
+            </ul>
+          ) : null
+        }
       </section>
     </section>
   );

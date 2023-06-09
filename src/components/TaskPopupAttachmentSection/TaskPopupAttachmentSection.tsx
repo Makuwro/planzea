@@ -51,35 +51,39 @@ export default function TaskPopupAttachmentSection({task}: {task: Task}) {
         <button id={styles.button} onClick={() => fileInputRef.current?.click()}>Add attachment</button>
         <input type="file" ref={fileInputRef} onChange={(event) => setFiles(event.target.files)} multiple />
       </section>
-      <ul id={styles.attachments}>
-        {
-          attachments.map((attachment) => {
+      {
+        attachments[0] ? (
+          <ul id={styles.attachments}>
+            {
+              attachments.map((attachment) => {
 
-            const blob = new Blob([attachment.arrayBuffer], {type: attachment.type});
-            const url = URL.createObjectURL(blob);
+                const blob = new Blob([attachment.arrayBuffer], {type: attachment.type});
+                const url = URL.createObjectURL(blob);
 
-            return (
-              <li key={attachment.id}>
-                <section>
-                  <section>
-                    <a href={url} target="_blank" rel="noreferrer">{attachment.name}</a>
-                    <label>{blob.size / 1000} KB</label>
-                  </section>
-                  <button onClick={async () => {
+                return (
+                  <li key={attachment.id}>
+                    <section>
+                      <section>
+                        <a href={url} target="_blank" rel="noreferrer">{attachment.name}</a>
+                        <label>{blob.size / 1000} KB</label>
+                      </section>
+                      <button onClick={async () => {
 
-                    await attachment.delete();
-                    setAttachments(attachments.filter((possibleAttachment) => possibleAttachment.id !== attachment.id));
+                        await attachment.delete();
+                        setAttachments(attachments.filter((possibleAttachment) => possibleAttachment.id !== attachment.id));
 
-                  }}>
-                    <Icon name="close" />
-                  </button>
-                </section>
-              </li>
-            );
+                      }}>
+                        <Icon name="close" />
+                      </button>
+                    </section>
+                  </li>
+                );
 
-          })
-        }
-      </ul>
+              })
+            }
+          </ul>
+        ) : null
+      }
     </section>
   );
 

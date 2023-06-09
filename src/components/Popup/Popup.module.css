@@ -25,6 +25,8 @@
   border-radius: 15px;
   max-height: 100%;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 #popup > section {
@@ -63,6 +65,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  overflow-y: auto;
 }
 
 #popupContent > form, #popupContent > form > section, #popupContent > section {
@@ -81,7 +84,7 @@
   border-bottom: 1px solid var(--border);
   height: 40px;
   padding: 0 15px;
-  display: flex;
+  flex-shrink: 0;
   align-items: center;
   font-weight: 300;
   color: var(--text);
@@ -100,15 +103,6 @@
 
   #popupContainer.open #popup {
     border-radius: 5px;
-  }
-
-}
-
-@media screen and (min-width: 1080px) {
-
-  .open #popupContent {
-    height: calc(100% - 41px);
-    box-sizing: border-box;
   }
 
 }
