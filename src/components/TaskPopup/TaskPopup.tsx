@@ -1,38 +1,76 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import styles from "./TaskPopup.module.css";
 import Icon from "../Icon/Icon";
 import Task from "../../client/Task";
-import { useNavigate } from "react-router-dom";
+import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import DateInput from "../DateInput/DateInput";
 import Client from "../../client/Client";
 import TaskPopupAttachmentSection from "../TaskPopupAttachmentSection/TaskPopupAttachmentSection";
 import TaskPopupSubTaskSection from "../TaskPopupSubTaskSection/TaskPopupSubTaskSection";
 import Project from "../../client/Project";
 import Popup from "../Popup/Popup";
+import TaskPopupParentTaskSection from "../TaskPopupParentTaskSection/TaskPopupParentTaskSection";
 
-export default function TaskPopup({client, isOpen, onClose, task, onUpdate, project}: {client: Client; isOpen: boolean; onClose: () => void; task: Task; onUpdate: (newTask: Task) => void; project: Project}) {
+export default function TaskPopup({client, project, setCurrentProject}: {client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
+
+  const location = useLocation();
+  const [task, setTask] = useState<Task | null>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+
+    (async () => {
+
+      const taskId = matchPath("/:username/projects/:projectId/tasks/:taskId", location.pathname)?.params.taskId;
+      if (client && taskId) {
+
+        const task = await client.getTask(taskId);
+
+        if (!project) {
+
+          setCurrentProject(await client.getProject(task.projectId));
+
+        }
+
+        setTask(task);
+
+      } else {
+        
+        setIsOpen(false);
+
+      }
+
+    })();
+
+  }, [client, location]);
 
   const [descriptionComponents, setDescriptionComponents] = useState<React.ReactElement[]>([<p key={0} placeholder="What's this task about?" />]);
   useEffect(() => {
 
-    if (task.description) {
+    if (task) {
 
-      const paragraphs = task.description.split("\n");
-      const descriptionComponents = [];
-      for (let i = 0; paragraphs.length > i; i++) {
+      if (task.description) {
 
-        descriptionComponents.push(
-          <p key={i}>
-            {paragraphs[i]}
-          </p>
-        );
+        const paragraphs = task.description.split("\n");
+        const descriptionComponents = [];
+        for (let i = 0; paragraphs.length > i; i++) {
+
+          descriptionComponents.push(
+            <p key={i}>
+              {paragraphs[i]}
+            </p>
+          );
+
+        }
+        setDescriptionComponents(descriptionComponents);
+
+      } else {
+
+        setDescriptionComponents([<p key={0} placeholder="What's this task about?" />]);
 
       }
-      setDescriptionComponents(descriptionComponents);
-
-    } else {
-
-      setDescriptionComponents([<p key={0} placeholder="What's this task about?" />]);
+      
+      setIsOpen(true);
 
     }
 
@@ -42,7 +80,7 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
   async function updateDescription() {
 
     const descriptionInput = descriptionRef.current;
-    if (descriptionInput) {
+    if (task && descriptionInput) {
 
       // Convert the description to Markdown.
       let newDescription = "";
@@ -90,15 +128,6 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
 
   }
 
-  async function updateDueDate(newDate: string) {
-
-    console.log(newDate);
-    await task.update({dueDate: newDate});
-    task.dueDate = newDate;
-    onUpdate(new Task(structuredClone(task), client));
-
-  }
-
   function verifyKey(event: React.KeyboardEvent) {
 
     const descriptionInput = descriptionRef.current;
@@ -107,7 +136,7 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
     if (descriptionInput && selection && range && event.key === "Backspace") {
 
       // Check if the user is at the beginning of the first paragraph.
-      const { startContainer, endContainer } = range;
+      const { startContainer } = range;
       if (startContainer === descriptionInput && range.startOffset === 0 && range.endOffset === 1) {
 
         event.preventDefault();
@@ -186,54 +215,64 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
 
   const navigate = useNavigate();
 
-  // Determine if the due date has expired.
-  const currentDate = new Date();
-  currentDate.setMilliseconds(0);
-  currentDate.setSeconds(0);
-  currentDate.setMinutes(0);
-  currentDate.setHours(0);
-  currentDate.setDate(currentDate.getDate() - 1);
-  const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
+  if (project && task) {
 
-  return (
-    <Popup isOpen={isOpen} name="Personal" onClose={() => {
+    // Determine if the due date has expired.
+    const currentDate = new Date();
+    currentDate.setMilliseconds(0);
+    currentDate.setSeconds(0);
+    currentDate.setMinutes(0);
+    currentDate.setHours(0);
+    currentDate.setDate(currentDate.getDate() - 1);
+    const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
 
-      navigate(`/personal/projects/${project.id}/tasks`);
-      onClose();
+    return (
+      <Popup isOpen={isOpen} name={task.name} onClose={() => {
 
-    }}>
-      <h1>{task.name}</h1>
-      {/* <nav>
-        <button className={styles.selected}>Details</button>
-        <button>Activity</button>
-      </nav> */}
-      <section id={styles.details}>
-        <section 
-          id={styles.description} 
-          ref={descriptionRef}
-          contentEditable 
-          onKeyDown={verifyKey}
-          suppressContentEditableWarning
-          onBlur={updateDescription}>
-          {descriptionComponents}
+        navigate(`/personal/projects/${project.id}/tasks`);
+
+      }}>
+        <h1>{task.name}</h1>
+        {/* <nav>
+          <button className={styles.selected}>Details</button>
+          <button>Activity</button>
+        </nav> */}
+        <section id={styles.details}>
+          <section 
+            id={styles.description} 
+            ref={descriptionRef}
+            contentEditable 
+            onKeyDown={verifyKey}
+            suppressContentEditableWarning
+            onBlur={updateDescription}>
+            {descriptionComponents}
+          </section>
+          {
+            task.parentTaskId ? (
+              <TaskPopupParentTaskSection client={client} parentTaskId={task.parentTaskId} project={project} />
+            ) : null
+          }
+          <TaskPopupSubTaskSection task={task} project={project} />
+          <section>
+            <label>Labels</label>
+            <p>None</p>
+          </section>
+          <section>
+            <label className={isPastDue ? styles.expired : undefined}>
+              Due date
+              {isPastDue ? <Icon name="warning" /> : null}
+            </label>
+            <span>
+              <DateInput date={task.dueDate} onChange={async (newDate) => await task.update({dueDate: newDate})} />
+            </span>
+          </section>
+          <TaskPopupAttachmentSection task={task} />
         </section>
-        <TaskPopupSubTaskSection task={task} project={project} />
-        <section>
-          <label>Labels</label>
-          <p>None</p>
-        </section>
-        <section>
-          <label className={isPastDue ? styles.expired : undefined}>
-            Due date
-            {isPastDue ? <Icon name="warning" /> : null}
-          </label>
-          <span>
-            <DateInput date={task.dueDate} onChange={async (newDate) => await updateDueDate(newDate)} />
-          </span>
-        </section>
-        <TaskPopupAttachmentSection task={task} />
-      </section>
-    </Popup>
-  );
+      </Popup>
+    );
+
+  } 
+
+  return null;
 
 }
