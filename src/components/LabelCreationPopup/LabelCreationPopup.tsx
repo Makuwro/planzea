@@ -4,7 +4,7 @@ import FormSection from "../FormSection/FormSection";
 import Client from "../../client/Client";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Project from "../../client/Project";
-import { InitialLabelProperties } from "../../client/Label";
+import Label, { InitialLabelProperties } from "../../client/Label";
 
 export default function LabelCreationPopup({client, documentTitle, project, setCurrentProject}: {client: Client; documentTitle: string; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
@@ -14,10 +14,11 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
   const [searchParams] = useSearchParams();
   const createValue = searchParams.get("create");
   const editValue = searchParams.get("edit");
+  const labelId = searchParams.get("id");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const params = useParams<{projectId: string}>();
-
   const isEditing = editValue === "label";
+  const [label, setLabel] = useState<Label | null>(null);
 
   useEffect(() => {
 
@@ -26,6 +27,23 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
       if (isEditing || createValue === "label") {
 
         if (project) {
+
+          if (isEditing) {
+
+            if (labelId) {
+
+              const label = await client.getLabel(labelId);
+              setLabel(label);
+              setLabelProperties({name: label.name});
+
+            } else {
+
+              navigate(location.pathname, {replace: true});
+              return;
+
+            }
+
+          }
 
           setTimeout(() => document.title = `${isEditing ? "Edit" : "New"} label ▪ ${project.name} ▪ Planzea`, 1);
           setIsOpen(true);
@@ -57,9 +75,16 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
     (async () => {
 
       if (project && isCreatingLabel) {
+        
+        if (label && isEditing) {
 
-        // Create the project and redirect to it.
-        await project.createLabel(labelProperties);
+          await label.update(labelProperties);
+
+        } else {
+
+          await project.createLabel(labelProperties);
+
+        }
         setIsOpen(false);
 
       }
@@ -75,9 +100,9 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
       
       navigate(location.pathname, {replace: true});
       setLabelProperties({name: ""});
+      setLabel(null);
     
-    }} maxHeight={250} maxWidth={420}>
-      <p>A project serves as a container for all of your tasks.</p>
+    }} maxWidth={420}>
       <form onSubmit={(event) => {
         
         event.preventDefault();
@@ -85,7 +110,7 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
 
       }}>
         <FormSection name="Label name">
-          <input type="text" value={labelProperties.name} onChange={({target: {value}}) => setLabelProperties({name: value})} placeholder="Really Cool" />
+          <input type="text" value={labelProperties.name} onChange={({target: {value}}) => setLabelProperties({name: value})} />
         </FormSection>
         <section style={{flexDirection: "row"}}> 
           <input type="submit" value={`${isEditing ? "Edit" : "Create"} label`} disabled={isCreatingLabel || !labelProperties.name} />
