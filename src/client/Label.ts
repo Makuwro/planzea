@@ -38,6 +38,12 @@ export default class Label {
 
   }
 
+  async removeFromProject(projectId: string): Promise<void> {
+
+    await this.#client.removeLabelFromProject(this.id, projectId);
+
+  }
+
   async update(newProperties: PropertiesUpdate<LabelProperties>): Promise<void> {
 
     await this.#client.updateLabel(this.id, newProperties);

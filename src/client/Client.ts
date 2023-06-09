@@ -12,6 +12,18 @@ export type PlanzeaObject = Attachment | Task | Label | Project;
 export type PlanzeaObjectConstructor = typeof Attachment | typeof Task | typeof Label | typeof Project;
 export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties;
 
+interface EventCallbacks {
+  labelCreate: ((label: Label) => void) | (() => void);
+  labelDelete: ((labelId: string) => void) | (() => void)
+  taskCreate: ((task: Task) => void) | (() => void);
+}
+
+interface EventCallbacksArray {
+  labelCreate: EventCallbacks["labelCreate"][];
+  labelDelete: EventCallbacks["labelDelete"][];
+  taskCreate: EventCallbacks["taskCreate"][];
+}
+
 export async function convertBlobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
 
   return new Promise((resolve, reject) => {
@@ -40,6 +52,11 @@ const clientDatabase = new ClientDatabase();
 export default class Client {
 
   readonly #db = clientDatabase;
+  eventCallbacks: EventCallbacksArray = {
+    labelCreate: [],
+    labelDelete: [],
+    taskCreate: []
+  };
   personalProjectId?: string;
 
   async #createObject(constructor: typeof Attachment, props: InitialAttachmentProperties): Promise<Attachment>;
@@ -171,7 +188,18 @@ export default class Client {
 
   async createLabel(props: InitialLabelProperties): Promise<Label> {
 
-    return await this.#createObject(Label, props);
+    // Create the label.
+    const label = await this.#createObject(Label, props);
+
+    // Run each callback.
+    for (const callback of this.eventCallbacks.labelCreate) {
+
+      callback(label);
+
+    }
+
+    // Return the label.
+    return label;
 
   }
 
@@ -230,6 +258,13 @@ export default class Client {
   async deleteLabel(labelId: string): Promise<void> {
 
     await this.#db.labels.delete(labelId);
+
+    // Run each callback.
+    for (const callback of this.eventCallbacks.labelDelete) {
+
+      callback(labelId);
+
+    }
 
   }
 
@@ -309,6 +344,12 @@ export default class Client {
 
   }
 
+  async getLabel(labelId: string): Promise<Label> {
+
+    return await this.#getObject(Label, labelId);
+
+  }
+
   /**
    * Gets all client labels.
    * @returns An array of `Label` objects.
@@ -329,6 +370,44 @@ export default class Client {
 
     return await this.#getObjects(Project, filter, exclusiveKeys);
 
+  }
+
+  addEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
+  addEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
+  addEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
+
+    this.eventCallbacks[eventName].push(callback as () => void);
+
+  } 
+
+  removeEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
+  removeEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
+  removeEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
+
+    this.eventCallbacks[eventName] = (this.eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
+
+  }
+
+  async removeLabelFromProject(labelId: string, projectId: string): Promise<void> {
+
+    const label = await this.getLabel(labelId);
+
+    if (label.projects) {
+
+      // Remove the label from the project.
+      await label.update({
+        projects: label.projects.filter((possibleProjectId) => possibleProjectId !== projectId)
+      });
+
+      // Run each callback.
+      for (const callback of this.eventCallbacks.labelDelete) {
+
+        callback(labelId);
+
+      }
+
+    }
+    
   }
 
   async updateAttachment(attachmentId: string, newProperties: PropertiesUpdate<AttachmentProperties>): Promise<void> {

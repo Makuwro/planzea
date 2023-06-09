@@ -108,6 +108,17 @@ export default class Project {
 
   }
 
+  async removeLabel(labelId: string): Promise<void> {
+
+    const label = (await this.#client.getLabels()).find((possibleLabel) => possibleLabel.id === labelId);
+    if (label) {
+
+      await label.removeFromProject(this.id);
+
+    }
+
+  }
+
   async update(newProperties: PropertiesUpdate<ProjectProperties>): Promise<void> {
 
     await this.#client.updateProject(this.id, newProperties);

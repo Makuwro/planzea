@@ -11,6 +11,7 @@ import SettingsPage from "./components/SettingsPage/SettingsPage";
 import HomePage from "./components/HomePage/HomePage";
 import ProjectCreationPopup from "./components/ProjectCreationPopup/ProjectCreationPopup";
 import LabelCreationPopup from "./components/LabelCreationPopup/LabelCreationPopup";
+import LabelRemovalPopup from "./components/LabelRemovalPopup/LabelRemovalPopup";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -59,6 +60,7 @@ export default function App() {
   return client ? (
     <>
       {task && currentProject ? <TaskPopup project={currentProject} client={client} onUpdate={(newTask) => setTask(newTask)} task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
+      <LabelRemovalPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <LabelCreationPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <ProjectCreationPopup client={client} documentTitle={documentTitle} />
       <Header />
