@@ -41,9 +41,9 @@ export default function Popup({name, isOpen, onClose, maxWidth, children}: Popup
             ) : null
           }
           <span id={styles.actions}>
-            <button>
+            {/* <button>
               <Icon name="more_horiz" />
-            </button>
+            </button> */}
             <button id={styles.closeButton} onClick={() => setIsShown(false)}>
               <Icon name="close" />
             </button>
