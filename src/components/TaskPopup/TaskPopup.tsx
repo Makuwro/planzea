@@ -72,6 +72,21 @@ export default function TaskPopup({client, project, setCurrentProject}: {client:
       
       setIsOpen(true);
 
+      // Listen to the events.
+      const onTaskUpdate = (newTask: Task) => {
+
+        if (newTask.id === task.id) {
+
+          setTask(newTask);
+
+        }
+
+      };
+
+      client.addEventListener("taskUpdate", onTaskUpdate);
+
+      return () => client.removeEventListener("taskUpdate", onTaskUpdate);
+
     }
 
   }, [task]);
@@ -249,7 +264,7 @@ export default function TaskPopup({client, project, setCurrentProject}: {client:
           </section>
           {
             task.parentTaskId ? (
-              <TaskPopupParentTaskSection client={client} parentTaskId={task.parentTaskId} project={project} />
+              <TaskPopupParentTaskSection childTask={task} client={client} parentTaskId={task.parentTaskId} project={project} />
             ) : null
           }
           <TaskPopupSubTaskSection task={task} project={project} />

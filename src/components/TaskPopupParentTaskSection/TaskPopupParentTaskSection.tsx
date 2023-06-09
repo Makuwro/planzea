@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Icon from "../Icon/Icon";
 import Project from "../../client/Project";
 
-export default function TaskPopupParentTaskSection({client, parentTaskId, project}: {client: Client; parentTaskId: string; project: Project}) {
+export default function TaskPopupParentTaskSection({childTask, client, parentTaskId, project}: {childTask: Task; client: Client; parentTaskId: string; project: Project}) {
 
   const [parentTask, setParentTask] = useState<Task | null>(null);
 
@@ -31,7 +31,7 @@ export default function TaskPopupParentTaskSection({client, parentTaskId, projec
             <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
             <Link to={`/personal/projects/${parentTask.projectId}/tasks/${parentTask.id}`}>{parentTask.name}</Link>
           </span>
-          <button onClick={async () => await parentTask.update({parentTaskId: undefined})}>
+          <button onClick={async () => await childTask.update({parentTaskId: undefined})}>
             <Icon name="close" />
           </button>
         </section>
