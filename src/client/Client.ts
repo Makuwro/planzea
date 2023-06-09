@@ -225,7 +225,7 @@ export default class Client {
    * Deletes a task from the database.
    * @param taskId The task's ID.
    */
-  async deleteTask(taskId: string): Promise<void> {
+  async deleteTask(taskId: string, shouldDeleteSubtasks?: boolean): Promise<void> {
 
     // Delete all tasks.
     await this.#db.tasks.bulkDelete((await this.#db.tasks.toArray()).reduce((ids, possibleTask) => {
@@ -240,7 +240,7 @@ export default class Client {
       
     }, [] as string[]));
 
-    // Get all associated attachments.
+    // Delete all associated attachments.
     for (const attachment of await this.getAttachments()) {
 
       attachment.taskIds = attachment.taskIds.filter((possibleTaskId) => possibleTaskId === taskId);
@@ -256,7 +256,23 @@ export default class Client {
 
     }
 
-    // Delete the issue.
+    // Delete or modify sub-tasks.
+    const subtasks = (await this.getTasks()).filter((possibleTask) => possibleTask.parentTaskId === taskId);
+    for (const task of subtasks) {
+
+      if (shouldDeleteSubtasks) {
+
+        await task.delete();
+
+      } else {
+
+        await task.update({parentTaskId: undefined});
+
+      }
+
+    }
+
+    // Delete the task.
     await this.#db.tasks.delete(taskId);
 
   }

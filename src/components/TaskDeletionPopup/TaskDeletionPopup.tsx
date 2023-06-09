@@ -32,13 +32,14 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
 
   // Check if the user confirmed the deletion.
   const [didUserConfirmDeletion, setDidUserConfirmDeletion] = useState<boolean>(false);
+  const [shouldDeleteSubtasks, setShouldDeleteSubtasks] = useState<boolean>(false);
   useEffect(() => {
 
     (async () => {
 
       if (task && didUserConfirmDeletion) {
 
-        await task.delete();
+        await task.delete(shouldDeleteSubtasks);
         setIsOpen(false);
 
       }
@@ -60,11 +61,19 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
       setDidUserConfirmDeletion(false);
       
     }}>
-      <p>Are you sure you want to delete the <b>{task.name}</b> task? No takesies-backsies.</p>
-      <span>
-        <button disabled={didUserConfirmDeletion} onClick={() => setDidUserConfirmDeletion(true)}>Delete task</button>
-        <button disabled={didUserConfirmDeletion} onClick={() => setIsOpen(false)}>Cancel</button>
-      </span>
+      <form onSubmit={(event) => {
+
+        event.preventDefault();
+        setDidUserConfirmDeletion(true);
+
+      }}>
+        <p>Are you sure you want to delete the <b>{task.name}</b> task? No takesies-backsies.</p>
+        <span>
+          <input type="checkbox" checked={shouldDeleteSubtasks} onChange={() => setShouldDeleteSubtasks(!shouldDeleteSubtasks)}>Delete subtasks</input>
+          <input type="submit" disabled={didUserConfirmDeletion} onClick={() => setDidUserConfirmDeletion(true)}>Delete task</input>
+          <button disabled={didUserConfirmDeletion} onClick={() => setIsOpen(false)}>Cancel</button>
+        </span>
+      </form>
     </Popup>
   ) : null;
 
