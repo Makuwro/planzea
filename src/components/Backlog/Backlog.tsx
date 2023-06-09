@@ -21,7 +21,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
 
       if (project) {
 
-        setTasks((await project.getTasks()).filter((task) => !task.parentTaskId));
+        setTasks(await project.getTasks());
         setCurrentProject(project);
         setDocumentTitle(`${project.name} ▪ Planzea`);
         document.title = `${project.name} ▪ Planzea`;
@@ -44,6 +44,28 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
     })();
 
   }, [project]);
+
+  useEffect(() => {
+
+    const onTaskUpdate = (newTask: Task) => {
+
+      const taskIndex = tasks.findIndex((possibleTask) => possibleTask.id === newTask.id);
+      if (taskIndex !== -1) {
+
+        const newTasks = [...tasks];
+        newTasks[taskIndex] = newTask;
+        setTasks(newTasks);
+
+      }
+      
+    };
+
+    client.addEventListener("taskUpdate", onTaskUpdate);
+
+    return () => client.removeEventListener("taskUpdate", onTaskUpdate);
+
+
+  }, [tasks, client]);
 
   const deleteTask = async (task: Task) => {
 
@@ -95,7 +117,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
             <section id={styles.taskListContainer}>
               <ul id={styles.taskList}>
                 {
-                  tasks.map((task) => <BacklogTask client={client} key={task.id} task={task} project={project} isSelected={taskSelection?.task.id === task.id} onClick={() => {
+                  tasks.filter((task) => !task.parentTaskId).map((task) => <BacklogTask client={client} key={task.id} task={task} project={project} isSelected={taskSelection?.task.id === task.id} onClick={() => {
                     
                     const newTaskSelection = {task, time: new Date().getTime()};
                     setTaskSelection(newTaskSelection);
