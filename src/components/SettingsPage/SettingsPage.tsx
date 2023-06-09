@@ -65,35 +65,37 @@ export default function SettingsPage({client, project, setCurrentProject, setDoc
 
   return (
     <main id={styles.main}>
-      <section id={styles.info}>
-        <h1>Labels</h1>
-        <p>You can use labels to organize your tasks.</p>
-      </section>
-      <section id={styles.listContainer}>
-        <section>
-          <button onClick={() => navigate(`${location.pathname}?create=label`)}>Create label</button>
+      <section id={styles.content}>
+        <section id={styles.info}>
+          <h1>Labels</h1>
+          <p>You can use labels to organize your tasks.</p>
         </section>
-        <ul id={styles.list}>
-          {
-            labels.map((label) => (
-              <li key={label.id}>
-                <section className={styles.labelBaseInfo}>
-                  <b>{label.name}</b>
-                  <button>
-                    <Icon name="expand_more" />
-                  </button>
-                </section>
-                <section className={styles.labelDescription}>
-                  {label.description}
-                  <span className={styles.labelActions}>
-                    <button onClick={() => navigate(`${location.pathname}?edit=label&id=${label.id}`, {replace: true})}>Edit</button>
-                    <button onClick={() => navigate(`${location.pathname}?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
-                  </span>
-                </section>
-              </li>
-            ))
-          }
-        </ul>
+        <section id={styles.listContainer}>
+          <section>
+            <button onClick={() => navigate(`${location.pathname}?create=label`)}>Create label</button>
+          </section>
+          <ul id={styles.list}>
+            {
+              labels.map((label) => (
+                <li key={label.id}>
+                  <section className={styles.labelBaseInfo}>
+                    <b>{label.name}</b>
+                    <button>
+                      <Icon name="expand_more" />
+                    </button>
+                  </section>
+                  <section className={styles.labelDescription}>
+                    {label.description}
+                    <span className={styles.labelActions}>
+                      <button onClick={() => navigate(`${location.pathname}?edit=label&id=${label.id}`, {replace: true})}>Edit</button>
+                      <button onClick={() => navigate(`${location.pathname}?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
+                    </span>
+                  </section>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
       </section>
     </main>
   );

@@ -57,4 +57,13 @@
   box-sizing: border-box;
   overflow-y: auto;
   height: calc(100% - var(--height-header));
+  align-items: center;
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 1080px;
+  width: 100%;
 }
