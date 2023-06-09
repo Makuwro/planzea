@@ -4,7 +4,7 @@ import "./global.css";
 import Header from "./components/Header/Header";
 import Backlog from "./components/Backlog/Backlog";
 import TaskPopup from "./components/TaskPopup/TaskPopup";
-import { Navigate, Route, Routes, matchPath, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, matchPath, useLocation } from "react-router-dom";
 import Task from "./client/Task";
 import Project from "./client/Project";
 import SettingsPage from "./components/SettingsPage/SettingsPage";
@@ -18,18 +18,29 @@ export type SetState<T> = Dispatch<SetStateAction<T>>;
 export default function App() {
 
   const [client, setClient] = useState<Client | null>(null);
+  const [isReady, setIsReady] = useState<boolean>(false);
+
+  useEffect(() => {
+
+    const client = new Client();
+    setClient(client);
+
+  }, []);
 
   useEffect(() => {
 
     (async () => {
      
-      const client = new Client();
-      await client.initialize();
-      setClient(client);
+      if (client) {
+        
+        await client.initialize();
+        setIsReady(true);
+
+      }
       
     })();
 
-  }, []);
+  }, [client]);
 
   const [task, setTask] = useState<Task | null>(null);
   const [isTaskPopupOpen, setIsTaskPopupOpen] = useState<boolean>(false);
@@ -57,7 +68,7 @@ export default function App() {
 
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
-  return client ? (
+  return client && isReady ? (
     <>
       {task && currentProject ? <TaskPopup project={currentProject} client={client} onUpdate={(newTask) => setTask(newTask)} task={task} isOpen={isTaskPopupOpen} onClose={() => setTask(null)} /> : null}
       <LabelRemovalPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
