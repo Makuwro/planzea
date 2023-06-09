@@ -63,7 +63,7 @@ export default function TaskPopupSubTaskSection({project, task}: {project: Proje
                     <li key={subTask.id}>
                       <span>
                         <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
-                        <Link to={`/${project.id}/issues/${subTask.id}`}>{subTask.name}</Link>
+                        <Link to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
                       </span>
                       <button onClick={async () => await deleteSubTask(subTask)}>
                         <Icon name="close" />

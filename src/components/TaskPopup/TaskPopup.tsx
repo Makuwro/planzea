@@ -12,14 +12,6 @@ import Popup from "../Popup/Popup";
 
 export default function TaskPopup({client, isOpen, onClose, task, onUpdate, project}: {client: Client; isOpen: boolean; onClose: () => void; task: Task; onUpdate: (newTask: Task) => void; project: Project}) {
 
-  const [isShown, setIsShown] = useState<boolean>(false);
-
-  useEffect(() => {
-
-    setTimeout(() => setIsShown(isOpen), 20);
-
-  }, [isOpen]);
-
   const [descriptionComponents, setDescriptionComponents] = useState<React.ReactElement[]>([<p key={0} placeholder="What's this task about?" />]);
   useEffect(() => {
 
@@ -37,6 +29,10 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
 
       }
       setDescriptionComponents(descriptionComponents);
+
+    } else {
+
+      setDescriptionComponents([<p key={0} placeholder="What's this task about?" />]);
 
     }
 
@@ -200,7 +196,7 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
   const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
 
   return (
-    <Popup isOpen name="Personal" onClose={() => {
+    <Popup isOpen={isOpen} name="Personal" onClose={() => {
 
       navigate(`/personal/projects/${project.id}/tasks`);
       onClose();
