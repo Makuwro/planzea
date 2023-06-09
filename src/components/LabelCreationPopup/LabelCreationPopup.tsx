@@ -13,19 +13,21 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const createValue = searchParams.get("create");
+  const editValue = searchParams.get("edit");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const params = useParams<{projectId: string}>();
+
+  const isEditing = editValue === "label";
 
   useEffect(() => {
 
     (async () => {
 
-      if (createValue === "label") {
+      if (isEditing || createValue === "label") {
 
         if (project) {
 
-          console.log(`New label ▪ ${project.name} ▪ Planzea`);
-          document.title = `New label ▪ ${project.name} ▪ Planzea`;
+          setTimeout(() => document.title = `${isEditing ? "Edit" : "New"} label ▪ ${project.name} ▪ Planzea`, 1);
           setIsOpen(true);
 
         } else if (params.projectId) {
@@ -48,7 +50,7 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
 
     })();
 
-  }, [createValue, project]);
+  }, [editValue, createValue, project]);
 
   useEffect(() => {
 
@@ -69,7 +71,7 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
   }, [isCreatingLabel]);
 
   return (
-    <Popup name="New label" isOpen={isOpen} onClose={() => {
+    <Popup name={`${isEditing ? "Edit" : "New"} label`} isOpen={isOpen} onClose={() => {
       
       navigate(location.pathname, {replace: true});
       setLabelProperties({name: ""});
@@ -86,7 +88,7 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
           <input type="text" value={labelProperties.name} onChange={({target: {value}}) => setLabelProperties({name: value})} placeholder="Really Cool" />
         </FormSection>
         <section style={{flexDirection: "row"}}> 
-          <input type="submit" value="Create label" disabled={isCreatingLabel || !labelProperties.name} />
+          <input type="submit" value={`${isEditing ? "Edit" : "Create"} label`} disabled={isCreatingLabel || !labelProperties.name} />
           <button onClick={(event) => {
             
             event.preventDefault();

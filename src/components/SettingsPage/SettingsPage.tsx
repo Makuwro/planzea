@@ -86,8 +86,8 @@ export default function SettingsPage({client, project, setCurrentProject, setDoc
                 <section className={styles.labelDescription}>
                   {label.description}
                   <span className={styles.labelActions}>
-                    <button>Edit</button>
-                    <button onClick={() => navigate(`${location.pathname}?remove=label&id=${label.id}`)}>Remove</button>
+                    <button onClick={() => navigate(`${location.pathname}?edit=label&id=${label.id}`, {replace: true})}>Edit</button>
+                    <button onClick={() => navigate(`${location.pathname}?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
                   </span>
                 </section>
               </li>
