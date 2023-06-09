@@ -60,11 +60,11 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
   const navigate = useNavigate();
   useEffect(() => {
 
-    if (taskSelection) {
+    if (taskSelection && project) {
 
       if (taskSelectionPrevious && taskSelection.time - taskSelectionPrevious.time <= 500) {
 
-        navigate(`/personal/projects/projectId/tasks/${taskSelection.task.id}`);
+        navigate(`/personal/projects/${project.id}/tasks/${taskSelection.task.id}`);
 
       }
 

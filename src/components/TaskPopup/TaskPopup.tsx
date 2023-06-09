@@ -202,7 +202,7 @@ export default function TaskPopup({client, isOpen, onClose, task, onUpdate, proj
   return (
     <Popup isOpen name="Personal" onClose={() => {
 
-      navigate("/personal/projects/projectId/tasks");
+      navigate(`/personal/projects/${project.id}/tasks`);
       onClose();
 
     }}>
