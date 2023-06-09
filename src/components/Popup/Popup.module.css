@@ -87,14 +87,24 @@
   color: var(--text);
 }
 
-@media screen and (min-width: 1080px) {
+@media screen and (min-width: 600px) {
 
-  #popupContainer #popup, #popupContainer.open #popup {
+  #popupContainer #popup {
+    --popup-width-max: 1080px;
     border-radius: 5px;
-    max-width: 1080px;
-    max-height: 720px;
+    height: auto;
     box-shadow: var(--box-shadow-default);
+    max-width: var(--popup-width-max);
+    max-height: 720px;
   }
+
+  #popupContainer.open #popup {
+    border-radius: 5px;
+  }
+
+}
+
+@media screen and (min-width: 1080px) {
 
   .open #popupContent {
     height: calc(100% - 41px);

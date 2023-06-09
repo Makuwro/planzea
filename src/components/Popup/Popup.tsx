@@ -11,7 +11,7 @@ interface PopupProperties {
   children: ReactNode;
 }
 
-export default function Popup({name, isOpen, onClose, maxHeight, maxWidth, children}: PopupProperties) {
+export default function Popup({name, isOpen, onClose, maxWidth, children}: PopupProperties) {
 
   const [isShown, setIsShown] = useState<boolean>(false);
 
@@ -31,10 +31,9 @@ export default function Popup({name, isOpen, onClose, maxHeight, maxWidth, child
       }
     
     }}>
-      <section id={styles.popup} style={{
-        maxHeight: maxHeight ? `${maxHeight}px` : undefined, 
-        maxWidth: maxWidth ? `${maxWidth}px` : undefined
-      }}>
+      <section id={styles.popup} style={maxWidth ? {
+        "--popup-width-max": `${maxWidth}px` 
+      } as React.CSSProperties : undefined}>
         <section id={styles.popupHeader}>
           {
             name ? (
