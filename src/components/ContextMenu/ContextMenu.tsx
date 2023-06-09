@@ -14,9 +14,9 @@ export default function ContextMenu({isOpen, options, onOutsideClick}: {isOpen: 
 
     const checkForOutsideClick = (event: MouseEvent) => {
 
+      // TODO: Exclude trigger/opening button
       if (event.target && !menuRef.current?.contains(event.target as Node)) {
 
-        // TODO: Exclude status button
         onOutsideClick();
 
       }
