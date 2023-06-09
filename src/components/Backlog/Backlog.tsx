@@ -21,7 +21,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
 
       if (project) {
 
-        setTasks(await project.getTasks());
+        setTasks((await project.getTasks()).filter((task) => !task.parentTaskId));
         setCurrentProject(project);
         setDocumentTitle(`${project.name} ▪ Planzea`);
         document.title = `${project.name} ▪ Planzea`;
