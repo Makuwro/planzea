@@ -6,6 +6,7 @@ import Task from "../../client/Task";
 import Client from "../../client/Client";
 import completeSound from "../../complete.ogg";
 import Label from "../../client/Label";
+import ContextMenu from "../ContextMenu/ContextMenu";
 
 interface BacklogTaskComponentProperties {
   client: Client;
@@ -21,25 +22,6 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
 
   const [isStatusSelectorOpen, setIsStatusSelectorOpen] = useState<boolean>(false);
   const statusButtonRef = useRef<HTMLButtonElement>(null);
-  const statusSelectorRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-
-    const checkForOutsideClick = (event: MouseEvent) => {
-
-      if (event.target && !statusSelectorRef.current?.contains(event.target as Node) && !statusButtonRef.current?.contains(event.target as Node)) {
-
-        setIsStatusSelectorOpen(false);
-
-      }
-
-    };
-
-    window.addEventListener("click", checkForOutsideClick);
-
-    return () => window.removeEventListener("click", checkForOutsideClick);
-
-  }, []);
 
   const status = project.statuses.find((status) => status.id === task.statusId);
   const statusHexBG = status ? `#${status.backgroundColor.toString(16)}` : undefined;
@@ -141,21 +123,7 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
           </button>
         </span>
       </section>
-      <section className={`${styles.statusSelectorContainer}${isStatusSelectorOpen ? ` ${styles.open}` : ""}`}>
-        <section className={styles.statusSelector} ref={statusSelectorRef}>
-          <ul>
-            {
-              project.statuses.map((status) => (
-                <li key={status.id}>
-                  <button onClick={() => setStatus(status.id)}>
-                    {status.name}
-                  </button>
-                </li>
-              ))
-            }
-          </ul>
-        </section>
-      </section>
+      <ContextMenu isOpen={isStatusSelectorOpen} options={project.statuses.map((status) => ({label: status.name, onClick: () => setStatus(status.id)}))} onOutsideClick={() => setIsStatusSelectorOpen(false)} />
     </li>
   );
 
