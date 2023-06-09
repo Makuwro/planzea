@@ -20,29 +20,6 @@ export default function SettingsPage({client, project, setCurrentProject, setDoc
         setDocumentTitle(`Labels ▪ ${project.name} ▪ Planzea`);
         document.title = `Labels ▪ ${project.name} ▪ Planzea`;
 
-        const onLabelCreate = (label: Label) => {
-
-          setLabels((labels) => [...labels, label]);
-
-        };
-
-        const onLabelDelete = (labelId: string) => {
-
-          console.log(labelId);
-          setLabels((labels) => labels.filter((possibleLabel) => possibleLabel.id !== labelId));
-
-        };
-
-        client.addEventListener("labelCreate", onLabelCreate);
-        client.addEventListener("labelDelete", onLabelDelete);
-        
-        return () => {
-          
-          client.removeEventListener("labelCreate", onLabelCreate);
-          client.removeEventListener("labelDelete", onLabelDelete);
-
-        };
-
       } else if (params.projectId) {
 
         const project = await client.getProject(params.projectId);
@@ -51,6 +28,36 @@ export default function SettingsPage({client, project, setCurrentProject, setDoc
       }
 
     })();
+
+  }, [project]);
+
+  useEffect(() => {
+
+    if (project) {
+
+      const onLabelCreate = (label: Label) => {
+
+        setLabels((labels) => [...labels, label]);
+
+      };
+
+      const onLabelDelete = (labelId: string) => {
+
+        setLabels((labels) => labels.filter((possibleLabel) => possibleLabel.id !== labelId));
+
+      };
+
+      client.addEventListener("labelCreate", onLabelCreate);
+      client.addEventListener("labelDelete", onLabelDelete);
+      
+      return () => {
+        
+        client.removeEventListener("labelCreate", onLabelCreate);
+        client.removeEventListener("labelDelete", onLabelDelete);
+
+      };
+
+    }
 
   }, [project]);
 
