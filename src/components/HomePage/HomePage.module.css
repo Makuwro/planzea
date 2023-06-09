@@ -48,3 +48,14 @@
   cursor: initial;
   padding: 0;
 }
+
+#projectListContainer {
+  display: flex;
+  overflow-y: auto;
+}
+
+#projectListContainer > ul {
+  max-width: 1080px;
+  width: 100%;
+  margin: 15px auto;
+}
