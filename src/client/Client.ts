@@ -239,48 +239,57 @@ export default class Client {
    */
   async deleteTask(taskId: string, shouldDeleteSubtasks = true): Promise<void> {
 
-    // Delete all associated attachments.
-    for (const attachment of await this.getAttachments()) {
+    // Get all descendant tasks.
+    const descendantTasks: string[] = [];
+    for (const task of await this.getTasks()) {
 
-      attachment.taskIds = attachment.taskIds.filter((possibleTaskId) => possibleTaskId === taskId);
-      if (attachment.taskIds[0]) {
+      if (task.parentTaskId === taskId || (shouldDeleteSubtasks && descendantTasks.find((possibleTask) => possibleTask === task.parentTaskId))) {
 
-        await attachment.update(attachment);
-
-      } else {
-
-        await attachment.delete();
+        descendantTasks.push(task.id);
 
       }
 
     }
+    
+    // Delete or promote descendant tasks.
+    for (const descendantTaskId of [...descendantTasks, taskId]) {
 
-    // Delete or promote sub-tasks.
-    const subtasks = (await this.getTasks()).filter((possibleTask) => possibleTask.parentTaskId === taskId);
-    for (const task of subtasks) {
+      if (taskId === descendantTaskId || shouldDeleteSubtasks) {
+        
+        // Delete all attachments.
+        for (const attachment of await this.getAttachments()) {
 
-      if (shouldDeleteSubtasks) {
-
-        await task.delete(true);
+          attachment.taskIds = attachment.taskIds.filter((possibleTaskId) => possibleTaskId === taskId);
+          if (attachment.taskIds[0]) {
+  
+            await attachment.update(attachment);
+  
+          } else {
+  
+            await attachment.delete();
+  
+          }
+  
+        }
+  
+        // Delete the task.
+        await this.#db.tasks.delete(taskId);
+  
+        // Run each callback.
+        for (const callback of this.eventCallbacks.taskDelete) {
+  
+          callback(taskId);
+    
+        }
 
       } else {
 
-        await task.update({parentTaskId: undefined});
+        await this.updateTask(descendantTaskId, {parentTaskId: undefined});
 
       }
 
     }
-
-    // Delete the task.
-    await this.#db.tasks.delete(taskId);
-
-    // Run each callback.
-    for (const callback of this.eventCallbacks.taskDelete) {
-
-      callback(taskId);
-
-    }
-
+    
   }
 
   async deleteLabel(labelId: string): Promise<void> {
