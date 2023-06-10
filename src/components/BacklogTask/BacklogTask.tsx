@@ -94,11 +94,10 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
   const dueMonth = dueDate ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][dueDate.getMonth()] : undefined;
 
   return (
-    <li className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`}>
-      <button onClick={onClick} />
-      <section>
+    <li>
+      <section className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`} onClick={onClick}>
         <span>
-          <section className={styles.statusContainer}>
+          <section className={styles.statusContainer} onClick={(event) => event.stopPropagation()}>
             <button className={styles.status} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} ref={statusButtonRef} style={{backgroundColor: statusHexBG}} />
           </section>
           <span style={task.statusId === "dc" ? {color: "#9d9d9d"} : undefined}>
@@ -123,7 +122,7 @@ export default function BacklogTask({client, task, project, isSelected, onClick,
           </button>
         </span>
       </section>
-      <ContextMenu isOpen={isStatusSelectorOpen} options={project.statuses.map((status) => ({label: status.name, onClick: () => setStatus(status.id)}))} onOutsideClick={() => setIsStatusSelectorOpen(false)} />
+      {isStatusSelectorOpen ? <ContextMenu isOpen options={project.statuses.map((status) => ({label: status.name, onClick: () => setStatus(status.id)}))} onOutsideClick={() => setIsStatusSelectorOpen(false)} triggerElement={statusButtonRef.current} /> : null}
     </li>
   );
 

@@ -60,10 +60,8 @@
     backdrop-filter: none;
     top: initial;
     left: initial;
-    position: fixed;
     height: initial;
     width: initial;
-    margin-top: 50px;
     justify-content: initial;
     align-items: initial;
   }

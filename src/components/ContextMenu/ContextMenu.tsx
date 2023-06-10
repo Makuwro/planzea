@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import styles from "./ContextMenu.module.css";
 
 export interface ContextMenuOption {
@@ -6,7 +6,14 @@ export interface ContextMenuOption {
   onClick: () => void;
 }
 
-export default function ContextMenu({isOpen, options, onOutsideClick}: {isOpen: boolean; options: ContextMenuOption[]; onOutsideClick: () => void}) {
+interface ContextMenuProperties {
+  isOpen: boolean; 
+  onOutsideClick: () => void;
+  options: ContextMenuOption[]; 
+  triggerElement?: HTMLElement | null;
+}
+
+export default function ContextMenu({isOpen, options, onOutsideClick, triggerElement}: ContextMenuProperties) {
 
   const menuRef = useRef<HTMLElement>(null);
 
@@ -14,8 +21,7 @@ export default function ContextMenu({isOpen, options, onOutsideClick}: {isOpen: 
 
     const checkForOutsideClick = (event: MouseEvent) => {
 
-      // TODO: Exclude trigger/opening button
-      if (event.target && !menuRef.current?.contains(event.target as Node)) {
+      if (event.target && !menuRef.current?.contains(event.target as Node) && (!triggerElement || !triggerElement.contains(event.target as Node))) {
 
         onOutsideClick();
 
@@ -23,19 +29,23 @@ export default function ContextMenu({isOpen, options, onOutsideClick}: {isOpen: 
 
     };
 
-    window.addEventListener("click", checkForOutsideClick);
+    if (isOpen) {
+
+      window.addEventListener("click", checkForOutsideClick);
+
+    }
 
     return () => window.removeEventListener("click", checkForOutsideClick);
 
-  }, []);
+  }, [isOpen]);
 
   return (
     <section className={`${styles.menuContainer}${isOpen ? ` ${styles.open}` : ""}`}>
       <section className={styles.menu} ref={menuRef}>
         <ul>
           {
-            options.map((option) => (
-              <li key={option.onClick.toString()}>
+            options.map((option, index) => (
+              <li key={index}>
                 <button onClick={option.onClick}>
                   {option.label}
                 </button>
