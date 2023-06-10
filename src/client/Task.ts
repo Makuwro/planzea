@@ -57,7 +57,7 @@ export default class Task {
 
   }
 
-  async delete(shouldDeleteSubtasks?: boolean) {
+  async delete(shouldDeleteSubtasks = true) {
 
     await this.#client.deleteTask(this.id, shouldDeleteSubtasks);
 

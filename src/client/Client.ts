@@ -237,20 +237,7 @@ export default class Client {
    * Deletes a task from the database.
    * @param taskId The task's ID.
    */
-  async deleteTask(taskId: string, shouldDeleteSubtasks?: boolean): Promise<void> {
-
-    // Delete all tasks.
-    await this.#db.tasks.bulkDelete((await this.#db.tasks.toArray()).reduce((ids, possibleTask) => {
-      
-      if (possibleTask.parentTaskId === taskId) {
-
-        ids.push(possibleTask.id);
-
-      }
-
-      return ids;
-      
-    }, [] as string[]));
+  async deleteTask(taskId: string, shouldDeleteSubtasks = true): Promise<void> {
 
     // Delete all associated attachments.
     for (const attachment of await this.getAttachments()) {

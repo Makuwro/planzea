@@ -32,7 +32,7 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
 
   // Check if the user confirmed the deletion.
   const [didUserConfirmDeletion, setDidUserConfirmDeletion] = useState<boolean>(false);
-  const [shouldDeleteSubtasks, setShouldDeleteSubtasks] = useState<boolean>(false);
+  const [shouldDeleteSubtasks, setShouldDeleteSubtasks] = useState<boolean>(true);
   useEffect(() => {
 
     (async () => {
@@ -46,7 +46,7 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
 
     })();
 
-  }, [task, didUserConfirmDeletion]);
+  }, [task, didUserConfirmDeletion, shouldDeleteSubtasks]);
 
   // Check if the popup is open.
   const [isMounted, setIsMounted] = useState(false);
@@ -58,7 +58,8 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
       navigate(location.pathname, {replace: true});
       setTask(null);
       setIsMounted(false);
-      setDidUserConfirmDeletion(false);
+      setDidUserConfirmDeletion(true);
+      setShouldDeleteSubtasks(true);
       
     }}>
       <form onSubmit={(event) => {
@@ -69,7 +70,7 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
       }}>
         <p>Are you sure you want to delete the <b>{task.name}</b> task? No takesies-backsies.</p>
         <span>
-          <section>  
+          <section style={{display: "flex"}}>
             <label>Delete sub-tasks</label>
             <input type="checkbox" checked={shouldDeleteSubtasks} onChange={() => setShouldDeleteSubtasks(!shouldDeleteSubtasks)} />
           </section>
