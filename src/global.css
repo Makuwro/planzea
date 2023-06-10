@@ -24,6 +24,7 @@
   --link: #5297f1;
   --link-selected: #d0dcff;
   --text: #5f6368;
+  --text-disabled: #999ea4;
   --text-red: #ff4545;
   --text-important: #101010;
   --box-shadow-default: rgba(0, 0, 0, 0.1) 0px 4px 12px;
@@ -90,6 +91,10 @@ button {
   color: var(--button-text);
   transition: 0.05s;
   font-weight: 300;
+}
+
+button[disabled] span {
+  color: var(--text-disabled);
 }
 
 button:hover {

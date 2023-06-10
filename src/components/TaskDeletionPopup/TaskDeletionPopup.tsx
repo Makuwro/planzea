@@ -19,8 +19,8 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
 
       if (deleteValue === "task" && taskId) {
 
-        // Look for the task in question.
         const task = await client.getTask(taskId);
+        setIsMounted(true);
         setTask(task);
         setIsOpen(true);
 
@@ -69,9 +69,14 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
       }}>
         <p>Are you sure you want to delete the <b>{task.name}</b> task? No takesies-backsies.</p>
         <span>
-          <input type="checkbox" checked={shouldDeleteSubtasks} onChange={() => setShouldDeleteSubtasks(!shouldDeleteSubtasks)}>Delete subtasks</input>
-          <input type="submit" disabled={didUserConfirmDeletion} onClick={() => setDidUserConfirmDeletion(true)}>Delete task</input>
-          <button disabled={didUserConfirmDeletion} onClick={() => setIsOpen(false)}>Cancel</button>
+          <section>  
+            <label>Delete sub-tasks</label>
+            <input type="checkbox" checked={shouldDeleteSubtasks} onChange={() => setShouldDeleteSubtasks(!shouldDeleteSubtasks)} />
+          </section>
+          <section>  
+            <input type="submit" disabled={didUserConfirmDeletion} onClick={() => setDidUserConfirmDeletion(true)} value="Delete task" />
+            <button disabled={didUserConfirmDeletion} onClick={() => setIsOpen(false)}>Cancel</button>
+          </section>
         </span>
       </form>
     </Popup>

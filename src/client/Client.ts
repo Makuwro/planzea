@@ -17,6 +17,7 @@ interface EventCallbacks {
   labelDelete: ((labelId: string) => void) | (() => void);
   labelUpdate: ((newLabel: Label, oldLabelProperties?: LabelProperties) => void) | ((newLabel: Label) => void) | (() => void);
   taskCreate: ((task: Task) => void) | (() => void);
+  taskDelete: ((taskId: string) => void) | (() => void);
   taskUpdate: ((newTask: Task, oldTaskProperties?: TaskProperties) => void) | ((newTask: Task) => void) | (() => void);
 }
 
@@ -25,6 +26,7 @@ interface EventCallbacksArray {
   labelDelete: EventCallbacks["labelDelete"][];
   labelUpdate: EventCallbacks["labelUpdate"][];
   taskCreate: EventCallbacks["taskCreate"][];
+  taskDelete: EventCallbacks["taskDelete"][];
   taskUpdate: EventCallbacks["taskUpdate"][];
 }
 
@@ -61,6 +63,7 @@ export default class Client {
     labelDelete: [],
     labelUpdate: [],
     taskCreate: [],
+    taskDelete: [],
     taskUpdate: []
   };
   personalProjectId?: string;
@@ -188,7 +191,16 @@ export default class Client {
    */
   async createTask(props: InitialTaskProperties): Promise<Task> {
 
-    return await this.#createObject(Task, props);
+    const task = await this.#createObject(Task, props);
+
+    // Run each callback.
+    for (const callback of this.eventCallbacks.taskCreate) {
+
+      callback(task);
+
+    }
+
+    return task;
     
   }
 
@@ -274,6 +286,13 @@ export default class Client {
 
     // Delete the task.
     await this.#db.tasks.delete(taskId);
+
+    // Run each callback.
+    for (const callback of this.eventCallbacks.taskDelete) {
+
+      callback(taskId);
+
+    }
 
   }
 
@@ -395,6 +414,8 @@ export default class Client {
   addEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
   addEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
   addEventListener(eventName: "labelUpdate", callback: EventCallbacks["labelUpdate"]): void;
+  addEventListener(eventName: "taskCreate", callback: EventCallbacks["taskCreate"]): void;
+  addEventListener(eventName: "taskDelete", callback: EventCallbacks["taskDelete"]): void;
   addEventListener(eventName: "taskUpdate", callback: EventCallbacks["taskUpdate"]): void;
   addEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
 
@@ -405,6 +426,8 @@ export default class Client {
   removeEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
   removeEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
   removeEventListener(eventName: "labelUpdate", callback: EventCallbacks["labelUpdate"]): void;
+  removeEventListener(eventName: "taskCreate", callback: EventCallbacks["taskCreate"]): void;
+  removeEventListener(eventName: "taskDelete", callback: EventCallbacks["taskDelete"]): void;
   removeEventListener(eventName: "taskUpdate", callback: EventCallbacks["taskUpdate"]): void;
   removeEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
 

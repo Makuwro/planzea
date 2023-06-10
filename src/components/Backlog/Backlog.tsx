@@ -47,6 +47,16 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
 
   useEffect(() => {
 
+    const onTaskCreate = (newTask: Task) => {
+
+      if (project && newTask.projectId === project.id) {
+
+        setTasks([...tasks, newTask]);
+
+      }
+
+    };
+
     const onTaskUpdate = (newTask: Task) => {
 
       const taskIndex = tasks.findIndex((possibleTask) => possibleTask.id === newTask.id);
@@ -60,24 +70,26 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
       
     };
 
+    const onTaskDelete = (taskId: string) => {
+
+      setTasks(tasks.filter((possibleTask) => possibleTask.id !== taskId));
+
+    };
+
+    client.addEventListener("taskCreate", onTaskCreate);
     client.addEventListener("taskUpdate", onTaskUpdate);
+    client.addEventListener("taskDelete", onTaskDelete);
 
-    return () => client.removeEventListener("taskUpdate", onTaskUpdate);
+    return () => {
+      
+      client.removeEventListener("taskCreate", onTaskCreate);
+      client.removeEventListener("taskUpdate", onTaskUpdate);
+      client.removeEventListener("taskDelete", onTaskDelete);
+
+    };
 
 
-  }, [tasks, client]);
-
-  const deleteTask = async (task: Task) => {
-
-    if (confirm("Are you sure you want to delete this task?")) {
-
-      await task.delete();
-      setTasks(tasks.filter((possibleTask) => possibleTask.id !== task.id));
-      setTaskSelection(null);
-
-    }
-
-  };
+  }, [tasks, client, project]);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -94,7 +106,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
 
         if (event.key === "Delete") {
 
-          await deleteTask(taskSelection.task);
+          navigate(`${location.pathname}?delete=task&id=${taskSelection.task.id}`, {replace: true});
 
         }
 
@@ -110,20 +122,20 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
 
   return project ? (
     <main id={styles.main}>
-      <BacklogViewModificationOptions project={project} onTaskCreate={(task) => setTasks([...tasks, task])} />
+      <BacklogViewModificationOptions project={project} onTaskCreate={(task) => setTasks([...tasks, task])} selectedTask={taskSelection?.task} />
       {
         tasks[0] ? (
           <>
             <section id={styles.taskListContainer}>
               <ul id={styles.taskList}>
                 {
-                  tasks.filter((task) => !task.parentTaskId).map((task) => <BacklogTask client={client} key={task.id} task={task} project={project} isSelected={taskSelection?.task.id === task.id} onClick={() => {
+                  tasks.filter((task) => !task.parentTaskId).map((task) => <BacklogTask key={task.id} task={task} project={project} isSelected={taskSelection?.task.id === task.id} onClick={() => {
                     
                     const newTaskSelection = {task, time: new Date().getTime()};
                     setTaskSelection(newTaskSelection);
                     setTaskSelectionPrevious(taskSelection);
                   
-                  }} onDelete={async () => await deleteTask(task)} onUpdate={(newTask) => setTasks(tasks.map((task) => task.id === newTask.id ? newTask : task))} />)
+                  }} />)
                 }
               </ul>
             </section>
