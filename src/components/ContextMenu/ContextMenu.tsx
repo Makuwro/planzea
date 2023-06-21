@@ -3,7 +3,7 @@ import styles from "./ContextMenu.module.css";
 
 export interface ContextMenuOption {
   label: ReactNode;
-  onClick: () => void;
+  onClick: React.MouseEventHandler;
 }
 
 interface ContextMenuProperties {

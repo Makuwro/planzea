@@ -84,7 +84,12 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
           {dueMonth && dueDate ? <span>{dueMonth} {dueDate.getDate() + 1}</span> : null}
         </span>
       </section>
-      {isStatusSelectorOpen ? <ContextMenu isOpen options={project.statuses.map((status) => ({label: status.name, onClick: () => setStatus(status.id)}))} onOutsideClick={() => setIsStatusSelectorOpen(false)} triggerElement={statusButtonRef.current} /> : null}
+      {isStatusSelectorOpen ? <ContextMenu isOpen options={project.statuses.map((status) => ({label: status.name, onClick: (event) => {
+        
+        event.stopPropagation();
+        setStatus(status.id);
+      
+      }}))} onOutsideClick={() => setIsStatusSelectorOpen(false)} triggerElement={statusButtonRef.current} /> : null}
     </li>
   );
 
