@@ -53,7 +53,7 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return isMounted && task ? (
-    <Popup name="Confirm task deletion" isOpen={isOpen} onClose={() => {
+    <Popup name="Confirm task deletion" maxWidth={535} isOpen={isOpen} onClose={() => {
 
       navigate(location.pathname, {replace: true});
       setTask(null);
@@ -69,12 +69,12 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
 
       }}>
         <p>Are you sure you want to delete the <b>{task.name}</b> task? No takesies-backsies.</p>
-        <span>
-          <section style={{display: "flex"}}>
+        <section>
+          <section style={{display: "flex", justifyContent: "space-between"}}>
             <label>Delete sub-tasks</label>
             <input type="checkbox" checked={shouldDeleteSubtasks} onChange={() => setShouldDeleteSubtasks(!shouldDeleteSubtasks)} />
           </section>
-          <section>  
+          <section style={{display: "flex", gap: "15px"}}>  
             <input type="submit" disabled={didUserConfirmDeletion} onClick={() => setDidUserConfirmDeletion(true)} value="Delete task" />
             <button disabled={didUserConfirmDeletion} onClick={(event) => {
               
@@ -83,7 +83,7 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
             
             }}>Cancel</button>
           </section>
-        </span>
+        </section>
       </form>
     </Popup>
   ) : null;

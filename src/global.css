@@ -124,6 +124,10 @@ input {
   font-size: 16px;
 }
 
+input[type="checkbox"] {
+  width: initial;
+}
+
 input[type="file"] {
   display: none;
 }
