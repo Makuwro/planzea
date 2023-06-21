@@ -30,69 +30,11 @@
 
 .statusContainer {
   display: flex;
-}
-
-.statusContainer {
   pointer-events: all;
 }
 
-.statusSelector {
-  border-radius: 5px;
-  box-shadow: var(--box-shadow-default);
-  overflow: hidden;
-  position: relative;
-  bottom: 0;
-  width: calc(100% - 25px);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  z-index: 2;
-}
-
-.statusSelectorContainer {
-  display: none;
-}
-
-.statusSelectorContainer.open {
-  position: fixed;
-  z-index: 2;
-  top: 0;
-  left: 0;
-  height: 100%;
-  display: flex;
-  background-color: rgba(47, 47, 47, 0.679);
-  backdrop-filter: blur(5px);
-  width: 100%;
-  justify-content: center;
-  align-items: flex-end;
-}
-
-.statusSelector > ul {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.statusSelector button {
-  width: 100%;
-  text-align: left;
-  border-radius: 0;
-  font-weight: 300;
-  cursor: initial;
-  background-color: var(--background);
-  color: var(--text);
-}
-
 .task {
-  display: flex;
   width: 100%;
-  position: relative;
-}
-
-.task > button {
-  width: 100%;
-  text-align: left;
-  color: var(--text);
-  font-weight: 300;
   background-color: transparent;
   border-radius: 5px;
   display: flex;
@@ -101,42 +43,29 @@
   min-height: 40px;
   border: 1px solid transparent;
   box-sizing: border-box;
-  z-index: 1;
-  padding: 0;
+  padding: 0 15px;
 }
 
-.task > button:hover {
-  background-color: rgb(244, 243, 243);
+.task:hover {
+  background-color: rgb(230, 230, 230);
   box-shadow: none;
   border-radius: 5px;
   cursor: initial;
 }
 
-.task > section:first-of-type {
-  position: absolute;
-  width: 100%;
-  display: flex;
-  padding: 0 15px;
-  height: 100%;
-  box-sizing: border-box;
-  justify-content: space-between;
-  align-items: center;
+.task:hover:active {
+  background-color: rgb(220, 220, 220);
 }
 
-.task > section:first-of-type > span {
-  pointer-events: none;
+.task.selected {
+  background-color: rgb(225, 225, 225);
+  border-color: var(--border);
 }
 
-.task > section > span {
+.task > span {
   display: flex;
   align-items: center;
   gap: 15px;
-  z-index: 1;
-}
-
-.task.selected > button {
-  background-color:rgb(228, 228, 228);
-  border-color: var(--border);
 }
 
 .taskOptions {
@@ -151,30 +80,4 @@
   color: var(--text);
   z-index: 1;
   pointer-events: all;
-}
-
-@media screen and (min-width: 720px) {
-  
-  .statusSelectorContainer.open {
-    background-color: transparent;
-    backdrop-filter: none;
-    top: initial;
-    left: initial;
-    position: fixed;
-    height: initial;
-    width: initial;
-    margin-top: 50px;
-    justify-content: initial;
-    align-items: initial;
-  }
-
-  .statusSelector {
-    bottom: initial;
-    position: relative;
-    width: 100%;
-    border: 1px solid var(--border);
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-  }
-
 }

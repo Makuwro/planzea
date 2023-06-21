@@ -83,9 +83,25 @@ export default function TaskPopup({client, project, setCurrentProject}: {client:
 
       };
 
-      client.addEventListener("taskUpdate", onTaskUpdate);
+      const onTaskDelete = (taskId: string) => {
 
-      return () => client.removeEventListener("taskUpdate", onTaskUpdate);
+        if (taskId === task.id) {
+
+          navigate(`/personal/projects/${project ? project.id : task.projectId}/tasks`, {replace: true});
+
+        }
+
+      };
+
+      client.addEventListener("taskUpdate", onTaskUpdate);
+      client.addEventListener("taskDelete", onTaskDelete);
+
+      return () => {
+        
+        client.removeEventListener("taskUpdate", onTaskUpdate);
+        client.removeEventListener("taskDelete", onTaskDelete);
+
+      };
 
     }
 
@@ -242,16 +258,16 @@ export default function TaskPopup({client, project, setCurrentProject}: {client:
     const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
 
     return (
-      <Popup isOpen={isOpen} name={task.name} onClose={() => {
+      <Popup actions={
+        <button onClick={() => navigate(`${location.pathname}?delete=task&id=${task.id}`, {replace: true})}>
+          <Icon name="delete" />
+        </button>
+      } isOpen={isOpen} name={task.name} onClose={() => {
 
         navigate(`/personal/projects/${project.id}/tasks`);
 
       }}>
         <h1>{task.name}</h1>
-        {/* <nav>
-          <button className={styles.selected}>Details</button>
-          <button>Activity</button>
-        </nav> */}
         <section id={styles.details}>
           <section 
             id={styles.description} 

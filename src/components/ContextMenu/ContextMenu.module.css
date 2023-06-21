@@ -1,0 +1,75 @@
+.menu {
+  border-radius: 5px;
+  box-shadow: var(--box-shadow-default);
+  overflow: hidden;
+  position: relative;
+  bottom: 0;
+  width: calc(100% - 25px);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: var(--background);
+  z-index: 2;
+}
+
+.menu > ul {
+  padding: 5px;
+  margin: 0;
+  list-style: none;
+}
+
+.menu button {
+  width: 100%;
+  text-align: left;
+  border-radius: 5px;
+  font-weight: 300;
+  cursor: initial;
+  background-color: var(--background);
+  color: var(--text);
+  box-shadow: none;
+}
+
+.menuContainer {
+  display: none;
+}
+
+.menuContainer.open {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: flex;
+  background-color: rgba(47, 47, 47, 0.679);
+  backdrop-filter: blur(5px);
+  width: 100%;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+@media screen and (min-width: 720px) {
+  
+  .menu {
+    bottom: initial;
+    position: relative;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  .menuContainer.open {
+    background-color: transparent;
+    backdrop-filter: none;
+    top: initial;
+    left: initial;
+    height: initial;
+    width: initial;
+    justify-content: initial;
+    align-items: initial;
+  }
+
+  .menu button:hover {
+    box-shadow: var(--box-shadow-default);
+  }
+
+}

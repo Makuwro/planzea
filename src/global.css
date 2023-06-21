@@ -24,6 +24,7 @@
   --link: #5297f1;
   --link-selected: #d0dcff;
   --text: #5f6368;
+  --text-disabled: #999ea4;
   --text-red: #ff4545;
   --text-important: #101010;
   --box-shadow-default: rgba(0, 0, 0, 0.1) 0px 4px 12px;
@@ -92,6 +93,10 @@ button {
   font-weight: 300;
 }
 
+button[disabled] span {
+  color: var(--text-disabled);
+}
+
 button:hover {
   filter: brightness(0.9);
 }
@@ -117,6 +122,10 @@ input {
   background-color: var(--background-input);
   font-weight: 100;
   font-size: 16px;
+}
+
+input[type="checkbox"] {
+  width: initial;
 }
 
 input[type="file"] {

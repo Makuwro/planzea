@@ -1,3 +1,7 @@
+#addIssueButton {
+  border: 1px solid var(--border);
+}
+
 #viewModificationOptions {
   margin: var(--height-header) -15px 0;
   border-bottom: 1px solid var(--border);
@@ -10,6 +14,11 @@
   justify-content: space-between;
 }
 
+#viewModificationOptions > span {
+  display: flex;
+  gap: 15px;
+}
+
 #viewModificationOptions button {
   display: flex;
   justify-content: center;
@@ -18,7 +27,6 @@
   height: 30px;
   background-color: var(--background);
   color: var(--text);
-  border: 1px solid var(--border);
   width: 30px;
   cursor: initial;
   padding: 0;
