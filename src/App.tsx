@@ -48,12 +48,12 @@ export default function App() {
   const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
   return client && isReady ? (
     <>
+      <TaskPopup project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
       <LabelRemovalPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <LabelCreationPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <ProjectCreationPopup client={client} documentTitle={documentTitle} />
       <TaskDeletionPopup client={client} />
       <TaskLabelManagementPopup client={client} documentTitle={documentTitle} project={currentProject} />
-      <TaskPopup project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
       <Header />
       <Routes>
         <Route path="/:username" element={<Navigate to="/" />} />

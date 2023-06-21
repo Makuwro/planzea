@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import styles from "./Popup.module.css";
 import Icon from "../Icon/Icon";
 
 interface PopupProperties {
+  actions?: ReactElement;
   name?: string;
   isOpen: boolean;
   onClose: () => void;
@@ -10,7 +11,7 @@ interface PopupProperties {
   children: ReactNode;
 }
 
-export default function Popup({name, isOpen, onClose, maxWidth, children}: PopupProperties) {
+export default function Popup({name, isOpen, onClose, maxWidth, children, actions}: PopupProperties) {
 
   const [isShown, setIsShown] = useState<boolean>(false);
 
@@ -40,9 +41,7 @@ export default function Popup({name, isOpen, onClose, maxWidth, children}: Popup
             ) : null
           }
           <span id={styles.actions}>
-            {/* <button>
-              <Icon name="more_horiz" />
-            </button> */}
+            {actions}
             <button id={styles.closeButton} onClick={() => setIsShown(false)}>
               <Icon name="close" />
             </button>
