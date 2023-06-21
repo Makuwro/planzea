@@ -58,7 +58,7 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
       navigate(location.pathname, {replace: true});
       setTask(null);
       setIsMounted(false);
-      setDidUserConfirmDeletion(true);
+      setDidUserConfirmDeletion(false);
       setShouldDeleteSubtasks(true);
       
     }}>
@@ -76,7 +76,12 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
           </section>
           <section>  
             <input type="submit" disabled={didUserConfirmDeletion} onClick={() => setDidUserConfirmDeletion(true)} value="Delete task" />
-            <button disabled={didUserConfirmDeletion} onClick={() => setIsOpen(false)}>Cancel</button>
+            <button disabled={didUserConfirmDeletion} onClick={(event) => {
+              
+              event.preventDefault();
+              setIsOpen(false);
+            
+            }}>Cancel</button>
           </section>
         </span>
       </form>

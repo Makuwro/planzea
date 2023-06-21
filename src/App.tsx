@@ -12,6 +12,7 @@ import ProjectCreationPopup from "./components/ProjectCreationPopup/ProjectCreat
 import LabelCreationPopup from "./components/LabelCreationPopup/LabelCreationPopup";
 import LabelRemovalPopup from "./components/LabelRemovalPopup/LabelRemovalPopup";
 import TaskDeletionPopup from "./components/TaskDeletionPopup/TaskDeletionPopup";
+import TaskLabelManagementPopup from "./components/TaskLabelManagementPopup/TaskLabelManagementPopup";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -47,11 +48,12 @@ export default function App() {
   const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
   return client && isReady ? (
     <>
-      <TaskDeletionPopup client={client} />
-      <TaskPopup project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
       <LabelRemovalPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <LabelCreationPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <ProjectCreationPopup client={client} documentTitle={documentTitle} />
+      <TaskDeletionPopup client={client} />
+      <TaskLabelManagementPopup client={client} documentTitle={documentTitle} project={currentProject} />
+      <TaskPopup project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
       <Header />
       <Routes>
         <Route path="/:username" element={<Navigate to="/" />} />
@@ -65,6 +67,7 @@ export default function App() {
         <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/settings" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
+        <Route path="/:username/projects/:projectId/settings/labels" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/" element={<HomePage client={client} setDocumentTitle={setDocumentTitle} />} />
       </Routes>
     </>
