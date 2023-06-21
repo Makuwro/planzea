@@ -101,7 +101,7 @@ export default function TaskPopup({client, project, setCurrentProject}: {client:
         client.removeEventListener("taskUpdate", onTaskUpdate);
         client.removeEventListener("taskDelete", onTaskDelete);
 
-      }
+      };
 
     }
 
