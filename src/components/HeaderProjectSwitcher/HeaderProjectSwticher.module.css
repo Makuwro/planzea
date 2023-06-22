@@ -1,0 +1,26 @@
+#button {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  color: var(--text);
+  gap: 5px;
+  padding: 0 10px;
+  max-width: 246px;
+  height: 40px;
+  border: 1px solid var(--border);
+}
+
+#name {
+  display: none;
+}
+
+@media screen and (min-width: 400px) {
+  
+  #name {
+    display: initial;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+}

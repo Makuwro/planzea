@@ -54,7 +54,7 @@ export default function App() {
       <ProjectCreationPopup client={client} documentTitle={documentTitle} />
       <TaskDeletionPopup client={client} />
       <TaskLabelManagementPopup client={client} documentTitle={documentTitle} project={currentProject} />
-      <Header />
+      <Header currentProject={currentProject} />
       <Routes>
         <Route path="/:username" element={<Navigate to="/" />} />
         <Route path="/:username/projects" element={<Navigate to="/" />} />
