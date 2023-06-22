@@ -4,7 +4,7 @@
   background-color: transparent;
   color: var(--text);
   gap: 5px;
-  padding: 0 10px;
+  padding: 0 7px;
   max-width: 246px;
   height: 40px;
   border: 1px solid var(--border);
@@ -16,6 +16,10 @@
 
 @media screen and (min-width: 400px) {
   
+  #button {
+    padding: 0 10px;
+  }
+
   #name {
     display: initial;
     overflow: hidden;
