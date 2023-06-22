@@ -28,7 +28,11 @@ export default function HeaderProjectSwitcher({client, currentProject}: {client:
       </button>
       <ContextMenu isOpen={isOpen} options={projects.map((project) => ({label: project.name, onClick: () => {
         
-        navigate(`/personal/projects/${project.id}`);
+        if (currentProject?.id !== project.id) {
+
+          navigate(`/personal/projects/${project.id}`);
+
+        }
         setIsOpen(false);
       
       }}))} onOutsideClick={() => setIsOpen(false)} triggerElement={buttonRef.current} />
