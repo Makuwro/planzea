@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import styles from "./Header.module.css";
 import HeaderProjectSwitcher from "../HeaderProjectSwitcher/HeaderProjectSwitcher";
 import Project from "../../client/Project";
+import Client from "../../client/Client";
 
-export default function Header({currentProject}: {currentProject: Project | null}) {
+export default function Header({client, currentProject}: {client: Client; currentProject: Project | null}) {
 
   return (
     <header>
@@ -12,7 +13,7 @@ export default function Header({currentProject}: {currentProject: Project | null
         <Link to={"/"}>
           Planzea
         </Link>
-        <HeaderProjectSwitcher currentProject={currentProject} />
+        <HeaderProjectSwitcher client={client} currentProject={currentProject} />
       </section>
       <section id={styles.right}>
         <button id={styles.accountButton}>
