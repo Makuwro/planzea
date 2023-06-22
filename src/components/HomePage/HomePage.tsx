@@ -1,16 +1,19 @@
-import React, { Dispatch, ReactElement, SetStateAction, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import styles from "./HomePage.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import Client from "../../client/Client";
 import Icon from "../Icon/Icon";
+import { SetState } from "../../App";
+import Project from "../../client/Project";
 
-export default function HomePage({client, setDocumentTitle}: {client: Client; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
+export default function HomePage({client, setDocumentTitle, setCurrentProject}: {client: Client; setDocumentTitle: SetState<string>; setCurrentProject: SetState<Project | null>}) {
 
   const navigate = useNavigate();
 
   useEffect(() => {
 
     setDocumentTitle("Home ▪ Planzea");
+    setCurrentProject(null);
     document.title = "Home ▪ Planzea";
 
   }, []);

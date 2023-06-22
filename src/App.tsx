@@ -54,7 +54,7 @@ export default function App() {
       <ProjectCreationPopup client={client} documentTitle={documentTitle} />
       <TaskDeletionPopup client={client} />
       <TaskLabelManagementPopup client={client} documentTitle={documentTitle} project={currentProject} />
-      <Header />
+      <Header client={client} currentProject={currentProject} />
       <Routes>
         <Route path="/:username" element={<Navigate to="/" />} />
         <Route path="/:username/projects" element={<Navigate to="/" />} />
@@ -68,7 +68,7 @@ export default function App() {
         <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/settings" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/settings/labels" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
-        <Route path="/" element={<HomePage client={client} setDocumentTitle={setDocumentTitle} />} />
+        <Route path="/" element={<HomePage client={client} setDocumentTitle={setDocumentTitle} setCurrentProject={setCurrentProject} />} />
       </Routes>
     </>
   ) : null;
