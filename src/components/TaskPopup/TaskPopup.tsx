@@ -10,8 +10,9 @@ import TaskPopupSubTaskSection from "../TaskPopupSubTaskSection/TaskPopupSubTask
 import Project from "../../client/Project";
 import Popup from "../Popup/Popup";
 import TaskPopupParentTaskSection from "../TaskPopupParentTaskSection/TaskPopupParentTaskSection";
+import { SetState } from "../../App";
 
-export default function TaskPopup({client, documentTitle, project, setCurrentProject}: {documentTitle: string; client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
+export default function TaskPopup({client, setTempDocumentTitle, project, setCurrentProject}: {setTempDocumentTitle: SetState<string | null>; client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
   const location = useLocation();
   const [task, setTask] = useState<Task | null>(null);
@@ -37,7 +38,6 @@ export default function TaskPopup({client, documentTitle, project, setCurrentPro
       } else {
         
         setIsOpen(false);
-        document.title = documentTitle;
 
       }
 
@@ -72,7 +72,7 @@ export default function TaskPopup({client, documentTitle, project, setCurrentPro
       }
 
       // Set the document title.
-      document.title = `${task.name} ▪ ${project.name}`;
+      setTempDocumentTitle(`${task.name} ▪ ${project.name}`);
 
       // Listen to the events.
       const onTaskUpdate = (newTask: Task) => {
@@ -268,6 +268,7 @@ export default function TaskPopup({client, documentTitle, project, setCurrentPro
         </button>
       } isOpen={isOpen} name={task.name} onClose={() => {
 
+        setTempDocumentTitle(null);
         navigate(`/personal/projects/${project.id}/tasks`);
 
       }}>

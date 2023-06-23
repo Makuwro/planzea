@@ -4,8 +4,9 @@ import Client from "../../client/Client";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
+import { SetState } from "../../App";
 
-export default function TaskLabelManagementPopup({client, documentTitle, project}: {client: Client; documentTitle: string; project: Project | null;}) {
+export default function TaskLabelManagementPopup({client, setTempDocumentTitle, project}: {client: Client; setTempDocumentTitle: SetState<string | null>; project: Project | null;}) {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -31,7 +32,7 @@ export default function TaskLabelManagementPopup({client, documentTitle, project
 
           if (task && taskProjectCopy) {
 
-            setTimeout(() => document.title = `Manage task labels ▪ ${task.name} ▪ ${taskProjectCopy.name}`, 1);
+            setTempDocumentTitle(`Manage task labels ▪ ${task.name} ▪ ${taskProjectCopy.name}`);
             setIsOpen(true);
 
           } else {
@@ -44,7 +45,6 @@ export default function TaskLabelManagementPopup({client, documentTitle, project
 
       } else {
 
-        document.title = documentTitle;
         setIsOpen(false);
 
       }
@@ -56,6 +56,7 @@ export default function TaskLabelManagementPopup({client, documentTitle, project
   return project && task ? (
     <Popup name={"Manage task labels"} isOpen={isOpen} onClose={() => {
       
+      setTempDocumentTitle(null);
       navigate(location.pathname, {replace: true});
       setTask(null);
     

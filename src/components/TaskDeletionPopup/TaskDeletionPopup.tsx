@@ -4,8 +4,9 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Client from "../../client/Client";
 import Task from "../../client/Task";
 import Project from "../../client/Project";
+import { SetState } from "../../App";
 
-export default function TaskDeletionPopup({client, currentProject}: {client: Client; currentProject: Project | null}) {
+export default function TaskDeletionPopup({client, currentProject, setTempDocumentTitle}: {client: Client; currentProject: Project | null; setTempDocumentTitle: SetState<string | null>}) {
 
   // Check if the user is requesting to delete a task.
   const [searchParams] = useSearchParams();
@@ -21,7 +22,7 @@ export default function TaskDeletionPopup({client, currentProject}: {client: Cli
       if (deleteValue === "task" && taskId) {
 
         const task = await client.getTask(taskId);
-        setTimeout(() => document.title = `Confirm task deletion ▪ ${task.name}${currentProject ? ` ▪ ${currentProject.name}` : ""}`, 1);
+        setTempDocumentTitle(`Confirm task deletion ▪ ${task.name}${currentProject ? ` ▪ ${currentProject.name}` : ""}`);
         setIsMounted(true);
         setTask(task);
         setIsOpen(true);
@@ -59,6 +60,7 @@ export default function TaskDeletionPopup({client, currentProject}: {client: Cli
 
       navigate(location.pathname, {replace: true});
       setTask(null);
+      setTempDocumentTitle(null);
       setIsMounted(false);
       setDidUserConfirmDeletion(false);
       setShouldDeleteSubtasks(true);

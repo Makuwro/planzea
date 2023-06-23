@@ -4,8 +4,9 @@ import FormSection from "../FormSection/FormSection";
 import Client from "../../client/Client";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { InitialProjectProperties } from "../../client/Project";
+import { SetState } from "../../App";
 
-export default function ProjectCreationPopup({client, documentTitle}: {client: Client; documentTitle: string}) {
+export default function ProjectCreationPopup({client, setTempDocumentTitle}: {client: Client; setTempDocumentTitle: SetState<string | null>}) {
 
   const [isCreatingProject, setIsCreatingProject] = useState<boolean>(false);
   const [newProjectId, setNewProjectId] = useState<string>("");
@@ -19,12 +20,11 @@ export default function ProjectCreationPopup({client, documentTitle}: {client: C
 
     if (createValue === "project") {
 
-      setTimeout(() => document.title = "New project", 1);
+      setTempDocumentTitle("New project");
       setIsOpen(true);
 
     } else {
 
-      document.title = documentTitle;
       setIsOpen(false);
 
     }
@@ -63,6 +63,7 @@ export default function ProjectCreationPopup({client, documentTitle}: {client: C
         navigate(location.pathname, {replace: true});
 
       }
+      setTempDocumentTitle(null);
       setProjectProperties({name: ""});
     
     }} maxWidth={420}>

@@ -5,8 +5,9 @@ import Client from "../../client/Client";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Project from "../../client/Project";
 import Label, { InitialLabelProperties } from "../../client/Label";
+import { SetState } from "../../App";
 
-export default function LabelCreationPopup({client, documentTitle, project, setCurrentProject}: {client: Client; documentTitle: string; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
+export default function LabelCreationPopup({client, setTempDocumentTitle, project, setCurrentProject}: {client: Client; setTempDocumentTitle: SetState<string | null>; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
   const [isCreatingLabel, setIsCreatingLabel] = useState<boolean>(false);
   const [labelProperties, setLabelProperties] = useState<InitialLabelProperties>({name: ""});
@@ -45,7 +46,7 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
 
           }
 
-          setTimeout(() => document.title = `${isEditing ? "Edit" : "New"} label ▪ ${project.name} ▪ Planzea`, 1);
+          setTempDocumentTitle(`${isEditing ? "Edit" : "New"} label ▪ ${project.name} ▪ Planzea`);
           setIsOpen(true);
 
         } else if (params.projectId) {
@@ -61,7 +62,6 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
 
       } else {
 
-        document.title = documentTitle;
         setIsOpen(false);
 
       }
@@ -98,6 +98,7 @@ export default function LabelCreationPopup({client, documentTitle, project, setC
   return (
     <Popup name={`${isEditing ? "Edit" : "New"} label`} isOpen={isOpen} onClose={() => {
       
+      setTempDocumentTitle(null);
       navigate(location.pathname, {replace: true});
       setLabelProperties({name: ""});
       setLabel(null);
