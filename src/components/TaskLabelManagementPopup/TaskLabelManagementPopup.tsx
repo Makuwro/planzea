@@ -31,7 +31,7 @@ export default function TaskLabelManagementPopup({client, documentTitle, project
 
           if (task && taskProjectCopy) {
 
-            setTimeout(() => document.title = `Manage task labels ▪ ${taskProjectCopy.name} ▪ Planzea`, 1);
+            setTimeout(() => document.title = `Manage task labels ▪ ${task.name} ▪ ${taskProjectCopy.name}`, 1);
             setIsOpen(true);
 
           } else {
