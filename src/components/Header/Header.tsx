@@ -17,7 +17,7 @@ export default function Header({client, currentProject}: {client: Client; curren
       </section>
       <section id={styles.right}>
         <button id={styles.accountButton}>
-          <span id={styles.nameContainer}>Personal</span>
+          <span id={styles.nameContainer}>User</span>
           <span id={styles.avatarContainer}>
             
           </span>
