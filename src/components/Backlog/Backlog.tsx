@@ -23,8 +23,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
 
         setTasks(await project.getTasks());
         setCurrentProject(project);
-        setDocumentTitle(`${project.name} ▪ Planzea`);
-        document.title = `${project.name} ▪ Planzea`;
+        setDocumentTitle(project.name);
 
       } else if (params.projectId) {
 

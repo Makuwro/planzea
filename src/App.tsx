@@ -43,9 +43,15 @@ export default function App() {
 
   }, [client]);
 
+  const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
+  useEffect(() => {
+
+    document.title = documentTitle;
+
+  }, [documentTitle]);
+
   const location = useLocation();
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
-  const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
   return client && isReady ? (
     <>
       <TaskPopup project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
