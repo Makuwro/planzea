@@ -12,9 +12,8 @@ export default function HomePage({client, setDocumentTitle, setCurrentProject}: 
 
   useEffect(() => {
 
-    setDocumentTitle("Home ▪ Planzea");
+    setDocumentTitle("Projects");
     setCurrentProject(null);
-    document.title = "Home ▪ Planzea";
 
   }, []);
 

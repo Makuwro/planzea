@@ -4,8 +4,9 @@ import Client from "../../client/Client";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Project from "../../client/Project";
 import Label from "../../client/Label";
+import { SetState } from "../../App";
 
-export default function LabelRemovalPopup({client, documentTitle, project, setCurrentProject}: {client: Client; documentTitle: string; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
+export default function LabelRemovalPopup({client, setTempDocumentTitle, project, setCurrentProject}: {client: Client; setTempDocumentTitle: SetState<string | null>; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
   const [isDeletingLabel, setIsDeletingLabel] = useState<boolean>(false);
   const [label, setLabel] = useState<Label | null>(null);
@@ -27,7 +28,7 @@ export default function LabelRemovalPopup({client, documentTitle, project, setCu
           const label = await client.getLabel(labelId);
           if (label) {
 
-            document.title = `Remove label ▪ ${project.name} ▪ Planzea`;
+            setTempDocumentTitle(`Remove label ▪ ${label.name} ▪ ${project.name}`);
             setLabel(label);
 
           } else {
@@ -49,7 +50,6 @@ export default function LabelRemovalPopup({client, documentTitle, project, setCu
 
       } else {
 
-        document.title = documentTitle;
         setIsOpen(false);
 
       }
@@ -85,6 +85,7 @@ export default function LabelRemovalPopup({client, documentTitle, project, setCu
   return label ? (
     <Popup name="Remove label" isOpen={isOpen} onClose={() => {
       
+      setTempDocumentTitle(null);
       navigate(location.pathname, {replace: true});
       setLabel(null);
 

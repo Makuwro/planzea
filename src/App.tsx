@@ -43,17 +43,24 @@ export default function App() {
 
   }, [client]);
 
+  const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
+  const [tempDocumentTitle, setTempDocumentTitle] = useState<string | null>(null);
+  useEffect(() => {
+
+    document.title = tempDocumentTitle ?? documentTitle;
+
+  }, [documentTitle, tempDocumentTitle]);
+
   const location = useLocation();
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
-  const [documentTitle, setDocumentTitle] = useState<string>("Planzea");
   return client && isReady ? (
     <>
-      <TaskPopup project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
-      <LabelRemovalPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
-      <LabelCreationPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
-      <ProjectCreationPopup client={client} documentTitle={documentTitle} />
-      <TaskDeletionPopup client={client} />
-      <TaskLabelManagementPopup client={client} documentTitle={documentTitle} project={currentProject} />
+      <TaskPopup setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
+      <LabelRemovalPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
+      <LabelCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
+      <ProjectCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
+      <TaskDeletionPopup client={client} currentProject={currentProject} setTempDocumentTitle={setTempDocumentTitle} />
+      <TaskLabelManagementPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} />
       <Header client={client} currentProject={currentProject} />
       <Routes>
         <Route path="/:username" element={<Navigate to="/" />} />
