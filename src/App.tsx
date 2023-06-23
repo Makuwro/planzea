@@ -58,7 +58,7 @@ export default function App() {
       <LabelRemovalPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <LabelCreationPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <ProjectCreationPopup client={client} documentTitle={documentTitle} />
-      <TaskDeletionPopup client={client} />
+      <TaskDeletionPopup client={client} currentProject={currentProject} />
       <TaskLabelManagementPopup client={client} documentTitle={documentTitle} project={currentProject} />
       <Header client={client} currentProject={currentProject} />
       <Routes>

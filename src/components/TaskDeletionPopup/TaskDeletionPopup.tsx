@@ -3,8 +3,9 @@ import Popup from "../Popup/Popup";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Client from "../../client/Client";
 import Task from "../../client/Task";
+import Project from "../../client/Project";
 
-export default function TaskDeletionPopup({client}: {client: Client}) {
+export default function TaskDeletionPopup({client, currentProject}: {client: Client; currentProject: Project | null}) {
 
   // Check if the user is requesting to delete a task.
   const [searchParams] = useSearchParams();
@@ -20,6 +21,7 @@ export default function TaskDeletionPopup({client}: {client: Client}) {
       if (deleteValue === "task" && taskId) {
 
         const task = await client.getTask(taskId);
+        document.title = `Confirm task deletion ▪ ${task.name}${currentProject ? ` ▪ ${currentProject.name}` : ""}`;
         setIsMounted(true);
         setTask(task);
         setIsOpen(true);
