@@ -11,7 +11,7 @@ import Project from "../../client/Project";
 import Popup from "../Popup/Popup";
 import TaskPopupParentTaskSection from "../TaskPopupParentTaskSection/TaskPopupParentTaskSection";
 
-export default function TaskPopup({client, project, setCurrentProject}: {client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
+export default function TaskPopup({client, documentTitle, project, setCurrentProject}: {documentTitle: string; client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
   const location = useLocation();
   const [task, setTask] = useState<Task | null>(null);
@@ -37,6 +37,7 @@ export default function TaskPopup({client, project, setCurrentProject}: {client:
       } else {
         
         setIsOpen(false);
+        document.title = documentTitle;
 
       }
 
@@ -47,7 +48,7 @@ export default function TaskPopup({client, project, setCurrentProject}: {client:
   const [descriptionComponents, setDescriptionComponents] = useState<React.ReactElement[]>([<p key={0} placeholder="What's this task about?" />]);
   useEffect(() => {
 
-    if (task) {
+    if (task && project) {
 
       if (task.description) {
 
@@ -69,8 +70,9 @@ export default function TaskPopup({client, project, setCurrentProject}: {client:
         setDescriptionComponents([<p key={0} placeholder="What's this task about?" />]);
 
       }
-      
-      setIsOpen(true);
+
+      // Set the document title.
+      document.title = `${task.name} ▪ ${project.name}`;
 
       // Listen to the events.
       const onTaskUpdate = (newTask: Task) => {
@@ -95,6 +97,8 @@ export default function TaskPopup({client, project, setCurrentProject}: {client:
 
       client.addEventListener("taskUpdate", onTaskUpdate);
       client.addEventListener("taskDelete", onTaskDelete);
+      
+      setIsOpen(true);
 
       return () => {
         
@@ -105,7 +109,7 @@ export default function TaskPopup({client, project, setCurrentProject}: {client:
 
     }
 
-  }, [task]);
+  }, [task, project]);
 
   const descriptionRef = useRef<HTMLElement>(null);
   async function updateDescription() {

@@ -54,7 +54,7 @@ export default function App() {
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   return client && isReady ? (
     <>
-      <TaskPopup project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
+      <TaskPopup documentTitle={documentTitle} project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
       <LabelRemovalPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <LabelCreationPopup client={client} documentTitle={documentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <ProjectCreationPopup client={client} documentTitle={documentTitle} />
