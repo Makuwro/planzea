@@ -46,7 +46,7 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
 
           }
 
-          setTempDocumentTitle(`${isEditing ? "Edit" : "New"} label ▪ ${project.name} ▪ Planzea`);
+          setTempDocumentTitle(`${isEditing ? "Edit" : "New"} label ▪ ${project.name}`);
           setIsOpen(true);
 
         } else if (params.projectId) {
