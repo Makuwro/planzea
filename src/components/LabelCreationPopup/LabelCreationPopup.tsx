@@ -29,11 +29,12 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
 
         if (project) {
 
+          let label;
           if (isEditing) {
 
             if (labelId) {
 
-              const label = await client.getLabel(labelId);
+              label = await client.getLabel(labelId);
               setLabel(label);
               setLabelProperties({name: label.name});
 
@@ -46,7 +47,7 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
 
           }
 
-          setTempDocumentTitle(`${isEditing ? "Edit" : "New"} label ▪ ${project.name}`);
+          setTempDocumentTitle(`${isEditing ? "Edit" : "New"} label ▪ ${label ? `${label.name} ▪ ` : ""}${project.name}`);
           setIsOpen(true);
 
         } else if (params.projectId) {
