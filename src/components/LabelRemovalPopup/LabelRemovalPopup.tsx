@@ -27,7 +27,7 @@ export default function LabelRemovalPopup({client, documentTitle, project, setCu
           const label = await client.getLabel(labelId);
           if (label) {
 
-            document.title = `Remove label ▪ ${project.name} ▪ Planzea`;
+            setTimeout(() => document.title = `Remove label ▪ ${label.name} ▪ ${project.name}`, 1);
             setLabel(label);
 
           } else {

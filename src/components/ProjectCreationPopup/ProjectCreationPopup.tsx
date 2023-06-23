@@ -19,7 +19,7 @@ export default function ProjectCreationPopup({client, documentTitle}: {client: C
 
     if (createValue === "project") {
 
-      document.title = "New project";
+      setTimeout(() => document.title = "New project", 1);
       setIsOpen(true);
 
     } else {

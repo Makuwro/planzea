@@ -21,7 +21,7 @@ export default function TaskDeletionPopup({client, currentProject}: {client: Cli
       if (deleteValue === "task" && taskId) {
 
         const task = await client.getTask(taskId);
-        document.title = `Confirm task deletion ▪ ${task.name}${currentProject ? ` ▪ ${currentProject.name}` : ""}`;
+        setTimeout(() => document.title = `Confirm task deletion ▪ ${task.name}${currentProject ? ` ▪ ${currentProject.name}` : ""}`, 1);
         setIsMounted(true);
         setTask(task);
         setIsOpen(true);
