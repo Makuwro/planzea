@@ -19,7 +19,7 @@ export default function ProjectCreationPopup({client, documentTitle}: {client: C
 
     if (createValue === "project") {
 
-      document.title = "New project ▪ Planzea";
+      document.title = "New project";
       setIsOpen(true);
 
     } else {
