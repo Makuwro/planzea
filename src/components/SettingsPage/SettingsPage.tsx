@@ -17,8 +17,7 @@ export default function SettingsPage({client, project, setCurrentProject, setDoc
       if (project) {
 
         setLabels(await project.getLabels());
-        setDocumentTitle(`Labels ▪ ${project.name} ▪ Planzea`);
-        document.title = `Labels ▪ ${project.name} ▪ Planzea`;
+        setDocumentTitle(`Labels ▪ ${project.name} settings`);
 
       } else if (params.projectId) {
 
