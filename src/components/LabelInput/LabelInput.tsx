@@ -42,6 +42,16 @@ export default function LabelInput({client, taskId, labelIds, onChange}: LabelIn
 
     })();
 
+    const onLabelCreate = (label: Label) => {
+
+      setProjectLabels([...projectLabels, label]);
+
+    };
+
+    client.addEventListener("labelCreate", onLabelCreate);
+
+    return () => client.removeEventListener("labelCreate", onLabelCreate);
+
   }, []);
 
   // Search for labels.
