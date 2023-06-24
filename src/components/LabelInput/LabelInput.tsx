@@ -97,7 +97,7 @@ export default function LabelInput({client, taskId, labelIds, onChange}: LabelIn
             </ul>
           ) : null
         }
-        <input type="text" value={labelQuery} onChange={({target: {value}}) => setLabelQuery(value)} />
+        <input type="text" value={labelQuery} onChange={({target: {value}}) => setLabelQuery(value)} placeholder="Add a label..." />
       </section>
       {
         results ? (
