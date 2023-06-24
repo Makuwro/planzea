@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import Label from "../../client/Label";
 import Icon from "../Icon/Icon";
 import Client from "../../client/Client";
+import { useNavigate } from "react-router-dom";
 
 export interface LabelInputComponentProperties {
   client: Client;
+  taskId?: string;
   labelIds: string[];
   onChange: (labelIds: string[]) => void;
 }
 
-export default function LabelInput({client, labelIds, onChange}: LabelInputComponentProperties) {
+export default function LabelInput({client, taskId, labelIds, onChange}: LabelInputComponentProperties) {
 
   // Get the labels from the label IDs.
   const [labels, setLabels] = useState<Label[]>([]);
@@ -63,6 +65,7 @@ export default function LabelInput({client, labelIds, onChange}: LabelInputCompo
 
   }, [projectLabels, labelQuery]);
 
+  const navigate = useNavigate();
   return (
     <section>
       <section>
@@ -107,7 +110,7 @@ export default function LabelInput({client, labelIds, onChange}: LabelInputCompo
               ))
             }
             <li>
-              <button>
+              <button onClick={() => navigate(`${location.pathname}?create=label&name=${labelQuery}${taskId ? `&taskId=${taskId}` : ""}`)}>
                 <b>Create new label:</b> {labelQuery}
               </button>
             </li>
