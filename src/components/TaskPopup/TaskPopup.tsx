@@ -268,6 +268,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
         </button>
       } isOpen={isOpen} name={task.name} onClose={() => {
 
+        setTask(null);
         setTempDocumentTitle(null);
         navigate(`/personal/projects/${project.id}/tasks`);
 
