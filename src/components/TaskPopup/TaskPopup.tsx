@@ -11,6 +11,7 @@ import Project from "../../client/Project";
 import Popup from "../Popup/Popup";
 import TaskPopupParentTaskSection from "../TaskPopupParentTaskSection/TaskPopupParentTaskSection";
 import { SetState } from "../../App";
+import LabelInput from "../LabelInput/LabelInput";
 
 export default function TaskPopup({client, setTempDocumentTitle, project, setCurrentProject}: {setTempDocumentTitle: SetState<string | null>; client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
@@ -292,7 +293,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
           <TaskPopupSubTaskSection task={task} project={project} />
           <section>
             <label>Labels</label>
-            <p>None</p>
+            <LabelInput client={client} labelIds={task.labelIds} onChange={async (labelIds) => await task.update({labelIds})} />
           </section>
           <section>
             <label className={isPastDue ? styles.expired : undefined}>
