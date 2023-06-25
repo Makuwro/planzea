@@ -48,6 +48,7 @@ export default function LabelInput({client, taskId, labelIds, onChange, resultsC
     const onLabelCreate = (label: Label) => {
 
       setProjectLabels([...projectLabels, label]);
+      setLabelQuery("");
 
     };
 
@@ -102,10 +103,7 @@ export default function LabelInput({client, taskId, labelIds, onChange, resultsC
 
   const navigate = useNavigate();
   const resultsComponent = results ? (
-    <ul className={styles.results} style={resultsContainer ? {
-      top,
-      maxWidth
-    } : undefined}>
+    <ul className={styles.results} style={resultsContainer ? {top, maxWidth} : undefined}>
       {
         results.map((label) => (
           <li key={label.id}>
