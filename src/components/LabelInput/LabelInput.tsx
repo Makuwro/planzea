@@ -83,7 +83,7 @@ export default function LabelInput({client, taskId, labelIds, onChange, resultsC
   const inputContainerRef = useRef<HTMLElement>(null);
   useEffect(() => {
 
-    const fixSize = () => {
+    const fixTop = () => {
 
       if (inputContainerRef.current && resultsContainer) {
 
@@ -94,9 +94,9 @@ export default function LabelInput({client, taskId, labelIds, onChange, resultsC
 
     };
 
-    fixSize();
-    window.addEventListener("resize", fixSize);
-    return () => window.removeEventListener("resize", fixSize);
+    fixTop();
+    window.addEventListener("resize", fixTop);
+    return () => window.removeEventListener("resize", fixTop);
 
   }, [results, resultsContainer]);
 
