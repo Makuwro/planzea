@@ -6,6 +6,7 @@ header {
   align-items: center;
   position: relative;
   z-index: 1;
+  gap: 15px;
 }
 
 #accountButton {
@@ -19,6 +20,7 @@ header {
   align-items: center;
   gap: 10px;
   font-weight: 200;
+  flex-shrink: 0;
 }
 
 #avatarContainer {
@@ -26,6 +28,8 @@ header {
   width: 30px;
   background-color: gray;
   display: flex;
+  flex-shrink: 0;
+  border-radius: 100%;
 }
 
 #left {
@@ -48,6 +52,15 @@ header {
 #right {
   display: flex;
   gap: 15px;
+  height: 40px;
+}
+
+#right > section {
+  display: flex;
+}
+
+#right > section > input {
+  display: none;
 }
 
 #projectSelector {
@@ -56,6 +69,15 @@ header {
   border: 1px solid var(--border);
   padding: 5px 15px;
   cursor: initial;
+}
+
+#searchButton {
+  width: 40px;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  height: 40px;
+  display: flex;
 }
 
 @media screen and (min-width: 400px) {
@@ -89,13 +111,30 @@ header {
     border-radius: 5px;
   }
 
-  #avatarContainer {
-    border-radius: 100%;
-  }
-
   #nameContainer {
     display: flex;
     color: var(--text);
+  }
+
+  #right {
+    justify-content: space-between;
+    flex-grow: 1;
+  }
+
+  #right > section {
+    margin-right: calc(var(--left-container-width) / 2);
+    flex-grow: 1;
+    justify-content: center;
+  }
+
+  #right > section > input {
+    max-width: 500px;
+    display: flex;
+    height: 100%;
+  }
+
+  #searchButton {
+    display: none;
   }
 
 }
