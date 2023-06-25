@@ -79,6 +79,7 @@ export default function LabelInput({client, taskId, labelIds, onChange, resultsC
   }, [projectLabels, labelQuery]);
 
   const [top, setTop] = useState<number>(0);
+  const [maxWidth] = useState<number>(1080 - 30); // width - padding
   const inputContainerRef = useRef<HTMLElement>(null);
   useEffect(() => {
 
@@ -94,7 +95,8 @@ export default function LabelInput({client, taskId, labelIds, onChange, resultsC
   const navigate = useNavigate();
   const resultsComponent = results ? (
     <ul className={styles.results} style={resultsContainer ? {
-      top
+      top,
+      maxWidth
     } : undefined}>
       {
         results.map((label) => (
