@@ -5,6 +5,7 @@ import Client from "../../client/Client";
 import { useNavigate } from "react-router-dom";
 import styles from "./LabelInput.module.css";
 import { createPortal } from "react-dom";
+import LabelButton from "../LabelButton/LabelButton";
 
 export interface LabelInputComponentProperties {
   client: Client;
@@ -141,14 +142,7 @@ export default function LabelInput({client, taskId, labelIds, onChange, resultsC
         <ul>
           {
             labels.map((label) => (
-              <li key={label.id} className={styles.label}>
-                <button className={styles.colorBubble} onClick={() => onChange(labelIds.filter((possibleId) => possibleId !== label.id))}>
-                  <Icon name="close" />
-                </button>
-                <span>
-                  {label.name}
-                </span>
-              </li>
+              <LabelButton label={label} key={label.id} onRemove={() => onChange(labelIds.filter((possibleId) => possibleId !== label.id))} />
             ))
           }
           <li>

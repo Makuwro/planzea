@@ -5,6 +5,7 @@ import Task from "../../client/Task";
 import completeSound from "../../complete.ogg";
 import Label from "../../client/Label";
 import ContextMenu from "../ContextMenu/ContextMenu";
+import LabelButton from "../LabelButton/LabelButton";
 
 interface BacklogTaskComponentProperties {
   isSelected: boolean;
@@ -71,11 +72,7 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
           <ul className={styles.labels}>
             {
               labels.map((label) => (
-                <li key={label.id}>
-                  <button>
-                    {label.name}
-                  </button>
-                </li>
+                <LabelButton key={label.id} label={label} onRemove={async () => await task.update({labelIds: task.labelIds.filter((possibleLabelId) => possibleLabelId !== label.id)})} />
               ))
             }
           </ul>
