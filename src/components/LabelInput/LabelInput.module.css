@@ -52,13 +52,16 @@
   list-style: none;
   flex-shrink: 0;
   gap: 10px;
-  max-width: 100%;
+  width: 100%;
   flex-wrap: wrap;
+}
+
+.inputContainer > ul > li:last-of-type {
+  flex-grow: 1;
 }
 
 .inputContainer > ul > li > input {
   border: none;
   background-color: transparent;
   padding: 0;
-  flex-grow: 1;
 }
