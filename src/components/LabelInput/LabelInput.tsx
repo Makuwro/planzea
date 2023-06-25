@@ -94,7 +94,17 @@ export default function LabelInput({client, taskId, labelIds, onChange}: LabelIn
             ))
           }
           <li>
-            <input type="text" value={labelQuery} onChange={({target: {value}}) => setLabelQuery(value)} placeholder="Add a label..." />
+            <input type="text" value={labelQuery} onKeyDown={(event) => {
+
+              if (event.key === "Backspace" && labels[0]) {
+
+                const newLabelIds = [...labelIds];
+                newLabelIds.pop();
+                onChange(newLabelIds);
+
+              }
+
+            }} onChange={({target: {value}}) => setLabelQuery(value)} placeholder="Add a label..." />
           </li>
         </ul>
       </section>
