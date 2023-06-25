@@ -15,6 +15,11 @@
   height: 15px;
   padding: 0;
   display: flex;
+  flex-shrink: 0;
+}
+
+.colorBubble:hover > span {
+  display: inline-block;
 }
 
 .colorBubble > span {
@@ -22,8 +27,8 @@
   display: none;
 }
 
-.colorBubble:hover > span {
-  display: inline-block;
+.colorBubble + span {
+  overflow-wrap: anywhere;
 }
 
 .label > span {
