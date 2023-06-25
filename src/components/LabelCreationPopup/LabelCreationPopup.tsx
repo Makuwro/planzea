@@ -6,6 +6,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Project from "../../client/Project";
 import Label, { InitialLabelProperties } from "../../client/Label";
 import { SetState } from "../../App";
+import Task from "../../client/Task";
 
 export default function LabelCreationPopup({client, setTempDocumentTitle, project, setCurrentProject}: {client: Client; setTempDocumentTitle: SetState<string | null>; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
@@ -16,6 +17,7 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
   const createValue = searchParams.get("create");
   const editValue = searchParams.get("edit");
   const labelId = searchParams.get("id");
+  const initialLabelName = searchParams.get("name");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const params = useParams<{projectId: string}>();
   const isEditing = editValue === "label";
@@ -45,6 +47,10 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
 
             }
 
+          } else if (initialLabelName) {
+
+            setLabelProperties({name: initialLabelName});
+            
           }
 
           setTempDocumentTitle(`${isEditing ? "Edit" : "New"} label ▪ ${label ? `${label.name} ▪ ` : ""}${project.name}`);
@@ -69,7 +75,30 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
 
     })();
 
-  }, [editValue, createValue, project]);
+  }, [editValue, createValue, project, initialLabelName]);
+
+  const [shouldAddLabelToTask, setShouldAddLabelToTask] = useState<boolean>(false);
+  const [task, setTask] = useState<Task | null>(null);
+  const taskId = searchParams.get("taskId");
+  useEffect(() => {
+
+    (async () => {
+
+      if (taskId) {
+
+        const task = await client.getTask(taskId);
+        if (task) {
+
+          setTask(task);
+          setShouldAddLabelToTask(true);
+
+        }
+
+      }
+
+    })();
+
+  }, [taskId]);
 
   useEffect(() => {
 
@@ -83,7 +112,12 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
 
         } else {
 
-          await project.createLabel(labelProperties);
+          const label = await project.createLabel(labelProperties);
+          if (task && taskId && shouldAddLabelToTask) {
+
+            await task.update({labelIds: [...task.labelIds, label.id]});
+
+          }
 
         }
         setIsOpen(false);
@@ -114,6 +148,14 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
         <FormSection name="Label name">
           <input type="text" value={labelProperties.name} onChange={({target: {value}}) => setLabelProperties({name: value})} />
         </FormSection>
+        {
+          task ? (
+            <FormSection>
+              <label>Add this label to task: {task.name}</label>
+              <input type="checkbox" checked={shouldAddLabelToTask} onChange={() => setShouldAddLabelToTask(!shouldAddLabelToTask)} />
+            </FormSection>
+          ) : null
+        }
         <section style={{flexDirection: "row"}}> 
           <input type="submit" value={`${isEditing ? "Edit" : "Create"} label`} disabled={isCreatingLabel || !labelProperties.name} />
           <button onClick={(event) => {

@@ -1,0 +1,39 @@
+.label {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  background-color: rgb(253, 253, 253);
+  border-radius: 5px;
+  padding: 0 5px;
+  box-shadow: var(--box-shadow-default);
+}
+
+.colorBubble {
+  background-color: var(--button);
+  border-radius: 100%;
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.colorBubble:hover > span {
+  display: inline-block;
+}
+
+.colorBubble > span {
+  font-size: 15px;
+  display: none;
+}
+
+.colorBubble + span {
+  overflow-wrap: anywhere;
+}
+
+.label > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}

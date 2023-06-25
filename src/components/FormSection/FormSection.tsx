@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./FormSection.module.css";
 
 interface FormSectionProperties {
-  name: string;
+  name?: string;
   hint?: string;
   children: ReactNode;
 }
