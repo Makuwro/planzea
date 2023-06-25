@@ -1,0 +1,64 @@
+.label {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  background-color: rgb(209, 209, 209);
+  border-radius: 5px;
+  padding: 0 5px;
+}
+
+.label > button {
+  border-radius: 100%;
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  display: flex;
+}
+
+.label > button:hover > span {
+  display: block;
+}
+
+.label > button > span {
+  font-size: 15px;
+  display: none;
+}
+
+.label > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.inputContainer {
+  display: flex;
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  padding: var(--input-padding);
+  box-sizing: border-box;
+  background-color: var(--background-input);
+  font-weight: 100;
+  font-size: 16px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.inputContainer > ul {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex-shrink: 0;
+  gap: 10px;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.inputContainer > ul > li > input {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  flex-grow: 1;
+}

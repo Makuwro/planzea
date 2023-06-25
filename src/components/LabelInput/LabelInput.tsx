@@ -3,6 +3,7 @@ import Label from "../../client/Label";
 import Icon from "../Icon/Icon";
 import Client from "../../client/Client";
 import { useNavigate } from "react-router-dom";
+import styles from "./LabelInput.module.css";
 
 export interface LabelInputComponentProperties {
   client: Client;
@@ -78,26 +79,24 @@ export default function LabelInput({client, taskId, labelIds, onChange}: LabelIn
   const navigate = useNavigate();
   return (
     <section>
-      <section>
-        {
-          labels[0] ? (
-            <ul>
-              {
-                labels.map((label) => (
-                  <li key={label.id}>
-                    <button onClick={() => onChange(labelIds.filter((possibleId) => possibleId !== label.id))}>
-                      <Icon name="close" />
-                    </button>
-                    <span>
-                      {label.name}
-                    </span>
-                  </li>
-                ))
-              }
-            </ul>
-          ) : null
-        }
-        <input type="text" value={labelQuery} onChange={({target: {value}}) => setLabelQuery(value)} placeholder="Add a label..." />
+      <section className={styles.inputContainer}>
+        <ul>
+          {
+            labels.map((label) => (
+              <li key={label.id} className={styles.label}>
+                <button onClick={() => onChange(labelIds.filter((possibleId) => possibleId !== label.id))}>
+                  <Icon name="close" />
+                </button>
+                <span>
+                  {label.name}
+                </span>
+              </li>
+            ))
+          }
+          <li>
+            <input type="text" value={labelQuery} onChange={({target: {value}}) => setLabelQuery(value)} placeholder="Add a label..." />
+          </li>
+        </ul>
       </section>
       {
         results ? (
