@@ -5,9 +5,11 @@
   background-color: rgb(209, 209, 209);
   border-radius: 5px;
   padding: 0 5px;
+  box-shadow: var(--box-shadow-default);
 }
 
-.label > button {
+.colorBubble {
+  background-color: var(--button);
   border-radius: 100%;
   width: 15px;
   height: 15px;
@@ -15,13 +17,13 @@
   display: flex;
 }
 
-.label > button:hover > span {
-  display: block;
-}
-
-.label > button > span {
+.colorBubble > span {
   font-size: 15px;
   display: none;
+}
+
+.colorBubble:hover > span {
+  display: inline-block;
 }
 
 .label > span {
@@ -64,4 +66,47 @@
   border: none;
   background-color: transparent;
   padding: 0;
+}
+
+.inputSuperContainer {
+  position: relative;
+}
+
+.results {
+  position: fixed;
+  background-color: var(--background);
+  padding: 0;
+  list-style: none;
+  width: calc(100% - 30px);
+  margin: 15px 0 0;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  z-index: 1;
+  box-sizing: border-box;
+  overflow: auto;
+  max-height: 184px;
+}
+
+.results > li {
+  margin: 5px;
+}
+
+.results button {
+  width: 100%;
+  text-align: left;
+  align-items: center;
+  display: flex;
+  background-color: var(--background);
+  color: var(--text);
+  gap: 10px;
+  border-radius: 5px;
+}
+
+.results button:hover {
+  box-shadow: var(--box-shadow-default);
+}
+
+.results button :global(.material-icons) {
+  font-size: 14px;
 }

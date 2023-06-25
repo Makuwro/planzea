@@ -250,6 +250,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
   }
 
   const navigate = useNavigate();
+  const popupContainerRef = useRef<HTMLElement>(null);
 
   if (project && task) {
 
@@ -263,7 +264,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
     const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
 
     return (
-      <Popup actions={
+      <Popup popupContainerRef={popupContainerRef} actions={
         <button onClick={() => navigate(`${location.pathname}?delete=task&id=${task.id}`, {replace: true})}>
           <Icon name="delete" />
         </button>
@@ -293,7 +294,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
           <TaskPopupSubTaskSection task={task} project={project} />
           <section>
             <label>Labels</label>
-            <LabelInput client={client} labelIds={task.labelIds} taskId={task.id} onChange={async (labelIds) => await task.update({labelIds})} />
+            <LabelInput resultsContainer={popupContainerRef?.current ?? undefined} client={client} labelIds={task.labelIds} taskId={task.id} onChange={async (labelIds) => await task.update({labelIds})} />
           </section>
           <section>
             <label className={isPastDue ? styles.expired : undefined}>

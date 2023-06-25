@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, RefObject, useEffect, useState } from "react";
 import styles from "./Popup.module.css";
 import Icon from "../Icon/Icon";
 
@@ -9,9 +9,10 @@ interface PopupProperties {
   onClose: () => void;
   maxWidth?: number;
   children: ReactNode;
+  popupContainerRef?: RefObject<HTMLElement>;
 }
 
-export default function Popup({name, isOpen, onClose, maxWidth, children, actions}: PopupProperties) {
+export default function Popup({name, isOpen, onClose, maxWidth, children, actions, popupContainerRef}: PopupProperties) {
 
   const [isShown, setIsShown] = useState<boolean>(false);
 
@@ -22,7 +23,7 @@ export default function Popup({name, isOpen, onClose, maxWidth, children, action
   }, [isOpen]);
 
   return (
-    <section id={styles.popupContainer} className={isShown ? styles.open : undefined} onTransitionEnd={() => {
+    <section ref={popupContainerRef} id={styles.popupContainer} className={isShown ? styles.open : undefined} onTransitionEnd={() => {
       
       if (!isShown) {
 

@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Label from "../../client/Label";
 import Icon from "../Icon/Icon";
 import Client from "../../client/Client";
 import { useNavigate } from "react-router-dom";
 import styles from "./LabelInput.module.css";
+import { createPortal } from "react-dom";
 
 export interface LabelInputComponentProperties {
   client: Client;
   taskId?: string;
   labelIds: string[];
   onChange: (labelIds: string[]) => void;
+  resultsContainer?: HTMLElement;
 }
 
-export default function LabelInput({client, taskId, labelIds, onChange}: LabelInputComponentProperties) {
+export default function LabelInput({client, taskId, labelIds, onChange, resultsContainer}: LabelInputComponentProperties) {
 
   // Get the labels from the label IDs.
   const [labels, setLabels] = useState<Label[]>([]);
@@ -76,15 +78,63 @@ export default function LabelInput({client, taskId, labelIds, onChange}: LabelIn
 
   }, [projectLabels, labelQuery]);
 
+  const [top, setTop] = useState<number>(0);
+  const inputContainerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+
+    if (inputContainerRef.current && resultsContainer) {
+
+      const rect = inputContainerRef.current.getBoundingClientRect();
+      setTop(rect.top + rect.height);
+
+    }
+
+  }, [results, resultsContainer]);
+
   const navigate = useNavigate();
+  const resultsComponent = results ? (
+    <ul className={styles.results} style={resultsContainer ? {
+      top
+    } : undefined}>
+      {
+        results.map((label) => (
+          <li key={label.id}>
+            <button onClick={() => {
+              
+              onChange([...labelIds, label.id]);
+              setLabelQuery("");
+            
+            }}>
+              <span className={styles.colorBubble} />
+              <span>
+                {label.name}
+              </span>
+            </button>
+          </li>
+        ))
+      }
+      <li>
+        <button onClick={() => navigate(`${location.pathname}?create=label&name=${labelQuery}${taskId ? `&taskId=${taskId}` : ""}`)}>
+          <Icon name="add" />
+          <span>
+            <b>Create new label: </b>
+            <span>
+              {labelQuery}
+            </span>
+          </span>
+        </button>
+      </li>
+    </ul>
+  ) : null;
+
   return (
-    <section>
+    <section ref={inputContainerRef} className={styles.inputSuperContainer}>
       <section className={styles.inputContainer}>
         <ul>
           {
             labels.map((label) => (
               <li key={label.id} className={styles.label}>
-                <button onClick={() => onChange(labelIds.filter((possibleId) => possibleId !== label.id))}>
+                <button className={styles.colorBubble} onClick={() => onChange(labelIds.filter((possibleId) => possibleId !== label.id))}>
                   <Icon name="close" />
                 </button>
                 <span>
@@ -96,7 +146,7 @@ export default function LabelInput({client, taskId, labelIds, onChange}: LabelIn
           <li>
             <input type="text" value={labelQuery} onKeyDown={(event) => {
 
-              if (event.key === "Backspace" && labels[0]) {
+              if (event.key === "Backspace" && !labelQuery && labels[0]) {
 
                 const newLabelIds = [...labelIds];
                 newLabelIds.pop();
@@ -108,34 +158,7 @@ export default function LabelInput({client, taskId, labelIds, onChange}: LabelIn
           </li>
         </ul>
       </section>
-      {
-        results ? (
-          <ul>
-            {
-              results.map((label) => (
-                <li key={label.id}>
-                  <button onClick={() => {
-                    
-                    onChange([...labelIds, label.id]);
-                    setLabelQuery("");
-                  
-                  }}>
-                    <span />
-                    <span>
-                      {label.name}
-                    </span>
-                  </button>
-                </li>
-              ))
-            }
-            <li>
-              <button onClick={() => navigate(`${location.pathname}?create=label&name=${labelQuery}${taskId ? `&taskId=${taskId}` : ""}`)}>
-                <b>Create new label:</b> {labelQuery}
-              </button>
-            </li>
-          </ul>
-        ) : null
-      }
+      {resultsContainer ? createPortal(resultsComponent, resultsContainer) : resultsComponent}
     </section>
   );
 
