@@ -17,7 +17,7 @@ type Results = {
   items: Result[];
 }[];
 
-export default function Search({currentProject, client}: {currentProject: Project | null; client: Client}) {
+export default function Search({currentProject, client, onMobileSearchChange}: {currentProject: Project | null; client: Client; onMobileSearchChange: (isMobileSearching: boolean) => void}) {
 
   // Get a cache of all projects.
   const [cache, setCache] = useState<{projects: Project[], tasks: Task[]} | null>(null);
@@ -54,7 +54,16 @@ export default function Search({currentProject, client}: {currentProject: Projec
         setResults([
           {
             name: "Tasks",
-            items: []
+            items: [
+              {
+                name: "Test",
+                onClick: () => {
+
+                  return null;
+
+                }
+              }
+            ]
           },
           {
             name: "Actions",
@@ -106,7 +115,7 @@ export default function Search({currentProject, client}: {currentProject: Projec
 
           comps.push(
             <section key={resultGroup.name}>
-              <section>{resultGroup.name}</section>
+              <h1>{resultGroup.name}</h1>
               <ul>
                 {
                   resultGroup.items.map((result, index) => (
@@ -132,13 +141,24 @@ export default function Search({currentProject, client}: {currentProject: Projec
   }, [results]);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  useEffect(() => {
+
+    onMobileSearchChange(isOpen);
+
+  }, [isOpen]);
+
   return (
     <section className={isOpen ? styles.open : undefined}>
       <button id={styles.searchButton} onClick={() => setIsOpen(true)}>
         <Icon name="search" />
       </button>
       <section>
-        <input id={styles.input} type="text" placeholder="Search" value={query} onChange={({target: {value}}) => setQuery(value)} />
+        <section id={styles.inputContainer}>
+          <input id={styles.input} type="text" placeholder="Search" value={query} onChange={({target: {value}}) => setQuery(value)} />
+          <button id={styles.closeButton} onClick={() => setIsOpen(false)}>
+            <Icon name="close" />
+          </button>
+        </section>
         {
           results ? (
             <section id={styles.resultContainer}>

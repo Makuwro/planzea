@@ -26,8 +26,10 @@ export default function Header({client, currentProject}: {client: Client; curren
 
   }, []);
 
+  const [isMobileSearching, setIsMobileSearching] = useState<boolean>(false);
+
   return (
-    <header style={{
+    <header className={isMobileSearching ? styles.mobileSearching : undefined} style={{
       "--left-container-width": `${leftContainerWidth}px`
     } as React.CSSProperties}>
       <section id={styles.left} ref={leftContainerRef}>
@@ -37,7 +39,7 @@ export default function Header({client, currentProject}: {client: Client; curren
         <HeaderProjectSwitcher client={client} currentProject={currentProject} />
       </section>
       <section id={styles.right}>
-        <Search currentProject={currentProject} client={client} />
+        <Search currentProject={currentProject} client={client} onMobileSearchChange={(isMobileSearching) => setIsMobileSearching(isMobileSearching)} />
         <button id={styles.accountButton}>
           <span id={styles.nameContainer}>User</span>
           <span id={styles.avatarContainer}>
