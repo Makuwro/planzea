@@ -11,7 +11,10 @@ interface Result {
 }
 
 type Results = {
-  [key in "actions" | "projects" | "tasks"]: Result[];
+  [key in "actions" | "projects" | "tasks"]?: {
+    name: ReactNode;
+    items: Result[];
+  }
 };
 
 export default function Search({currentProject, client}: {currentProject: Project | null; client: Client}) {
@@ -34,15 +37,16 @@ export default function Search({currentProject, client}: {currentProject: Projec
   const [query, setQuery] = useState<string>("");
   const navigate = useNavigate();
   const [results, setResults] = useState<Results | null>({
-    actions: [
-      {
-        name: "Delete project",
-        disabled: Boolean(currentProject),
-        onClick: () => navigate(`${location.pathname}?delete=project`)
-      }
-    ],
-    projects: [],
-    tasks: []
+    actions: {
+      name: "Actions",
+      items: [
+        {
+          name: "Delete project",
+          disabled: Boolean(currentProject),
+          onClick: () => navigate(`${location.pathname}?delete=project`)
+        }
+      ]
+    }
   });
   useEffect(() => {
 
@@ -78,15 +82,15 @@ export default function Search({currentProject, client}: {currentProject: Projec
 
       for (const key of Object.keys(results) as (keyof typeof results)[]) {
 
-        const keyResults = results[key];
-        if (keyResults[0]) {
+        const resultGroup = results[key];
+        if (resultGroup?.items[0]) {
 
           comps.push(
             <section key={key}>
-              <section>{key}</section>
+              <section>{resultGroup.name}</section>
               <ul>
                 {
-                  keyResults.map((result, index) => (
+                  resultGroup.items.map((result, index) => (
                     <li key={index}>
                       <button onClick={result.onClick} disabled={result.disabled}>
                         {result.name}
