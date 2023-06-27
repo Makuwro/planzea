@@ -5,6 +5,7 @@ import HeaderProjectSwitcher from "../HeaderProjectSwitcher/HeaderProjectSwitche
 import Project from "../../client/Project";
 import Client from "../../client/Client";
 import Icon from "../Icon/Icon";
+import Search from "../Search/Search";
 
 export default function Header({client, currentProject}: {client: Client; currentProject: Project | null}) {
 
@@ -40,7 +41,7 @@ export default function Header({client, currentProject}: {client: Client; curren
           <button id={styles.searchButton}>
             <Icon name="search" />
           </button>
-          <input type="text" placeholder="Search" />
+          <Search currentProject={currentProject} client={client} />
         </section>
         <button id={styles.accountButton}>
           <span id={styles.nameContainer}>User</span>
