@@ -3,19 +3,18 @@ import Client from "../../client/Client";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
 import { useNavigate } from "react-router-dom";
+import styles from "./Search.module.css";
 
 interface Result {
   name: ReactNode;
-  disabled?: boolean;
+  isDisabled?: boolean;
   onClick: () => void;
 }
 
 type Results = {
-  [key in "actions" | "projects" | "tasks"]?: {
-    name: ReactNode;
-    items: Result[];
-  }
-};
+  name: string;
+  items: Result[];
+}[];
 
 export default function Search({currentProject, client}: {currentProject: Project | null; client: Client}) {
 
@@ -36,18 +35,7 @@ export default function Search({currentProject, client}: {currentProject: Projec
 
   const [query, setQuery] = useState<string>("");
   const navigate = useNavigate();
-  const [results, setResults] = useState<Results | null>({
-    actions: {
-      name: "Actions",
-      items: [
-        {
-          name: "Delete project",
-          disabled: Boolean(currentProject),
-          onClick: () => navigate(`${location.pathname}?delete=project`)
-        }
-      ]
-    }
-  });
+  const [results, setResults] = useState<Results | null>(null);
   useEffect(() => {
 
     (async () => {
@@ -62,10 +50,41 @@ export default function Search({currentProject, client}: {currentProject: Projec
         //     onClick: () => 
         //   }
         // ];
+        setResults([
+          {
+            name: "Tasks",
+            items: []
+          },
+          {
+            name: "Actions",
+            items: [
+              {
+                name: "Manage project settings",
+                isDisabled: !currentProject,
+                onClick: () => {
+                  
+                  if (currentProject) {
+                    
+                    const newPath = `/personal/projects/${currentProject.id}/settings`;
+                    if (location.pathname !== newPath) {
+                      
+                      navigate(newPath);
+
+                    }
+
+                    setQuery("");
+
+                  }
+                  
+                }
+              }
+            ]
+          }
+        ]);
 
       } else if (!query) {
 
-        // setResults(null);
+        setResults(null);
 
       }
 
@@ -80,19 +99,18 @@ export default function Search({currentProject, client}: {currentProject: Projec
 
     if (results) {
 
-      for (const key of Object.keys(results) as (keyof typeof results)[]) {
+      for (const resultGroup of results) {
 
-        const resultGroup = results[key];
-        if (resultGroup?.items[0]) {
+        if (resultGroup.items[0]) {
 
           comps.push(
-            <section key={key}>
+            <section key={resultGroup.name}>
               <section>{resultGroup.name}</section>
               <ul>
                 {
                   resultGroup.items.map((result, index) => (
                     <li key={index}>
-                      <button onClick={result.onClick} disabled={result.disabled}>
+                      <button onClick={result.onClick} disabled={result.isDisabled}>
                         {result.name}
                       </button>
                     </li>
@@ -115,9 +133,13 @@ export default function Search({currentProject, client}: {currentProject: Projec
   return (
     <section>
       <input type="text" placeholder="Search" value={query} onChange={({target: {value}}) => setQuery(value)} />
-      <section>
-        {resultComponents[0] ? resultComponents : <p>Couldn't find anything</p>}
-      </section>
+      {
+        results ? (
+          <section id={styles.resultContainer}>
+            {resultComponents[0] ? resultComponents : <p>Couldn't find anything</p>}
+          </section>
+        ) : null
+      }
     </section>
   );
 

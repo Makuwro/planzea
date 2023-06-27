@@ -59,7 +59,11 @@ header {
   display: flex;
 }
 
-#right > section > input {
+#right > section > section {
+  display: flex;
+}
+
+#right > section > section > input {
   display: none;
 }
 
@@ -121,13 +125,13 @@ header {
     flex-grow: 1;
   }
 
-  #right > section {
+  #right > section, #right > section > section {
     margin-right: calc(var(--left-container-width) / 2);
     flex-grow: 1;
     justify-content: center;
   }
 
-  #right > section > input {
+  #right > section > section > input {
     max-width: 500px;
     display: flex;
     height: 100%;
