@@ -1,7 +1,7 @@
 header {
   display: flex;
   justify-content: space-between;
-  padding: 0 15px;
+  padding: 15px;
   height: var(--height-header);
   align-items: center;
   position: relative;
@@ -36,6 +36,11 @@ header {
   display: flex;
   align-items: center;
   gap: 15px;
+  height: 100%;
+}
+
+#left > section {
+  height: 100%;
 }
 
 #left a {
@@ -52,7 +57,7 @@ header {
 #right {
   display: flex;
   gap: 15px;
-  height: 40px;
+  height: 100%;
 }
 
 #right > section {
@@ -113,9 +118,8 @@ header {
   }
 
   #right > section, #right > section > section {
-    margin-right: calc(var(--left-container-width) / 2);
     flex-grow: 1;
-    justify-content: center;
+    justify-content: right;
   }
 
 }
