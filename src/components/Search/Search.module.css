@@ -33,6 +33,10 @@
   display: none;
 }
 
+.open #resultContainer {
+  display: initial;
+}
+
 #resultContainer {
   position: fixed;
   background-color: var(--background);
@@ -41,9 +45,9 @@
   padding: 5px;
   margin-top: 45px;
   width: calc(100% - 30px);
-  max-width: 500px;
   border: 1px solid var(--border);
   box-sizing: border-box;
+  display: none;
 }
 
 #resultContainer > section {
@@ -91,6 +95,11 @@
 
   #input {
     display: flex;
+    max-width: 500px;
+  }
+
+  #resultContainer {
+    display: initial;
     max-width: 500px;
   }
 

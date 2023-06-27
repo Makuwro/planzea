@@ -54,7 +54,16 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
         setResults([
           {
             name: "Tasks",
-            items: []
+            items: [
+              {
+                name: "Test",
+                onClick: () => {
+
+                  return null;
+
+                }
+              }
+            ]
           },
           {
             name: "Actions",
