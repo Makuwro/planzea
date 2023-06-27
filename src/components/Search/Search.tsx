@@ -44,13 +44,7 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
       if (cache && query) {
 
         // Get all related projects.
-        // const expression = new RegExp(query, "gi");
-        // const actions: Result = [
-        //   {
-        //     name: "Delete project",
-        //     onClick: () => 
-        //   }
-        // ];
+        const expression = new RegExp(query, "gi");
         setResults([
           {
             name: "Tasks",
@@ -88,7 +82,7 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
                   
                 }
               }
-            ]
+            ].filter((action) => action.name.match(expression))
           }
         ]);
 
