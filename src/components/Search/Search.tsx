@@ -115,7 +115,7 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
 
           comps.push(
             <section key={resultGroup.name}>
-              <section>{resultGroup.name}</section>
+              <h1>{resultGroup.name}</h1>
               <ul>
                 {
                   resultGroup.items.map((result, index) => (
