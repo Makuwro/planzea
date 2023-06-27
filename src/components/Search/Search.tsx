@@ -17,7 +17,7 @@ type Results = {
   items: Result[];
 }[];
 
-export default function Search({currentProject, client}: {currentProject: Project | null; client: Client}) {
+export default function Search({currentProject, client, onMobileSearchChange}: {currentProject: Project | null; client: Client; onMobileSearchChange: (isMobileSearching: boolean) => void}) {
 
   // Get a cache of all projects.
   const [cache, setCache] = useState<{projects: Project[], tasks: Task[]} | null>(null);
@@ -132,6 +132,12 @@ export default function Search({currentProject, client}: {currentProject: Projec
   }, [results]);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  useEffect(() => {
+
+    onMobileSearchChange(isOpen);
+
+  }, [isOpen]);
+
   return (
     <section className={isOpen ? styles.open : undefined}>
       <button id={styles.searchButton} onClick={() => setIsOpen(true)}>

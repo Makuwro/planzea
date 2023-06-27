@@ -50,8 +50,12 @@ header {
   text-decoration: none;
 }
 
-#left > nav, #nameContainer {
+.mobileSearching > #left, .mobileSearching #accountButton, #nameContainer {
   display: none;
+}
+
+.mobileSearching > #right, .mobileSearching > #right > section, .mobileSearching > #right > section > section {
+  flex-grow: 1;
 }
 
 #right {
@@ -77,22 +81,6 @@ header {
 }
 
 @media screen and (min-width: 400px) {
-  
-  #left > nav {
-    display: flex;
-    gap: 15px;
-  }
-
-  #left > nav > a {
-    text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: 0.15s;
-  }
-
-  #left > nav > a:not(.selected):hover {
-    background-color: #d9deed;
-  }
 
   .selected {
     background-color: var(--link-selected);
@@ -110,6 +98,10 @@ header {
   #nameContainer {
     display: flex;
     color: var(--text);
+  }
+
+  .mobileSearching > #left, .mobileSearching #accountButton {
+    display: flex;
   }
 
   #right {

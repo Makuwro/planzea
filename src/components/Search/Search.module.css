@@ -1,11 +1,11 @@
 #input {
   display: none;
   height: 100%;
-  max-width: 500px;
 }
 
 .open #input {
   display: flex;
+  flex-grow: 1;
 }
 
 .open #searchButton {
@@ -69,6 +69,7 @@
   
   #input {
     display: flex;
+    max-width: 500px;
   }
 
   #searchButton {
