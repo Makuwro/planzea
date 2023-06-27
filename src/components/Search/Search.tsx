@@ -4,6 +4,7 @@ import Project from "../../client/Project";
 import Task from "../../client/Task";
 import { useNavigate } from "react-router-dom";
 import styles from "./Search.module.css";
+import Icon from "../Icon/Icon";
 
 interface Result {
   name: ReactNode;
@@ -130,16 +131,22 @@ export default function Search({currentProject, client}: {currentProject: Projec
 
   }, [results]);
 
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
-    <section>
-      <input type="text" placeholder="Search" value={query} onChange={({target: {value}}) => setQuery(value)} />
-      {
-        results ? (
-          <section id={styles.resultContainer}>
-            {resultComponents[0] ? resultComponents : <p>Couldn't find anything</p>}
-          </section>
-        ) : null
-      }
+    <section className={isOpen ? styles.open : undefined}>
+      <button id={styles.searchButton} onClick={() => setIsOpen(true)}>
+        <Icon name="search" />
+      </button>
+      <section>
+        <input id={styles.input} type="text" placeholder="Search" value={query} onChange={({target: {value}}) => setQuery(value)} />
+        {
+          results ? (
+            <section id={styles.resultContainer}>
+              {resultComponents[0] ? resultComponents : <p>Couldn't find anything</p>}
+            </section>
+          ) : null
+        }
+      </section>
     </section>
   );
 

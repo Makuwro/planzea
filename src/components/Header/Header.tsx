@@ -37,12 +37,7 @@ export default function Header({client, currentProject}: {client: Client; curren
         <HeaderProjectSwitcher client={client} currentProject={currentProject} />
       </section>
       <section id={styles.right}>
-        <section>
-          <button id={styles.searchButton}>
-            <Icon name="search" />
-          </button>
-          <Search currentProject={currentProject} client={client} />
-        </section>
+        <Search currentProject={currentProject} client={client} />
         <button id={styles.accountButton}>
           <span id={styles.nameContainer}>User</span>
           <span id={styles.avatarContainer}>

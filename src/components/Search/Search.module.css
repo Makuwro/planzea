@@ -1,3 +1,17 @@
+#input {
+  display: none;
+  height: 100%;
+  max-width: 500px;
+}
+
+.open #input {
+  display: flex;
+}
+
+.open #searchButton {
+  display: none;
+}
+
 #resultContainer {
   position: fixed;
   background-color: var(--background);
@@ -40,4 +54,25 @@
 
 #resultContainer button:hover {
   box-shadow: var(--box-shadow-default);
+}
+
+#searchButton {
+  width: 40px;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  height: 40px;
+  display: flex;
+}
+
+@media screen and (min-width: 720px) {
+  
+  #input {
+    display: flex;
+  }
+
+  #searchButton {
+    display: none;
+  }
+
 }

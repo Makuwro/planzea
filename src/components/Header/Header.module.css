@@ -63,25 +63,12 @@ header {
   display: flex;
 }
 
-#right > section > section > input {
-  display: none;
-}
-
 #projectSelector {
   background-color: var(--background);
   color: var(--text);
   border: 1px solid var(--border);
   padding: 5px 15px;
   cursor: initial;
-}
-
-#searchButton {
-  width: 40px;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-  height: 40px;
-  display: flex;
 }
 
 @media screen and (min-width: 400px) {
@@ -129,16 +116,6 @@ header {
     margin-right: calc(var(--left-container-width) / 2);
     flex-grow: 1;
     justify-content: center;
-  }
-
-  #right > section > section > input {
-    max-width: 500px;
-    display: flex;
-    height: 100%;
-  }
-
-  #searchButton {
-    display: none;
   }
 
 }
