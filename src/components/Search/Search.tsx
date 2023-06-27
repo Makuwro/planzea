@@ -144,7 +144,12 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
         <Icon name="search" />
       </button>
       <section>
-        <input id={styles.input} type="text" placeholder="Search" value={query} onChange={({target: {value}}) => setQuery(value)} />
+        <section id={styles.inputContainer}>
+          <input id={styles.input} type="text" placeholder="Search" value={query} onChange={({target: {value}}) => setQuery(value)} />
+          <button id={styles.closeButton} onClick={() => setIsOpen(false)}>
+            <Icon name="close" />
+          </button>
+        </section>
         {
           results ? (
             <section id={styles.resultContainer}>
