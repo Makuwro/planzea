@@ -25,6 +25,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle, ui
         setTasks(await project.getTasks());
         setCurrentProject(project);
         setDocumentTitle(project.name);
+        uiClient.setCurrentProject(project);
 
       } else if (params.projectId) {
 
@@ -43,7 +44,12 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle, ui
 
     })();
 
-    return () => uiClient.setSelectedTasks([]);
+    return () => {
+      
+      uiClient.setCurrentProject(null);
+      uiClient.setSelectedTasks([]);
+
+    };
 
   }, [project]);
 
