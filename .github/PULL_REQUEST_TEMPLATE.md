@@ -10,7 +10,7 @@
 
 <!-- Please list what you need to do to complete the implementation -->
 ```[tasklist]
-### Completion criteria for reviewers
+### Acceptance criteria for reviewers
 - [ ] 
 ```
 
