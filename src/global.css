@@ -4,7 +4,7 @@
 
 :root {
   --article: #313237;
-  --background: #f1f1f1;
+  --background: #f6f8fa;
   --background-box: #fffffff0;
   --background-header: #f5f4f4b8;
   --background-label: rgb(236, 236, 236);
@@ -20,7 +20,7 @@
   --button-hover: #69b65c;
   --button-disabled: #b8b8b8;
   --grid: #f8f9fb;
-  --height-header: 50px;
+  --height-header: 35px;
   --link: #5297f1;
   --link-selected: #d0dcff;
   --text: #5f6368;
