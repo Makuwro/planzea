@@ -47,6 +47,24 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
         const escapedQuery = query.replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
         const quantifier = escapedQuery.length - 1;
         const expression = new RegExp(`(?=[${escapedQuery}]{${quantifier > 0 ? quantifier : 1},})${escapedQuery.split("").join("?")}?`, "gi");
+        const navigateIfNotAlreadyThere = (path: string) => {
+
+          if (location.pathname !== path) {
+
+            navigate(path);
+
+          }
+
+        };
+        const navigateIfProjectExists = (path: string | ((projectId: string) => string)) => {
+
+          if (currentProject) {
+
+            navigateIfNotAlreadyThere(typeof path === "function" ? path(currentProject.id) : path);
+
+          }
+
+        };
         setResults([
           {
             name: "Tasks",
@@ -66,52 +84,22 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
             items: [
               {
                 name: "Create project",
-                onClick: () => {
-                    
-                  const newPath = `${location.pathname}?create=project`;
-                  if (location.pathname !== newPath) {
-                    
-                    navigate(newPath);
-
-                  }
-
-                }
+                onClick: () => navigateIfNotAlreadyThere(`${location.pathname}?create=project`)
+              },
+              {
+                name: "Create task",
+                isDisabled: !currentProject,
+                onClick: () => navigateIfProjectExists(`${location.pathname}?create=task`)
               },
               {
                 name: "Delete project",
                 isDisabled: !currentProject,
-                onClick: () => {
-
-                  if (currentProject) {
-                    
-                    const newPath = `${location.pathname}?delete=project&id=${currentProject.id}`;
-                    if (location.pathname !== newPath) {
-                      
-                      navigate(newPath);
-
-                    }
-
-                  }
-
-                }
+                onClick: () => navigateIfProjectExists((projectId) => `${location.pathname}?delete=project&id=${projectId}`)
               },
               {
                 name: "Manage project settings",
                 isDisabled: !currentProject,
-                onClick: () => {
-                  
-                  if (currentProject) {
-                    
-                    const newPath = `/personal/projects/${currentProject.id}/settings`;
-                    if (location.pathname !== newPath) {
-                      
-                      navigate(newPath);
-
-                    }
-
-                  }
-                  
-                }
+                onClick: () => navigateIfProjectExists((projectId) => `/personal/projects/${projectId}/settings`)
               }
             ].filter((action) => action.name.match(expression)).splice(0, 4)
           }
