@@ -12,7 +12,7 @@ export type PlanzeaObject = Attachment | Task | Label | Project;
 export type PlanzeaObjectConstructor = typeof Attachment | typeof Task | typeof Label | typeof Project;
 export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties;
 
-interface EventCallbacks {
+export interface EventCallbacks {
   labelCreate: ((label: Label) => void) | (() => void);
   labelDelete: ((labelId: string) => void) | (() => void);
   labelUpdate: ((newLabel: Label, oldLabelProperties?: LabelProperties) => void) | ((newLabel: Label) => void) | (() => void);
@@ -21,14 +21,9 @@ interface EventCallbacks {
   taskUpdate: ((newTask: Task, oldTaskProperties?: TaskProperties) => void) | ((newTask: Task) => void) | (() => void);
 }
 
-interface EventCallbacksArray {
-  labelCreate: EventCallbacks["labelCreate"][];
-  labelDelete: EventCallbacks["labelDelete"][];
-  labelUpdate: EventCallbacks["labelUpdate"][];
-  taskCreate: EventCallbacks["taskCreate"][];
-  taskDelete: EventCallbacks["taskDelete"][];
-  taskUpdate: EventCallbacks["taskUpdate"][];
-}
+type EventCallbacksArray = {
+  [EventName in keyof EventCallbacks]: EventCallbacks[EventName][];
+};
 
 export async function convertBlobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
 
@@ -58,7 +53,7 @@ const clientDatabase = new ClientDatabase();
 export default class Client {
 
   readonly #db = clientDatabase;
-  eventCallbacks: EventCallbacksArray = {
+  protected eventCallbacks: EventCallbacksArray = {
     labelCreate: [],
     labelDelete: [],
     labelUpdate: [],
@@ -194,11 +189,7 @@ export default class Client {
     const task = await this.#createObject(Task, props);
 
     // Run each callback.
-    for (const callback of this.eventCallbacks.taskCreate) {
-
-      callback(task);
-
-    }
+    this.#fireEvent("taskCreate", task);
 
     return task;
     
@@ -210,11 +201,7 @@ export default class Client {
     const label = await this.#createObject(Label, props);
 
     // Run each callback.
-    for (const callback of this.eventCallbacks.labelCreate) {
-
-      callback(label);
-
-    }
+    this.#fireEvent("labelCreate", label);
 
     // Return the label.
     return label;
@@ -276,11 +263,7 @@ export default class Client {
         await this.#db.tasks.delete(taskId);
   
         // Run each callback.
-        for (const callback of this.eventCallbacks.taskDelete) {
-  
-          callback(taskId);
-    
-        }
+        this.#fireEvent("taskDelete", taskId);
 
       } else {
 
@@ -297,11 +280,7 @@ export default class Client {
     await this.#db.labels.delete(labelId);
 
     // Run each callback.
-    for (const callback of this.eventCallbacks.labelDelete) {
-
-      callback(labelId);
-
-    }
+    this.#fireEvent("labelDelete", labelId);
 
   }
 
@@ -314,6 +293,16 @@ export default class Client {
   async export(): Promise<Blob> {
 
     return await this.#db.export();
+
+  }
+
+  #fireEvent<EventName extends keyof EventCallbacksArray>(eventName: EventName, ...props: Parameters<EventCallbacks[EventName]>): void {
+
+    for (const callback of this.eventCallbacks[eventName]) {
+
+      (callback as (...props: Parameters<EventCallbacks[EventName]>) => void)(...props);
+
+    }
 
   }
 
@@ -407,25 +396,13 @@ export default class Client {
 
   }
 
-  addEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
-  addEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
-  addEventListener(eventName: "labelUpdate", callback: EventCallbacks["labelUpdate"]): void;
-  addEventListener(eventName: "taskCreate", callback: EventCallbacks["taskCreate"]): void;
-  addEventListener(eventName: "taskDelete", callback: EventCallbacks["taskDelete"]): void;
-  addEventListener(eventName: "taskUpdate", callback: EventCallbacks["taskUpdate"]): void;
-  addEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
+  addEventListener<EventName extends keyof EventCallbacksArray>(eventName: EventName, callback: EventCallbacks[EventName]): void {
 
     this.eventCallbacks[eventName].push(callback as () => void);
 
   } 
 
-  removeEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
-  removeEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
-  removeEventListener(eventName: "labelUpdate", callback: EventCallbacks["labelUpdate"]): void;
-  removeEventListener(eventName: "taskCreate", callback: EventCallbacks["taskCreate"]): void;
-  removeEventListener(eventName: "taskDelete", callback: EventCallbacks["taskDelete"]): void;
-  removeEventListener(eventName: "taskUpdate", callback: EventCallbacks["taskUpdate"]): void;
-  removeEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
+  removeEventListener<EventName extends keyof EventCallbacksArray>(eventName: EventName, callback: EventCallbacks[EventName]): void {
 
     this.eventCallbacks[eventName] = (this.eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
 
@@ -443,11 +420,7 @@ export default class Client {
       });
 
       // Run each callback.
-      for (const callback of this.eventCallbacks.labelDelete) {
-
-        callback(labelId);
-
-      }
+      this.#fireEvent("labelDelete", labelId);
 
     }
     
@@ -469,11 +442,7 @@ export default class Client {
 
     // Fire the event.
     const task = await this.getTask(taskId);
-    for (const callback of this.eventCallbacks.taskUpdate) {
-
-      callback(task, oldTaskProperties);
-
-    }
+    this.#fireEvent("taskUpdate", task, oldTaskProperties);
 
   }
 
@@ -487,11 +456,7 @@ export default class Client {
 
     // Fire the event.
     const label = await this.getLabel(labelId);
-    for (const callback of this.eventCallbacks.labelUpdate) {
-
-      callback(label, oldLabelProperties);
-
-    }
+    this.#fireEvent("labelUpdate", label, oldLabelProperties);
 
   }
 

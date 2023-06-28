@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import styles from "./Header.module.css";
 import HeaderProjectSwitcher from "../HeaderProjectSwitcher/HeaderProjectSwitcher";
 import Project from "../../client/Project";
-import Client from "../../client/Client";
 import Search from "../Search/Search";
+import CacheClient from "../../client/CacheClient";
 
-export default function Header({client, currentProject}: {client: Client; currentProject: Project | null}) {
+export default function Header({client, currentProject}: {client: CacheClient; currentProject: Project | null}) {
 
   const [leftContainerWidth, setLeftContainerWidth] = useState<number>(195.43);
   const leftContainerRef = useRef<HTMLElement>(null);
@@ -38,7 +38,7 @@ export default function Header({client, currentProject}: {client: Client; curren
         <HeaderProjectSwitcher client={client} currentProject={currentProject} />
       </section>
       <section id={styles.right}>
-        <Search currentProject={currentProject} client={client} onMobileSearchChange={(isMobileSearching) => setIsMobileSearching(isMobileSearching)} />
+        <Search client={client} onMobileSearchChange={(isMobileSearching) => setIsMobileSearching(isMobileSearching)} />
         <button id={styles.accountButton}>
           <span id={styles.nameContainer}>User</span>
           <span id={styles.avatarContainer}>

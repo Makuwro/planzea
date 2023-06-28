@@ -1,6 +1,4 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import Client from "./client/Client";
-import "./global.css";
 import Header from "./components/Header/Header";
 import Backlog from "./components/Backlog/Backlog";
 import TaskPopup from "./components/TaskPopup/TaskPopup";
@@ -13,18 +11,19 @@ import LabelCreationPopup from "./components/LabelCreationPopup/LabelCreationPop
 import LabelRemovalPopup from "./components/LabelRemovalPopup/LabelRemovalPopup";
 import TaskDeletionPopup from "./components/TaskDeletionPopup/TaskDeletionPopup";
 import TaskLabelManagementPopup from "./components/TaskLabelManagementPopup/TaskLabelManagementPopup";
+import CacheClient from "./client/CacheClient";
+import "./global.css";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
 export default function App() {
 
-  const [client, setClient] = useState<Client | null>(null);
+  const [client, setClient] = useState<CacheClient | null>(null);
   const [isReady, setIsReady] = useState<boolean>(false);
 
   useEffect(() => {
 
-    const client = new Client();
-    setClient(client);
+    setClient(new CacheClient());
 
   }, []);
 

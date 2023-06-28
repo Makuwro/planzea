@@ -1,38 +1,85 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import Client from "../../client/Client";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
 import { useNavigate } from "react-router-dom";
 import styles from "./Search.module.css";
 import Icon from "../Icon/Icon";
+import CacheClient from "../../client/CacheClient";
 
 interface Result {
-  name: ReactNode;
+  name: string;
   isDisabled?: boolean;
   onClick: () => void;
 }
 
 type Results = {
   name: string;
+  isTop?: boolean;
   items: Result[];
 }[];
 
-export default function Search({currentProject, client, onMobileSearchChange}: {currentProject: Project | null; client: Client; onMobileSearchChange: (isMobileSearching: boolean) => void}) {
+export default function Search({client, onMobileSearchChange}: {client: CacheClient; onMobileSearchChange: (isMobileSearching: boolean) => void}) {
 
-  // Get a cache of all projects.
-  const [cache, setCache] = useState<{projects: Project[], tasks: Task[]} | null>(null);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
+  const [currentProjectTasks, setCurrentProjectTasks] = useState<Task[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   useEffect(() => {
 
     (async () => {
 
-      setCache({
-        projects: await client.getProjects(),
-        tasks: await client.getTasks()
-      });
+      if (client.currentProject) {
+
+        setCurrentProjectTasks(await client.currentProject.getTasks());
+
+      }
 
     })();
 
-  }, []);
+    const onCurrentProjectChange = (project: Project | null) => {
+
+      (async () => {
+
+        if (project) {
+
+          // Get the tasks.
+          setCurrentProjectTasks(await project.getTasks());
+
+        } else {
+
+          setCurrentProjectTasks([]);
+
+        }
+
+      })();
+
+    };
+
+    const onProjectsArrayChange = (projects: Project[]) => {
+
+      setProjects(projects);
+
+    };
+
+    const onTaskBacklogSelectionChange = (tasks: Task[]) => {
+      
+      setSelectedTaskIds(tasks.map((task) => task.id));
+
+    };
+
+    client.addEventListener("currentProjectChange", onCurrentProjectChange);
+    client.addEventListener("projectsArrayChange", onProjectsArrayChange);
+    client.addEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
+
+    return () => {
+      
+      client.removeEventListener("currentProjectChange", onCurrentProjectChange);
+      client.removeEventListener("projectsArrayChange", onProjectsArrayChange);
+      client.removeEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
+
+    };
+
+  }, [client]);
+
 
   const [query, setQuery] = useState<string>("");
   const navigate = useNavigate();
@@ -41,50 +88,101 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
 
     (async () => {
 
-      if (cache && query) {
+      if (query) {
 
         // Get all related projects.
-        const escapedQuery = query.replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
-        const quantifier = escapedQuery.length - 1;
-        const expression = new RegExp(`(?=[${escapedQuery}]{${quantifier > 0 ? quantifier : 1},})${escapedQuery.split("").join("?")}?`, "gi");
+        const escapedQuery = query.toLocaleLowerCase().replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
+        const projectId = client.currentProject?.id;
+        const navigateIfNotAlreadyThere = (path: string) => {
+
+          if (location.pathname !== path) {
+
+            navigate(path);
+
+          }
+
+        };
+        const navigateIfProjectExists = (path: string) => {
+
+          if (projectId) {
+
+            navigateIfNotAlreadyThere(path);
+
+          }
+
+        };
+        
+        // Let's filter the tasks.
+        const itemFilter = (action: Result) => action.name.toLocaleLowerCase().match(escapedQuery);
+        const itemSort = (resultA: Result, resultB: Result) => {
+
+          // Sort tasks by direct match.
+          const resultALC = resultA.name.toLocaleLowerCase();
+          const resultBLC = resultB.name.toLocaleLowerCase();
+          const queryLC = escapedQuery.toLocaleLowerCase();
+          if (resultALC === queryLC) {
+
+            return -1;
+
+          } else if (resultBLC === queryLC) {
+
+            return 1;
+
+          }
+
+          return 0;
+
+        };
+
         setResults([
           {
             name: "Tasks",
-            items: [
+            isTop: Boolean(client.currentProject),
+            items: currentProjectTasks.map((task) => (
               {
-                name: "Test",
-                onClick: () => {
-
-                  return null;
-
-                }
+                name: task.name,
+                onClick: () => navigate(`/personal/projects/${projectId}/tasks/${task.id}`)
               }
-            ]
+            )).filter(itemFilter).sort(itemSort).splice(0, 4)
+          },
+          {
+            name: "Projects",
+            isTop: location.pathname === "/",
+            items: projects.map((project) => (
+              {
+                name: project.name,
+                onClick: () => navigate(`/personal/projects/${project.id}/tasks`)
+              }
+            )).filter(itemFilter).sort(itemSort).splice(0, 4)
           },
           {
             name: "Actions",
             items: [
               {
+                name: "Create project",
+                onClick: () => navigateIfNotAlreadyThere(`${location.pathname}?create=project`)
+              },
+              {
+                name: "Create task",
+                isDisabled: !projectId,
+                onClick: () => navigateIfProjectExists(`${location.pathname}?create=task`)
+              },
+              {
+                name: "Delete project",
+                isDisabled: !projectId,
+                onClick: () => navigateIfProjectExists(`${location.pathname}?delete=project&id=${projectId}`)
+              },
+              {
+                name: "Delete task",
+                isDisabled: !selectedTaskIds[0],
+                onClick: () => selectedTaskIds[0] ? navigateIfProjectExists(`${location.pathname}?delete=task&id=${selectedTaskIds[0]}`) : undefined
+              },
+              {
                 name: "Manage project settings",
-                isDisabled: !currentProject,
-                onClick: () => {
-                  
-                  if (currentProject) {
-                    
-                    const newPath = `/personal/projects/${currentProject.id}/settings`;
-                    if (location.pathname !== newPath) {
-                      
-                      navigate(newPath);
-
-                    }
-
-                    setQuery("");
-
-                  }
-                  
-                }
+                isDisabled: !projectId,
+                onClick: () => navigateIfProjectExists(`/personal/projects/${projectId}/settings`)
               }
-            ].filter((action) => action.name.match(expression)).splice(0, 4)
+            ].filter(itemFilter).sort(itemSort).splice(0, 4)
           }
         ]);
 
@@ -96,7 +194,7 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
 
     })();
 
-  }, [cache, query]);
+  }, [currentProjectTasks, selectedTaskIds, query]);
 
   const [resultComponents, setResultComponents] = useState<ReactElement[]>([]);
   useEffect(() => {
@@ -111,12 +209,17 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
 
           comps.push(
             <section key={resultGroup.name}>
-              <h1>{resultGroup.name}</h1>
+              {!resultGroup.isTop ? <h1>{resultGroup.name}</h1> : null}
               <ul>
                 {
                   resultGroup.items.map((result, index) => (
                     <li key={index}>
-                      <button onClick={result.onClick} disabled={result.isDisabled}>
+                      <button onClick={() => {
+                        
+                        result.onClick();
+                        setQuery("");
+                      
+                      }} disabled={result.isDisabled}>
                         {result.name}
                       </button>
                     </li>

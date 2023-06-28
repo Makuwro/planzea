@@ -66,13 +66,12 @@
   gap: 5px;
 }
 
-#resultContainer > section:first-of-type > h1 {
-  display: none;
-}
-
 #resultContainer > section:not(:first-of-type) {
   border-top: 1px solid var(--border);
-  padding-top: 15px;
+}
+
+#resultContainer > section > h1 {
+  padding-top: 10px;
 }
 
 #resultContainer ul {
