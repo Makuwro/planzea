@@ -8,6 +8,7 @@
   max-width: 246px;
   height: 40px;
   border: 1px solid var(--border);
+  height: 100%;
 }
 
 #name {

@@ -9,6 +9,7 @@
   border-bottom-right-radius: 0;
   background-color: var(--background);
   z-index: 2;
+  margin-top: 5px;
 }
 
 .menu > ul {
