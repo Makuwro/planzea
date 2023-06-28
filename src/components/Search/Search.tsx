@@ -84,7 +84,7 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
                   
                 }
               }
-            ].filter((action) => action.name.match(expression))
+            ].filter((action) => action.name.match(expression)).splice(0, 4)
           }
         ]);
 
