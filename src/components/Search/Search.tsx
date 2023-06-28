@@ -119,12 +119,7 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
         
         // Let's filter the tasks.
         const itemFilter = (action: Result) => action.name.toLocaleLowerCase().match(escapedQuery);
-        const taskResults = currentProjectTasks.map((task) => (
-          {
-            name: task.name,
-            onClick: () => navigate(`/personal/projects/${projectId}/tasks/${task.id}`)
-          }
-        )).filter((task) => task.name.toLocaleLowerCase().match(escapedQuery)).sort((resultA, resultB) => {
+        const itemSort = (resultA: Result, resultB: Result) => {
 
           // Sort tasks by direct match.
           const resultALC = resultA.name.toLocaleLowerCase();
@@ -142,7 +137,13 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
 
           return 0;
 
-        }).splice(0, 4);
+        };
+        const taskResults = currentProjectTasks.map((task) => (
+          {
+            name: task.name,
+            onClick: () => navigate(`/personal/projects/${projectId}/tasks/${task.id}`)
+          }
+        )).filter(itemFilter).sort(itemSort).splice(0, 4);
 
         setResults([
           {
@@ -176,7 +177,7 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
                 isDisabled: !projectId,
                 onClick: () => navigateIfProjectExists(`/personal/projects/${projectId}/settings`)
               }
-            ].filter(itemFilter).splice(0, 4)
+            ].filter(itemFilter).sort(itemSort).splice(0, 4)
           }
         ]);
 
