@@ -138,17 +138,16 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
           return 0;
 
         };
-        const taskResults = currentProjectTasks.map((task) => (
-          {
-            name: task.name,
-            onClick: () => navigate(`/personal/projects/${projectId}/tasks/${task.id}`)
-          }
-        )).filter(itemFilter).sort(itemSort).splice(0, 4);
 
         setResults([
           {
             name: "Tasks",
-            items: taskResults
+            items: currentProjectTasks.map((task) => (
+              {
+                name: task.name,
+                onClick: () => navigate(`/personal/projects/${projectId}/tasks/${task.id}`)
+              }
+            )).filter(itemFilter).sort(itemSort).splice(0, 4)
           },
           {
             name: "Actions",
