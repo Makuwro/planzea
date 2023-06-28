@@ -96,9 +96,7 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
       if (cache && query) {
 
         // Get all related projects.
-        const escapedQuery = query.replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
-        const quantifier = escapedQuery.length - 1;
-        const expression = new RegExp(`(?=[${escapedQuery}]{${quantifier > 0 ? quantifier : 1},})${escapedQuery.split("").join("?")}?`, "gi");
+        const escapedQuery = query.toLocaleLowerCase().replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
         const projectId = uiClient.currentProject?.id;
         const navigateIfNotAlreadyThere = (path: string) => {
 
@@ -118,16 +116,38 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
           }
 
         };
-        const itemFilter = (action: Result) => action.name.match(expression);
+        
+        // Let's filter the tasks.
+        const itemFilter = (action: Result) => action.name.toLocaleLowerCase().match(escapedQuery);
+        const taskResults = currentProjectTasks.map((task) => (
+          {
+            name: task.name,
+            onClick: () => navigate(`/personal/projects/${projectId}/tasks/${task.id}`)
+          }
+        )).filter((task) => task.name.toLocaleLowerCase().match(escapedQuery)).sort((resultA, resultB) => {
+
+          // Sort tasks by direct match.
+          const resultALC = resultA.name.toLocaleLowerCase();
+          const resultBLC = resultB.name.toLocaleLowerCase();
+          const queryLC = escapedQuery.toLocaleLowerCase();
+          if (resultALC === queryLC) {
+
+            return -1;
+
+          } else if (resultBLC === queryLC) {
+
+            return 1;
+
+          }
+
+          return 0;
+
+        }).splice(0, 4);
+
         setResults([
           {
             name: "Tasks",
-            items: currentProjectTasks.map((task) => (
-              {
-                name: task.name,
-                onClick: () => navigate(`/personal/projects/${projectId}/tasks/${task.id}`)
-              }
-            )).filter(itemFilter).splice(0, 4)
+            items: taskResults
           },
           {
             name: "Actions",
