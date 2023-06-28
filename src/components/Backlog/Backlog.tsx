@@ -6,8 +6,9 @@ import Client from "../../client/Client";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
 import { useNavigate, useParams } from "react-router-dom";
+import UIClient from "../../client/UIClient";
 
-export default function Backlog({client, setCurrentProject, setDocumentTitle}: {client: Client; setCurrentProject: (project: Project) => void; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
+export default function Backlog({client, setCurrentProject, setDocumentTitle, uiClient}: {client: Client; setCurrentProject: (project: Project) => void; setDocumentTitle: Dispatch<SetStateAction<string>>; uiClient: UIClient}) {
 
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -42,6 +43,8 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
 
     })();
 
+    return () => uiClient.setSelectedTasks([]);
+
   }, [project]);
 
   useEffect(() => {
@@ -72,6 +75,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
     const onTaskDelete = (taskId: string) => {
 
       setTasks(tasks.filter((possibleTask) => possibleTask.id !== taskId));
+      uiClient.setSelectedTasks(uiClient.selectedTasks.filter((task) => task.id !== taskId));
 
     };
 
@@ -131,6 +135,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
                   tasks.filter((task) => !task.parentTaskId).map((task) => <BacklogTask key={task.id} task={task} project={project} isSelected={taskSelection?.task.id === task.id} onClick={() => {
                     
                     const newTaskSelection = {task, time: new Date().getTime()};
+                    uiClient.setSelectedTasks([newTaskSelection.task]);
                     setTaskSelection(newTaskSelection);
                     setTaskSelectionPrevious(taskSelection);
                   
