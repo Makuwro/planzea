@@ -21,14 +21,9 @@ interface EventCallbacks {
   taskUpdate: ((newTask: Task, oldTaskProperties?: TaskProperties) => void) | ((newTask: Task) => void) | (() => void);
 }
 
-interface EventCallbacksArray {
-  labelCreate: EventCallbacks["labelCreate"][];
-  labelDelete: EventCallbacks["labelDelete"][];
-  labelUpdate: EventCallbacks["labelUpdate"][];
-  taskCreate: EventCallbacks["taskCreate"][];
-  taskDelete: EventCallbacks["taskDelete"][];
-  taskUpdate: EventCallbacks["taskUpdate"][];
-}
+type EventCallbacksArray = {
+  [EventName in keyof EventCallbacks]: EventCallbacks[EventName][];
+};
 
 export async function convertBlobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
 
@@ -58,7 +53,7 @@ const clientDatabase = new ClientDatabase();
 export default class Client {
 
   readonly #db = clientDatabase;
-  eventCallbacks: EventCallbacksArray = {
+  #eventCallbacks: EventCallbacksArray = {
     labelCreate: [],
     labelDelete: [],
     labelUpdate: [],
@@ -194,7 +189,7 @@ export default class Client {
     const task = await this.#createObject(Task, props);
 
     // Run each callback.
-    for (const callback of this.eventCallbacks.taskCreate) {
+    for (const callback of this.#eventCallbacks.taskCreate) {
 
       callback(task);
 
@@ -210,7 +205,7 @@ export default class Client {
     const label = await this.#createObject(Label, props);
 
     // Run each callback.
-    for (const callback of this.eventCallbacks.labelCreate) {
+    for (const callback of this.#eventCallbacks.labelCreate) {
 
       callback(label);
 
@@ -276,7 +271,7 @@ export default class Client {
         await this.#db.tasks.delete(taskId);
   
         // Run each callback.
-        for (const callback of this.eventCallbacks.taskDelete) {
+        for (const callback of this.#eventCallbacks.taskDelete) {
   
           callback(taskId);
     
@@ -297,7 +292,7 @@ export default class Client {
     await this.#db.labels.delete(labelId);
 
     // Run each callback.
-    for (const callback of this.eventCallbacks.labelDelete) {
+    for (const callback of this.#eventCallbacks.labelDelete) {
 
       callback(labelId);
 
@@ -407,27 +402,17 @@ export default class Client {
 
   }
 
-  addEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
-  addEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
-  addEventListener(eventName: "labelUpdate", callback: EventCallbacks["labelUpdate"]): void;
-  addEventListener(eventName: "taskCreate", callback: EventCallbacks["taskCreate"]): void;
-  addEventListener(eventName: "taskDelete", callback: EventCallbacks["taskDelete"]): void;
-  addEventListener(eventName: "taskUpdate", callback: EventCallbacks["taskUpdate"]): void;
+  addEventListener<EventName extends "labelCreate" | "labelDelete" | "labelUpdate" | "taskCreate" | "taskDelete" | "taskUpdate">(eventName: EventName, callback: EventCallbacks[EventName]): void;
   addEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
 
-    this.eventCallbacks[eventName].push(callback as () => void);
+    this.#eventCallbacks[eventName].push(callback as () => void);
 
   } 
 
-  removeEventListener(eventName: "labelCreate", callback: EventCallbacks["labelCreate"]): void;
-  removeEventListener(eventName: "labelDelete", callback: EventCallbacks["labelDelete"]): void;
-  removeEventListener(eventName: "labelUpdate", callback: EventCallbacks["labelUpdate"]): void;
-  removeEventListener(eventName: "taskCreate", callback: EventCallbacks["taskCreate"]): void;
-  removeEventListener(eventName: "taskDelete", callback: EventCallbacks["taskDelete"]): void;
-  removeEventListener(eventName: "taskUpdate", callback: EventCallbacks["taskUpdate"]): void;
+  removeEventListener<EventName extends "labelCreate" | "labelDelete" | "labelUpdate" | "taskCreate" | "taskDelete" | "taskUpdate">(eventName: EventName, callback: EventCallbacks[EventName]): void;
   removeEventListener(eventName: keyof EventCallbacks, callback: EventCallbacks[keyof EventCallbacks]): void {
 
-    this.eventCallbacks[eventName] = (this.eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
+    this.#eventCallbacks[eventName] = (this.#eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
 
   }
 
@@ -443,7 +428,7 @@ export default class Client {
       });
 
       // Run each callback.
-      for (const callback of this.eventCallbacks.labelDelete) {
+      for (const callback of this.#eventCallbacks.labelDelete) {
 
         callback(labelId);
 
@@ -469,7 +454,7 @@ export default class Client {
 
     // Fire the event.
     const task = await this.getTask(taskId);
-    for (const callback of this.eventCallbacks.taskUpdate) {
+    for (const callback of this.#eventCallbacks.taskUpdate) {
 
       callback(task, oldTaskProperties);
 
@@ -487,7 +472,7 @@ export default class Client {
 
     // Fire the event.
     const label = await this.getLabel(labelId);
-    for (const callback of this.eventCallbacks.labelUpdate) {
+    for (const callback of this.#eventCallbacks.labelUpdate) {
 
       callback(label, oldLabelProperties);
 

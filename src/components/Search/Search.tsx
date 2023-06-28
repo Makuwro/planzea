@@ -5,6 +5,7 @@ import Task from "../../client/Task";
 import { useNavigate } from "react-router-dom";
 import styles from "./Search.module.css";
 import Icon from "../Icon/Icon";
+import UIClient from "../../client/UIClient";
 
 interface Result {
   name: ReactNode;
@@ -17,7 +18,7 @@ type Results = {
   items: Result[];
 }[];
 
-export default function Search({currentProject, client, onMobileSearchChange}: {currentProject: Project | null; client: Client; onMobileSearchChange: (isMobileSearching: boolean) => void}) {
+export default function Search({currentProject, client, onMobileSearchChange, uiClient}: {currentProject: Project | null; client: Client; onMobileSearchChange: (isMobileSearching: boolean) => void; uiClient: UIClient}) {
 
   // Get a cache of all projects.
   const [cache, setCache] = useState<{projects: Project[], tasks: Task[]} | null>(null);
@@ -33,6 +34,17 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
     })();
 
   }, []);
+
+  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
+  useEffect(() => {
+
+    const onTaskBacklogSelectionChange = (tasks: Task[]) => setSelectedTaskIds(tasks.map((task) => task.id));
+
+    uiClient.addEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
+
+    return () => uiClient.removeEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
+
+  }, [uiClient]);
 
   const [query, setQuery] = useState<string>("");
   const navigate = useNavigate();
@@ -98,8 +110,8 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
               },
               {
                 name: "Delete task",
-                isDisabled: !currentProject,
-                onClick: () => navigateIfProjectExists(`${location.pathname}?delete=task`)
+                isDisabled: !selectedTaskIds[0],
+                onClick: () => selectedTaskIds[0] ? navigateIfProjectExists(`${location.pathname}?delete=task&id=${selectedTaskIds[0]}`) : undefined
               },
               {
                 name: "Manage project settings",
@@ -118,7 +130,7 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
 
     })();
 
-  }, [cache, query]);
+  }, [selectedTaskIds, cache, query]);
 
   const [resultComponents, setResultComponents] = useState<ReactElement[]>([]);
   useEffect(() => {

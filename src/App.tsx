@@ -13,18 +13,20 @@ import LabelCreationPopup from "./components/LabelCreationPopup/LabelCreationPop
 import LabelRemovalPopup from "./components/LabelRemovalPopup/LabelRemovalPopup";
 import TaskDeletionPopup from "./components/TaskDeletionPopup/TaskDeletionPopup";
 import TaskLabelManagementPopup from "./components/TaskLabelManagementPopup/TaskLabelManagementPopup";
+import UIClient from "./client/UIClient";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
 export default function App() {
 
   const [client, setClient] = useState<Client | null>(null);
+  const [uiClient, setUIClient] = useState<UIClient | null>(null);
   const [isReady, setIsReady] = useState<boolean>(false);
 
   useEffect(() => {
 
-    const client = new Client();
-    setClient(client);
+    setClient(new Client());
+    setUIClient(new UIClient());
 
   }, []);
 
@@ -53,7 +55,7 @@ export default function App() {
 
   const location = useLocation();
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
-  return client && isReady ? (
+  return client && uiClient && isReady ? (
     <>
       <TaskPopup setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
       <LabelRemovalPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
@@ -61,7 +63,7 @@ export default function App() {
       <ProjectCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskDeletionPopup client={client} currentProject={currentProject} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskLabelManagementPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} />
-      <Header client={client} currentProject={currentProject} />
+      <Header uiClient={uiClient} client={client} currentProject={currentProject} />
       <Routes>
         <Route path="/:username" element={<Navigate to="/" />} />
         <Route path="/:username/projects" element={<Navigate to="/" />} />
@@ -71,8 +73,8 @@ export default function App() {
           return params ? `/${params.username}/projects/${params.projectId}/tasks` : "/";
 
         })()} replace />} />
-        <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
-        <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
+        <Route path="/:username/projects/:projectId/tasks" element={<Backlog uiClient={uiClient} client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
+        <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog uiClient={uiClient} client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/settings" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/settings/labels" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/" element={<HomePage client={client} setDocumentTitle={setDocumentTitle} setCurrentProject={setCurrentProject} />} />
