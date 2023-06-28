@@ -4,7 +4,6 @@ import styles from "./Header.module.css";
 import HeaderProjectSwitcher from "../HeaderProjectSwitcher/HeaderProjectSwitcher";
 import Project from "../../client/Project";
 import Client from "../../client/Client";
-import Icon from "../Icon/Icon";
 import Search from "../Search/Search";
 
 export default function Header({client, currentProject}: {client: Client; currentProject: Project | null}) {
