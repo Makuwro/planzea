@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useRef, useState } from "react";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
 import { useNavigate } from "react-router-dom";
@@ -79,7 +79,6 @@ export default function Search({client, onMobileSearchChange}: {client: CacheCli
     };
 
   }, [client]);
-
 
   const [query, setQuery] = useState<string>("");
   const navigate = useNavigate();
@@ -246,20 +245,45 @@ export default function Search({client, onMobileSearchChange}: {client: CacheCli
 
   }, [isOpen]);
 
+  const [areResultsShown, setAreResultsShown] = useState<boolean>(false);
+  const searchContainerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+
+    const checkForOutsideClick = (event: MouseEvent) => {
+
+      if (event.target && !searchContainerRef.current?.contains(event.target as Node)) {
+
+        setAreResultsShown(false);
+
+      }
+
+    };
+
+    window.addEventListener("click", checkForOutsideClick);
+
+    return () => window.removeEventListener("click", checkForOutsideClick);
+
+  }, []);
+
   return (
     <section className={isOpen ? styles.open : undefined}>
       <button id={styles.searchButton} onClick={() => setIsOpen(true)}>
         <Icon name="search" />
       </button>
-      <section>
+      <section ref={searchContainerRef}>
         <section id={styles.inputContainer}>
-          <input id={styles.input} type="text" placeholder="Search" value={query} onChange={({target: {value}}) => setQuery(value)} />
+          <input id={styles.input} onClick={() => setAreResultsShown(true)} type="text" placeholder="Search" value={query} onChange={({target: {value}}) => {
+            
+            setAreResultsShown(true);
+            setQuery(value);
+          
+          }} />
           <button id={styles.closeButton} onClick={() => setIsOpen(false)}>
             <Icon name="close" />
           </button>
         </section>
         {
-          results ? (
+          results && areResultsShown ? (
             <section id={styles.resultContainer}>
               {resultComponents[0] ? resultComponents : <p>Couldn't find anything</p>}
             </section>
