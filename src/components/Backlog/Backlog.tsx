@@ -2,13 +2,12 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styles from "./Backlog.module.css";
 import BacklogTask from "../BacklogTask/BacklogTask";
 import BacklogViewModificationOptions from "../BacklogViewModificationOptions/BacklogViewModificationOptions";
-import Client from "../../client/Client";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
 import { useNavigate, useParams } from "react-router-dom";
-import UIClient from "../../client/UIClient";
+import CacheClient from "../../client/CacheClient";
 
-export default function Backlog({client, setCurrentProject, setDocumentTitle, uiClient}: {client: Client; setCurrentProject: (project: Project) => void; setDocumentTitle: Dispatch<SetStateAction<string>>; uiClient: UIClient}) {
+export default function Backlog({client, setCurrentProject, setDocumentTitle}: {client: CacheClient; setCurrentProject: (project: Project) => void; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
 
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -20,19 +19,24 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle, ui
 
     (async () => {
 
-      if (project) {
+      if (project && params.projectId === project.id) {
 
         setTasks(await project.getTasks());
         setCurrentProject(project);
         setDocumentTitle(project.name);
-        uiClient.setCurrentProject(project);
+        client.setCurrentProject(project);
 
       } else if (params.projectId) {
 
-        const project = await client.getProject(params.projectId);
-        if (project) {
+        try {
 
+          const project = await client.getProject(params.projectId);
           setProject(project);
+
+        } catch (err) {
+
+          alert("That project doesn't exist");
+          navigate("/", {replace: true});
 
         }
 
@@ -46,12 +50,12 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle, ui
 
     return () => {
       
-      uiClient.setCurrentProject(null);
-      uiClient.setSelectedTasks([]);
+      client.setCurrentProject(null);
+      client.setSelectedTasks([]);
 
     };
 
-  }, [project]);
+  }, [project, params.projectId]);
 
   useEffect(() => {
 
@@ -81,7 +85,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle, ui
     const onTaskDelete = (taskId: string) => {
 
       setTasks(tasks.filter((possibleTask) => possibleTask.id !== taskId));
-      uiClient.setSelectedTasks(uiClient.selectedTasks.filter((task) => task.id !== taskId));
+      client.setSelectedTasks(client.selectedTasks.filter((task) => task.id !== taskId));
 
     };
 
@@ -141,7 +145,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle, ui
                   tasks.filter((task) => !task.parentTaskId).map((task) => <BacklogTask key={task.id} task={task} project={project} isSelected={taskSelection?.task.id === task.id} onClick={() => {
                     
                     const newTaskSelection = {task, time: new Date().getTime()};
-                    uiClient.setSelectedTasks([newTaskSelection.task]);
+                    client.setSelectedTasks([newTaskSelection.task]);
                     setTaskSelection(newTaskSelection);
                     setTaskSelectionPrevious(taskSelection);
                   

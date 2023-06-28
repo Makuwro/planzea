@@ -1,11 +1,10 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import Client from "../../client/Client";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
 import { useNavigate } from "react-router-dom";
 import styles from "./Search.module.css";
 import Icon from "../Icon/Icon";
-import UIClient from "../../client/UIClient";
+import CacheClient from "../../client/CacheClient";
 
 interface Result {
   name: string;
@@ -15,35 +14,22 @@ interface Result {
 
 type Results = {
   name: string;
+  isTop?: boolean;
   items: Result[];
 }[];
 
-export default function Search({client, onMobileSearchChange, uiClient}: {client: Client; onMobileSearchChange: (isMobileSearching: boolean) => void; uiClient: UIClient}) {
-
-  // Get a cache of all projects.
-  const [cache, setCache] = useState<{projects: Project[], tasks: Task[]} | null>(null);
-  useEffect(() => {
-
-    (async () => {
-
-      setCache({
-        projects: await client.getProjects(),
-        tasks: await client.getTasks()
-      });
-
-    })();
-
-  }, []);
+export default function Search({client, onMobileSearchChange}: {client: CacheClient; onMobileSearchChange: (isMobileSearching: boolean) => void}) {
 
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
   const [currentProjectTasks, setCurrentProjectTasks] = useState<Task[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   useEffect(() => {
 
     (async () => {
 
-      if (uiClient.currentProject) {
+      if (client.currentProject) {
 
-        setCurrentProjectTasks(await uiClient.currentProject.getTasks());
+        setCurrentProjectTasks(await client.currentProject.getTasks());
 
       }
 
@@ -67,23 +53,32 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
       })();
 
     };
+
+    const onProjectsArrayChange = (projects: Project[]) => {
+
+      setProjects(projects);
+
+    };
+
     const onTaskBacklogSelectionChange = (tasks: Task[]) => {
       
       setSelectedTaskIds(tasks.map((task) => task.id));
 
     };
 
-    uiClient.addEventListener("currentProjectChange", onCurrentProjectChange);
-    uiClient.addEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
+    client.addEventListener("currentProjectChange", onCurrentProjectChange);
+    client.addEventListener("projectsArrayChange", onProjectsArrayChange);
+    client.addEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
 
     return () => {
       
-      uiClient.removeEventListener("currentProjectChange", onCurrentProjectChange);
-      uiClient.removeEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
+      client.removeEventListener("currentProjectChange", onCurrentProjectChange);
+      client.removeEventListener("projectsArrayChange", onProjectsArrayChange);
+      client.removeEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
 
     };
 
-  }, [uiClient]);
+  }, [client]);
 
 
   const [query, setQuery] = useState<string>("");
@@ -93,11 +88,11 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
 
     (async () => {
 
-      if (cache && query) {
+      if (query) {
 
         // Get all related projects.
         const escapedQuery = query.toLocaleLowerCase().replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
-        const projectId = uiClient.currentProject?.id;
+        const projectId = client.currentProject?.id;
         const navigateIfNotAlreadyThere = (path: string) => {
 
           if (location.pathname !== path) {
@@ -142,10 +137,21 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
         setResults([
           {
             name: "Tasks",
+            isTop: Boolean(client.currentProject),
             items: currentProjectTasks.map((task) => (
               {
                 name: task.name,
                 onClick: () => navigate(`/personal/projects/${projectId}/tasks/${task.id}`)
+              }
+            )).filter(itemFilter).sort(itemSort).splice(0, 4)
+          },
+          {
+            name: "Projects",
+            isTop: location.pathname === "/",
+            items: projects.map((project) => (
+              {
+                name: project.name,
+                onClick: () => navigate(`/personal/projects/${project.id}/tasks`)
               }
             )).filter(itemFilter).sort(itemSort).splice(0, 4)
           },
@@ -188,7 +194,7 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
 
     })();
 
-  }, [currentProjectTasks, selectedTaskIds, cache, query]);
+  }, [currentProjectTasks, selectedTaskIds, query]);
 
   const [resultComponents, setResultComponents] = useState<ReactElement[]>([]);
   useEffect(() => {
@@ -203,7 +209,7 @@ export default function Search({client, onMobileSearchChange, uiClient}: {client
 
           comps.push(
             <section key={resultGroup.name}>
-              <h1>{resultGroup.name}</h1>
+              {!resultGroup.isTop ? <h1>{resultGroup.name}</h1> : null}
               <ul>
                 {
                   resultGroup.items.map((result, index) => (

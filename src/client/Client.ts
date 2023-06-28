@@ -12,7 +12,7 @@ export type PlanzeaObject = Attachment | Task | Label | Project;
 export type PlanzeaObjectConstructor = typeof Attachment | typeof Task | typeof Label | typeof Project;
 export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties;
 
-interface EventCallbacks {
+export interface EventCallbacks {
   labelCreate: ((label: Label) => void) | (() => void);
   labelDelete: ((labelId: string) => void) | (() => void);
   labelUpdate: ((newLabel: Label, oldLabelProperties?: LabelProperties) => void) | ((newLabel: Label) => void) | (() => void);
@@ -53,7 +53,7 @@ const clientDatabase = new ClientDatabase();
 export default class Client {
 
   readonly #db = clientDatabase;
-  #eventCallbacks: EventCallbacksArray = {
+  protected eventCallbacks: EventCallbacksArray = {
     labelCreate: [],
     labelDelete: [],
     labelUpdate: [],
@@ -298,7 +298,7 @@ export default class Client {
 
   #fireEvent<EventName extends keyof EventCallbacksArray>(eventName: EventName, ...props: Parameters<EventCallbacks[EventName]>): void {
 
-    for (const callback of this.#eventCallbacks[eventName]) {
+    for (const callback of this.eventCallbacks[eventName]) {
 
       (callback as (...props: Parameters<EventCallbacks[EventName]>) => void)(...props);
 
@@ -398,13 +398,13 @@ export default class Client {
 
   addEventListener<EventName extends keyof EventCallbacksArray>(eventName: EventName, callback: EventCallbacks[EventName]): void {
 
-    this.#eventCallbacks[eventName].push(callback as () => void);
+    this.eventCallbacks[eventName].push(callback as () => void);
 
   } 
 
   removeEventListener<EventName extends keyof EventCallbacksArray>(eventName: EventName, callback: EventCallbacks[EventName]): void {
 
-    this.#eventCallbacks[eventName] = (this.#eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
+    this.eventCallbacks[eventName] = (this.eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
 
   }
 
