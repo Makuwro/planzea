@@ -39,7 +39,7 @@ export default function Header({client, currentProject, uiClient}: {client: Clie
         <HeaderProjectSwitcher client={client} currentProject={currentProject} />
       </section>
       <section id={styles.right}>
-        <Search currentProject={currentProject} client={client} uiClient={uiClient} onMobileSearchChange={(isMobileSearching) => setIsMobileSearching(isMobileSearching)} />
+        <Search client={client} uiClient={uiClient} onMobileSearchChange={(isMobileSearching) => setIsMobileSearching(isMobileSearching)} />
         <button id={styles.accountButton}>
           <span id={styles.nameContainer}>User</span>
           <span id={styles.avatarContainer}>

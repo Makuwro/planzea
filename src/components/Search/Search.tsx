@@ -8,7 +8,7 @@ import Icon from "../Icon/Icon";
 import UIClient from "../../client/UIClient";
 
 interface Result {
-  name: ReactNode;
+  name: string;
   isDisabled?: boolean;
   onClick: () => void;
 }
@@ -18,7 +18,7 @@ type Results = {
   items: Result[];
 }[];
 
-export default function Search({currentProject, client, onMobileSearchChange, uiClient}: {currentProject: Project | null; client: Client; onMobileSearchChange: (isMobileSearching: boolean) => void; uiClient: UIClient}) {
+export default function Search({client, onMobileSearchChange, uiClient}: {client: Client; onMobileSearchChange: (isMobileSearching: boolean) => void; uiClient: UIClient}) {
 
   // Get a cache of all projects.
   const [cache, setCache] = useState<{projects: Project[], tasks: Task[]} | null>(null);
@@ -36,15 +36,55 @@ export default function Search({currentProject, client, onMobileSearchChange, ui
   }, []);
 
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
+  const [currentProjectTasks, setCurrentProjectTasks] = useState<Task[]>([]);
   useEffect(() => {
 
-    const onTaskBacklogSelectionChange = (tasks: Task[]) => setSelectedTaskIds(tasks.map((task) => task.id));
+    (async () => {
 
+      if (uiClient.currentProject) {
+
+        setCurrentProjectTasks(await uiClient.currentProject.getTasks());
+
+      }
+
+    })();
+
+    const onCurrentProjectChange = (project: Project | null) => {
+
+      (async () => {
+
+        if (project) {
+
+          // Get the tasks.
+          setCurrentProjectTasks(await project.getTasks());
+
+        } else {
+
+          setCurrentProjectTasks([]);
+
+        }
+
+      })();
+
+    };
+    const onTaskBacklogSelectionChange = (tasks: Task[]) => {
+      
+      setSelectedTaskIds(tasks.map((task) => task.id));
+
+    };
+
+    uiClient.addEventListener("currentProjectChange", onCurrentProjectChange);
     uiClient.addEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
 
-    return () => uiClient.removeEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
+    return () => {
+      
+      uiClient.removeEventListener("currentProjectChange", onCurrentProjectChange);
+      uiClient.removeEventListener("taskBacklogSelectionChange", onTaskBacklogSelectionChange);
+
+    };
 
   }, [uiClient]);
+
 
   const [query, setQuery] = useState<string>("");
   const navigate = useNavigate();
@@ -56,9 +96,8 @@ export default function Search({currentProject, client, onMobileSearchChange, ui
       if (cache && query) {
 
         // Get all related projects.
-        const escapedQuery = query.replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
-        const quantifier = escapedQuery.length - 1;
-        const expression = new RegExp(`(?=[${escapedQuery}]{${quantifier > 0 ? quantifier : 1},})${escapedQuery.split("").join("?")}?`, "gi");
+        const escapedQuery = query.toLocaleLowerCase().replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
+        const projectId = uiClient.currentProject?.id;
         const navigateIfNotAlreadyThere = (path: string) => {
 
           if (location.pathname !== path) {
@@ -68,28 +107,47 @@ export default function Search({currentProject, client, onMobileSearchChange, ui
           }
 
         };
-        const navigateIfProjectExists = (path: string | ((projectId: string) => string)) => {
+        const navigateIfProjectExists = (path: string) => {
 
-          if (currentProject) {
+          if (projectId) {
 
-            navigateIfNotAlreadyThere(typeof path === "function" ? path(currentProject.id) : path);
+            navigateIfNotAlreadyThere(path);
 
           }
 
         };
+        
+        // Let's filter the tasks.
+        const itemFilter = (action: Result) => action.name.toLocaleLowerCase().match(escapedQuery);
+        const itemSort = (resultA: Result, resultB: Result) => {
+
+          // Sort tasks by direct match.
+          const resultALC = resultA.name.toLocaleLowerCase();
+          const resultBLC = resultB.name.toLocaleLowerCase();
+          const queryLC = escapedQuery.toLocaleLowerCase();
+          if (resultALC === queryLC) {
+
+            return -1;
+
+          } else if (resultBLC === queryLC) {
+
+            return 1;
+
+          }
+
+          return 0;
+
+        };
+
         setResults([
           {
             name: "Tasks",
-            items: [
+            items: currentProjectTasks.map((task) => (
               {
-                name: "Test",
-                onClick: () => {
-
-                  return null;
-
-                }
+                name: task.name,
+                onClick: () => navigate(`/personal/projects/${projectId}/tasks/${task.id}`)
               }
-            ]
+            )).filter(itemFilter).sort(itemSort).splice(0, 4)
           },
           {
             name: "Actions",
@@ -100,13 +158,13 @@ export default function Search({currentProject, client, onMobileSearchChange, ui
               },
               {
                 name: "Create task",
-                isDisabled: !currentProject,
+                isDisabled: !projectId,
                 onClick: () => navigateIfProjectExists(`${location.pathname}?create=task`)
               },
               {
                 name: "Delete project",
-                isDisabled: !currentProject,
-                onClick: () => navigateIfProjectExists((projectId) => `${location.pathname}?delete=project&id=${projectId}`)
+                isDisabled: !projectId,
+                onClick: () => navigateIfProjectExists(`${location.pathname}?delete=project&id=${projectId}`)
               },
               {
                 name: "Delete task",
@@ -115,10 +173,10 @@ export default function Search({currentProject, client, onMobileSearchChange, ui
               },
               {
                 name: "Manage project settings",
-                isDisabled: !currentProject,
-                onClick: () => navigateIfProjectExists((projectId) => `/personal/projects/${projectId}/settings`)
+                isDisabled: !projectId,
+                onClick: () => navigateIfProjectExists(`/personal/projects/${projectId}/settings`)
               }
-            ].filter((action) => action.name.match(expression)).splice(0, 4)
+            ].filter(itemFilter).sort(itemSort).splice(0, 4)
           }
         ]);
 
@@ -130,7 +188,7 @@ export default function Search({currentProject, client, onMobileSearchChange, ui
 
     })();
 
-  }, [selectedTaskIds, cache, query]);
+  }, [currentProjectTasks, selectedTaskIds, cache, query]);
 
   const [resultComponents, setResultComponents] = useState<ReactElement[]>([]);
   useEffect(() => {
