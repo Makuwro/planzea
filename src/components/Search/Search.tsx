@@ -82,6 +82,24 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
                 }
               },
               {
+                name: "Delete project",
+                isDisabled: !currentProject,
+                onClick: () => {
+
+                  if (currentProject) {
+                    
+                    const newPath = `${location.pathname}?delete=project&id=${currentProject.id}`;
+                    if (location.pathname !== newPath) {
+                      
+                      navigate(newPath);
+
+                    }
+
+                  }
+
+                }
+              },
+              {
                 name: "Manage project settings",
                 isDisabled: !currentProject,
                 onClick: () => {
