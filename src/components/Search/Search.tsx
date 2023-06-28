@@ -44,7 +44,9 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
       if (cache && query) {
 
         // Get all related projects.
-        const expression = new RegExp(query, "gi");
+        const escapedQuery = query.replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
+        const quantifier = escapedQuery.length - 1;
+        const expression = new RegExp(`(?=[${escapedQuery}]{${quantifier > 0 ? quantifier : 1},})${escapedQuery.split("").join("?")}?`, "gi");
         setResults([
           {
             name: "Tasks",
