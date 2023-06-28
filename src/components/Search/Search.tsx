@@ -65,6 +65,23 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
             name: "Actions",
             items: [
               {
+                name: "Create project",
+                onClick: () => {
+
+                  if (currentProject) {
+                    
+                    const newPath = `${location.pathname}?create=project`;
+                    if (location.pathname !== newPath) {
+                      
+                      navigate(newPath);
+
+                    }
+
+                  }
+
+                }
+              },
+              {
                 name: "Manage project settings",
                 isDisabled: !currentProject,
                 onClick: () => {
@@ -77,8 +94,6 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
                       navigate(newPath);
 
                     }
-
-                    setQuery("");
 
                   }
                   
@@ -116,7 +131,12 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
                 {
                   resultGroup.items.map((result, index) => (
                     <li key={index}>
-                      <button onClick={result.onClick} disabled={result.isDisabled}>
+                      <button onClick={() => {
+                        
+                        result.onClick();
+                        setQuery("");
+                      
+                      }} disabled={result.isDisabled}>
                         {result.name}
                       </button>
                     </li>
