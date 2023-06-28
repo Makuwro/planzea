@@ -97,6 +97,11 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
                 onClick: () => navigateIfProjectExists((projectId) => `${location.pathname}?delete=project&id=${projectId}`)
               },
               {
+                name: "Delete task",
+                isDisabled: !currentProject,
+                onClick: () => navigateIfProjectExists(`${location.pathname}?delete=task`)
+              },
+              {
                 name: "Manage project settings",
                 isDisabled: !currentProject,
                 onClick: () => navigateIfProjectExists((projectId) => `/personal/projects/${projectId}/settings`)
