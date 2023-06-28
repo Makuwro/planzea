@@ -67,15 +67,11 @@ export default function Search({currentProject, client, onMobileSearchChange}: {
               {
                 name: "Create project",
                 onClick: () => {
-
-                  if (currentProject) {
                     
-                    const newPath = `${location.pathname}?create=project`;
-                    if (location.pathname !== newPath) {
-                      
-                      navigate(newPath);
-
-                    }
+                  const newPath = `${location.pathname}?create=project`;
+                  if (location.pathname !== newPath) {
+                    
+                    navigate(newPath);
 
                   }
 
