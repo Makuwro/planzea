@@ -1,5 +1,5 @@
 import Client, { EventCallbacks } from "./Client";
-import Project, { InitialProjectProperties } from "./Project";
+import Project from "./Project";
 import Task from "./Task";
 
 interface CacheEventCallbacks extends EventCallbacks {
