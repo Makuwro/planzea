@@ -9,9 +9,14 @@ export default function ProjectHeaderOptions() {
 
   return (
     <HeaderOptions>
-      <button className="singlePixelBorder" onClick={() => navigate("?create=project", {replace: true})}>
-        <Icon name="add" />
-      </button>
+      <span>
+        <button className="singlePixelBorder" onClick={() => navigate("?create=project", {replace: true})}>
+          <Icon name="add" />
+        </button>
+        <button disabled onClick={() => navigate("?delete=project&id=", {replace: true})}>
+          <Icon name="delete" />
+        </button>
+      </span>
     </HeaderOptions>
   );
 
