@@ -91,7 +91,7 @@ export default function Search({client, onMobileSearchChange}: {client: CacheCli
 
         // Get all related projects.
         const escapedQuery = query.toLocaleLowerCase().replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
-        const projectId = client.currentProject?.id;
+        const projectId = client.currentProject?.id ?? client.selectedProjects[0]?.id;
         const navigateIfNotAlreadyThere = (path: string) => {
 
           if (location.pathname !== path) {
@@ -163,7 +163,7 @@ export default function Search({client, onMobileSearchChange}: {client: CacheCli
               },
               {
                 name: "Create task",
-                isDisabled: !projectId,
+                isDisabled: !client.currentProject,
                 onClick: () => navigateIfProjectExists("?create=task")
               },
               {

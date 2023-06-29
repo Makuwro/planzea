@@ -62,7 +62,7 @@ export default function App() {
       <ProjectDeletionPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskDeletionPopup client={client} currentProject={currentProject} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskLabelManagementPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} />
-      <Header client={client} currentProject={currentProject} />
+      <Header client={client} />
       <Routes>
         <Route path="/:username" element={<Navigate to="/" />} />
         <Route path="/:username/projects" element={<Navigate to="/" />} />

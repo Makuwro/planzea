@@ -21,7 +21,8 @@ export default function HomePage({client, setDocumentTitle}: {client: CacheClien
     setDocumentTitle("Projects");
 
     (async () => {
-      
+
+      client.setCurrentProject(null);
       setProjects(await client.getProjects());
       setReady(true);
 

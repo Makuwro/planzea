@@ -2,11 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Header.module.css";
 import HeaderProjectSwitcher from "../HeaderProjectSwitcher/HeaderProjectSwitcher";
-import Project from "../../client/Project";
 import Search from "../Search/Search";
 import CacheClient from "../../client/CacheClient";
 
-export default function Header({client, currentProject}: {client: CacheClient; currentProject: Project | null}) {
+export default function Header({client}: {client: CacheClient}) {
 
   const [leftContainerWidth, setLeftContainerWidth] = useState<number>(195.43);
   const leftContainerRef = useRef<HTMLElement>(null);
@@ -35,7 +34,7 @@ export default function Header({client, currentProject}: {client: CacheClient; c
         <Link to={"/"}>
           Planzea
         </Link>
-        <HeaderProjectSwitcher client={client} currentProject={currentProject} />
+        <HeaderProjectSwitcher client={client} />
       </section>
       <section id={styles.right}>
         <Search client={client} onMobileSearchChange={(isMobileSearching) => setIsMobileSearching(isMobileSearching)} />
