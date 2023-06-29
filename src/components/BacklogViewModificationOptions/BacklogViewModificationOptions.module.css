@@ -1,33 +1,3 @@
 #addIssueButton {
   border: 1px solid var(--border);
 }
-
-#viewModificationOptions {
-  margin: var(--height-header) -15px 0;
-  border-bottom: 1px solid var(--border);
-  padding: 0 15px 15px;
-  gap: 15px;
-  display: flex;
-  align-items: center;
-  height: var(--height-header);
-  z-index: 1;
-  justify-content: space-between;
-}
-
-#viewModificationOptions > span {
-  display: flex;
-  gap: 15px;
-}
-
-#viewModificationOptions button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 100%;
-  height: 30px;
-  background-color: var(--background);
-  color: var(--text);
-  width: 30px;
-  cursor: initial;
-  padding: 0;
-}

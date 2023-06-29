@@ -4,6 +4,7 @@ import styles from "./BacklogViewModificationOptions.module.css";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
 import { useLocation, useNavigate } from "react-router-dom";
+import HeaderOptions from "../HeaderOptions/HeaderOptions";
 
 export default function BacklogViewModificationOptions({project, onTaskCreate, selectedTask}: {project: Project, onTaskCreate: (task: Task) => void; selectedTask?: Task}) {
 
@@ -23,7 +24,7 @@ export default function BacklogViewModificationOptions({project, onTaskCreate, s
   const navigate = useNavigate();
 
   return (
-    <section id={styles.viewModificationOptions}>
+    <HeaderOptions>
       <span>
         <button id={styles.addIssueButton} onClick={createTask}>
           <Icon name="add" />
@@ -40,7 +41,7 @@ export default function BacklogViewModificationOptions({project, onTaskCreate, s
           <Icon name="settings" />
         </button>
       </span>
-    </section>
+    </HeaderOptions>
   );
 
 }
