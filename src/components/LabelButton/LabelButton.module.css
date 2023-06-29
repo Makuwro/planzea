@@ -2,10 +2,14 @@
   display: flex;
   gap: 5px;
   align-items: center;
-  background-color: rgb(253, 253, 253);
+  background-color: #fdfdfd;
   border-radius: 5px;
   padding: 0 5px;
   box-shadow: var(--box-shadow-default);
+}
+
+:global(.dark) .label {
+  background-color: #000000;
 }
 
 .colorBubble {

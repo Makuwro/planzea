@@ -46,7 +46,7 @@ header {
 #left a {
   font-size: 17px;
   font-weight: 400;
-  color: black;
+  color: var(--text-important);
   text-decoration: none;
 }
 

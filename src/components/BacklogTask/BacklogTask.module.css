@@ -39,6 +39,10 @@
   cursor: initial;
 }
 
+:global(.dark) .task:not(.selected):hover {
+  background-color: rgba(55, 55, 55, 0.14);
+}
+
 .task:hover:active {
   background-color: rgb(220, 220, 220);
 }
@@ -46,6 +50,10 @@
 .task.selected {
   background-color: rgb(225, 225, 225);
   border-color: var(--border);
+}
+
+:global(.dark) .task.selected {
+  background-color: rgba(91, 91, 91, 0.14);
 }
 
 .task > span {
