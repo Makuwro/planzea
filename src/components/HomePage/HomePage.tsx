@@ -6,6 +6,7 @@ import Icon from "../Icon/Icon";
 import { SetState } from "../../App";
 import Project from "../../client/Project";
 import ProjectHeaderOptions from "../ProjectHeaderOptions/ProjectHeaderOptions";
+import ProjectListButton from "../ProjectListButton/ProjectListButton";
 
 export default function HomePage({client, setDocumentTitle, setCurrentProject}: {client: Client; setDocumentTitle: SetState<string>; setCurrentProject: SetState<Project | null>}) {
 
@@ -18,25 +19,13 @@ export default function HomePage({client, setDocumentTitle, setCurrentProject}: 
 
   }, []);
 
-  const [projectComponents, setProjectComponents] = useState<ReactElement[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [ready, setReady] = useState<boolean>(false);
   useEffect(() => {
 
     (async () => {
 
-      const comps = [];
-      for (const project of await client.getProjects()) {
-
-        comps.push(
-          <li key={project.id}>
-            <Link to={`/personal/projects/${project.id}/`}>
-              {project.name}
-            </Link>
-          </li>
-        );
-
-      }
-      setProjectComponents(comps);
+      setProjects(await client.getProjects());
       setReady(true);
 
     })();
@@ -48,10 +37,12 @@ export default function HomePage({client, setDocumentTitle, setCurrentProject}: 
       <ProjectHeaderOptions />
       {
         ready ? (
-          projectComponents[0] ? (
+          projects[0] ? (
             <section id={styles.projectListContainer}>
-              <ul>
-                {projectComponents}
+              <ul id={styles.projectList}>
+                {
+                  projects.map((project) => <ProjectListButton key={project.id} project={project} isSelected={false} onClick={() => undefined} />)
+                }
               </ul>
             </section>
           ) : (
