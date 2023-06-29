@@ -1,9 +1,8 @@
 import React from "react";
 import Icon from "../Icon/Icon";
-import styles from "./BacklogViewModificationOptions.module.css";
 import Project from "../../client/Project";
 import Task from "../../client/Task";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import HeaderOptions from "../HeaderOptions/HeaderOptions";
 
 export default function BacklogViewModificationOptions({project, onTaskCreate, selectedTask}: {project: Project, onTaskCreate: (task: Task) => void; selectedTask?: Task}) {
@@ -20,9 +19,7 @@ export default function BacklogViewModificationOptions({project, onTaskCreate, s
 
   }
 
-  const location = useLocation();
   const navigate = useNavigate();
-
   return (
     <HeaderOptions>
       <span>
