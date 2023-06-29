@@ -297,6 +297,14 @@ export default class Client {
 
   async deleteProject(projectId: string): Promise<void> {
 
+    // Delete each project task.
+    for (const task of await this.getTasks({projectId})) {
+
+      await task.delete();
+
+    }
+
+    // Delete the project.
     await this.#db.projects.delete(projectId);
 
     // Fire the event.
