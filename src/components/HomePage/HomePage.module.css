@@ -23,18 +23,6 @@
   z-index: -1;
 }
 
-#options {
-  margin: var(--height-header) -15px 0;
-  border-bottom: 1px solid var(--border);
-  padding: 0 15px 15px;
-  gap: 15px;
-  display: flex;
-  align-items: center;
-  height: var(--height-header);
-  z-index: 1;
-  justify-content: space-between;
-}
-
 #options > button {
   display: flex;
   justify-content: center;
@@ -53,10 +41,15 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  margin-top: 15px;
 }
 
-#projectListContainer > ul {
-  max-width: 1080px;
+#projectList {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  list-style-type: none;
+  margin: 0 auto;
   width: 100%;
-  margin: 15px auto;
+  max-width: 1080px;
 }
