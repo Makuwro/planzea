@@ -194,7 +194,7 @@ export default class Client {
 
     const task = await this.#createObject(Task, props);
 
-    // Run each callback.
+    // Fire the event.
     this.#fireEvent("taskCreate", task);
 
     return task;
@@ -206,7 +206,7 @@ export default class Client {
     // Create the label.
     const label = await this.#createObject(Label, props);
 
-    // Run each callback.
+    // Fire the event.
     this.#fireEvent("labelCreate", label);
 
     // Return the label.
@@ -216,7 +216,12 @@ export default class Client {
 
   async createProject(props: InitialProjectProperties): Promise<Project> {
 
-    return await this.#createObject(Project, props);
+    const project = await this.#createObject(Project, props);
+
+    // Fire the event.
+    this.#fireEvent("projectCreate", project);
+
+    return project;
 
   }
 
@@ -293,6 +298,9 @@ export default class Client {
   async deleteProject(projectId: string): Promise<void> {
 
     await this.#db.projects.delete(projectId);
+
+    // Fire the event.
+    this.#fireEvent("projectDelete", projectId);
 
   }
 
@@ -468,7 +476,14 @@ export default class Client {
 
   async updateProject(projectId: string, newProperties: PropertiesUpdate<ProjectProperties>): Promise<void> {
 
+    // Get current project properties.
+    const oldProjectProperties = await this.#db.projects.get(projectId);
+
+    // Update the project.
     await this.#db.projects.update(projectId, newProperties);
+
+    // Fire the event.
+    this.#fireEvent("projectUpdate", await this.getProject(projectId), oldProjectProperties);
 
   }
 

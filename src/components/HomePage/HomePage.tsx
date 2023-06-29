@@ -14,22 +14,47 @@ interface ProjectSelection {
 
 export default function HomePage({client, setDocumentTitle}: {client: CacheClient; setDocumentTitle: SetState<string>;}) {
 
-  useEffect(() => {
-
-    setDocumentTitle("Projects");
-
-  }, []);
-
   const [projects, setProjects] = useState<Project[]>([]);
   const [ready, setReady] = useState<boolean>(false);
   useEffect(() => {
 
-    (async () => {
+    setDocumentTitle("Projects");
 
+    (async () => {
+      
       setProjects(await client.getProjects());
       setReady(true);
 
     })();
+
+  }, []);
+
+  const [projectSelection, setProjectSelection] = useState<ProjectSelection | null>(null);
+  const [projectSelectionPrevious, setProjectSelectionPrevious] = useState<ProjectSelection | null>(null);
+  const navigate = useNavigate();
+  useEffect(() => {
+
+    if (projectSelection) {
+      
+      if (projectSelectionPrevious && projectSelection.time - projectSelectionPrevious.time <= 500) {
+
+        navigate(`/personal/projects/${projectSelection.project.id}/tasks`);
+
+      } else {
+
+        client.setSelectedProjects([projectSelection.project]);
+
+      }
+
+    } else {
+
+      client.setSelectedProjects([]);
+
+    }
+
+  }, [projectSelection]);
+
+  useEffect(() => {
 
     const onProjectCreate = (project: Project) => {
 
@@ -56,6 +81,12 @@ export default function HomePage({client, setDocumentTitle}: {client: CacheClien
       setProjects(projects.filter(projectFilter));
       client.setSelectedProjects(client.selectedProjects.filter(projectFilter));
 
+      if (projectSelection?.project.id === projectId) {
+
+        setProjectSelection(null);
+
+      }
+
     };
 
     client.addEventListener("projectCreate", onProjectCreate);
@@ -72,32 +103,7 @@ export default function HomePage({client, setDocumentTitle}: {client: CacheClien
     };
 
 
-  }, [client]);
-
-  const [projectSelection, setProjectSelection] = useState<ProjectSelection | null>(null);
-  const [projectSelectionPrevious, setProjectSelectionPrevious] = useState<ProjectSelection | null>(null);
-  const navigate = useNavigate();
-  useEffect(() => {
-
-    if (projectSelection) {
-      
-      if (projectSelectionPrevious && projectSelection.time - projectSelectionPrevious.time <= 500) {
-
-        navigate(`/personal/projects/${projectSelection.project.id}/tasks`);
-
-      } else {
-
-        client.setSelectedProjects([projectSelection.project]);
-
-      }
-
-    } else {
-
-      client.setSelectedProjects([]);
-
-    }
-
-  }, [projectSelection]);
+  }, [projectSelection, projects, client]);
 
   return (
     <main id={styles.main}>

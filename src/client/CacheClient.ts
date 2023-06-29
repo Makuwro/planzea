@@ -1,5 +1,5 @@
 import Client, { EventCallbacks } from "./Client";
-import Project from "./Project";
+import Project, { InitialProjectProperties } from "./Project";
 import Task from "./Task";
 
 interface CacheEventCallbacks extends EventCallbacks {
@@ -30,6 +30,21 @@ export default class CacheClient extends Client {
   readonly selectedTasks: Task[] = [];
   readonly selectedProjects: Project[] = [];
   readonly currentProject: Project | null = null;
+
+  async createProject(...parameters: Parameters<Client["createProject"]>): Promise<Project> {
+    
+    const project = await super.createProject(...parameters);
+
+    // Add project to cache.
+    if (this.projects) {
+      
+      (this as MutableCacheClient).projects = [...this.projects, project];
+
+    }
+
+    return project;
+
+  }
 
   async getProjects(...parameters: Parameters<Client["getProjects"]>): Promise<Project[]> {
 
