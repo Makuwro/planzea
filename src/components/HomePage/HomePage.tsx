@@ -5,6 +5,7 @@ import Client from "../../client/Client";
 import Icon from "../Icon/Icon";
 import { SetState } from "../../App";
 import Project from "../../client/Project";
+import ProjectHeaderOptions from "../ProjectHeaderOptions/ProjectHeaderOptions";
 
 export default function HomePage({client, setDocumentTitle, setCurrentProject}: {client: Client; setDocumentTitle: SetState<string>; setCurrentProject: SetState<Project | null>}) {
 
@@ -44,11 +45,7 @@ export default function HomePage({client, setDocumentTitle, setCurrentProject}: 
 
   return (
     <main id={styles.main}>
-      <section id={styles.options}>
-        <button onClick={() => navigate("?create=project", {replace: true})}>
-          <Icon name="add" />
-        </button>
-      </section>
+      <ProjectHeaderOptions />
       {
         ready ? (
           projectComponents[0] ? (

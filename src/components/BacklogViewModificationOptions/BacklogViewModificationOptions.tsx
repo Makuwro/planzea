@@ -26,7 +26,7 @@ export default function BacklogViewModificationOptions({project, onTaskCreate, s
   return (
     <HeaderOptions>
       <span>
-        <button id={styles.addIssueButton} onClick={createTask}>
+        <button className="singlePixelBorder" onClick={createTask}>
           <Icon name="add" />
         </button>
         <button disabled={Boolean(!selectedTask)} onClick={selectedTask ? () => navigate(`${location.pathname}?manage=task-labels&taskId=${selectedTask.id}`, {replace: true}) : undefined}>
