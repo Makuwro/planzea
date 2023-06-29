@@ -1,11 +1,12 @@
 header {
   display: flex;
   justify-content: space-between;
-  padding: 0 15px;
+  padding: 15px;
   height: var(--height-header);
   align-items: center;
   position: relative;
   z-index: 1;
+  gap: 15px;
 }
 
 #accountButton {
@@ -19,6 +20,7 @@ header {
   align-items: center;
   gap: 10px;
   font-weight: 200;
+  flex-shrink: 0;
 }
 
 #avatarContainer {
@@ -26,12 +28,19 @@ header {
   width: 30px;
   background-color: gray;
   display: flex;
+  flex-shrink: 0;
+  border-radius: 100%;
 }
 
 #left {
   display: flex;
   align-items: center;
   gap: 15px;
+  height: 100%;
+}
+
+#left > section {
+  height: 100%;
 }
 
 #left a {
@@ -41,13 +50,26 @@ header {
   text-decoration: none;
 }
 
-#left > nav, #nameContainer {
+.mobileSearching > #left, .mobileSearching #accountButton, #nameContainer {
   display: none;
+}
+
+.mobileSearching > #right, .mobileSearching > #right > section, .mobileSearching > #right > section > section {
+  flex-grow: 1;
 }
 
 #right {
   display: flex;
   gap: 15px;
+  height: 100%;
+}
+
+#right > section {
+  display: flex;
+}
+
+#right > section > section {
+  display: flex;
 }
 
 #projectSelector {
@@ -59,22 +81,6 @@ header {
 }
 
 @media screen and (min-width: 400px) {
-  
-  #left > nav {
-    display: flex;
-    gap: 15px;
-  }
-
-  #left > nav > a {
-    text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: 0.15s;
-  }
-
-  #left > nav > a:not(.selected):hover {
-    background-color: #d9deed;
-  }
 
   .selected {
     background-color: var(--link-selected);
@@ -89,13 +95,23 @@ header {
     border-radius: 5px;
   }
 
-  #avatarContainer {
-    border-radius: 100%;
-  }
-
   #nameContainer {
     display: flex;
     color: var(--text);
+  }
+
+  .mobileSearching > #left, .mobileSearching #accountButton {
+    display: flex;
+  }
+
+  #right {
+    justify-content: space-between;
+    flex-grow: 1;
+  }
+
+  #right > section, #right > section > section {
+    flex-grow: 1;
+    justify-content: right;
   }
 
 }

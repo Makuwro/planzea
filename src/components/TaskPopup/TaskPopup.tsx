@@ -265,7 +265,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
 
     return (
       <Popup popupContainerRef={popupContainerRef} actions={
-        <button onClick={() => navigate(`${location.pathname}?delete=task&id=${task.id}`, {replace: true})}>
+        <button onClick={() => navigate(`?delete=task&id=${task.id}`, {replace: true})}>
           <Icon name="delete" />
         </button>
       } isOpen={isOpen} name={task.name} onClose={() => {

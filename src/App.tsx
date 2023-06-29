@@ -1,6 +1,4 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import Client from "./client/Client";
-import "./global.css";
 import Header from "./components/Header/Header";
 import Backlog from "./components/Backlog/Backlog";
 import TaskPopup from "./components/TaskPopup/TaskPopup";
@@ -13,18 +11,20 @@ import LabelCreationPopup from "./components/LabelCreationPopup/LabelCreationPop
 import LabelRemovalPopup from "./components/LabelRemovalPopup/LabelRemovalPopup";
 import TaskDeletionPopup from "./components/TaskDeletionPopup/TaskDeletionPopup";
 import TaskLabelManagementPopup from "./components/TaskLabelManagementPopup/TaskLabelManagementPopup";
+import CacheClient from "./client/CacheClient";
+import "./global.css";
+import ProjectDeletionPopup from "./components/ProjectDeletionPopup/ProjectDeletionPopup";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
 export default function App() {
 
-  const [client, setClient] = useState<Client | null>(null);
+  const [client, setClient] = useState<CacheClient | null>(null);
   const [isReady, setIsReady] = useState<boolean>(false);
 
   useEffect(() => {
 
-    const client = new Client();
-    setClient(client);
+    setClient(new CacheClient());
 
   }, []);
 
@@ -59,9 +59,10 @@ export default function App() {
       <LabelRemovalPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <LabelCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <ProjectCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
+      <ProjectDeletionPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskDeletionPopup client={client} currentProject={currentProject} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskLabelManagementPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} />
-      <Header client={client} currentProject={currentProject} />
+      <Header client={client} />
       <Routes>
         <Route path="/:username" element={<Navigate to="/" />} />
         <Route path="/:username/projects" element={<Navigate to="/" />} />
@@ -75,7 +76,7 @@ export default function App() {
         <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/settings" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/settings/labels" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
-        <Route path="/" element={<HomePage client={client} setDocumentTitle={setDocumentTitle} setCurrentProject={setCurrentProject} />} />
+        <Route path="/" element={<HomePage client={client} setDocumentTitle={setDocumentTitle} />} />
       </Routes>
     </>
   ) : null;

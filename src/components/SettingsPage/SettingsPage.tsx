@@ -80,7 +80,7 @@ export default function SettingsPage({client, project, setCurrentProject, setDoc
         </section>
         <section id={styles.listContainer}>
           <section>
-            <button onClick={() => navigate(`${location.pathname}?create=label`)}>Create label</button>
+            <button onClick={() => navigate(`?create=label`)}>Create label</button>
           </section>
           <ul id={styles.list}>
             {
@@ -88,8 +88,8 @@ export default function SettingsPage({client, project, setCurrentProject, setDoc
                 <SettingsPageOption key={label.id} isOpen={openOptions[label.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [label.id]: isOpen})} name={label.name}>
                   {label.description}
                   <span className={styles.labelActions}>
-                    <button onClick={() => navigate(`${location.pathname}?edit=label&id=${label.id}`, {replace: true})}>Edit</button>
-                    <button onClick={() => navigate(`${location.pathname}?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
+                    <button onClick={() => navigate(`?edit=label&id=${label.id}`, {replace: true})}>Edit</button>
+                    <button onClick={() => navigate(`?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
                   </span>
                 </SettingsPageOption>
               ))

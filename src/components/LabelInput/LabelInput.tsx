@@ -123,7 +123,7 @@ export default function LabelInput({client, taskId, labelIds, onChange, resultsC
         ))
       }
       <li>
-        <button onClick={() => navigate(`${location.pathname}?create=label&name=${labelQuery}${taskId ? `&taskId=${taskId}` : ""}`)}>
+        <button onClick={() => navigate(`?create=label&name=${labelQuery}${taskId ? `&taskId=${taskId}` : ""}`)}>
           <Icon name="add" />
           <span>
             <b>Create new label: </b>
