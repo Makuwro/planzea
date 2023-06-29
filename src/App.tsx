@@ -24,6 +24,15 @@ export default function App() {
 
   useEffect(() => {
 
+    // Check if the user wants dark theme.
+    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark");
+    const onSystemThemeChange = (mediaQueryList: MediaQueryList | MediaQueryListEvent) => document.body.classList[mediaQueryList.matches ? "add" : "remove"]("dark");
+    onSystemThemeChange(mediaQueryList);
+
+    // Watch for changes to system theme.
+    mediaQueryList.addEventListener("change", onSystemThemeChange);
+
+    // Set the client.
     setClient(new CacheClient());
 
   }, []);
