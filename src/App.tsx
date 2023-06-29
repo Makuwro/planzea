@@ -13,6 +13,7 @@ import TaskDeletionPopup from "./components/TaskDeletionPopup/TaskDeletionPopup"
 import TaskLabelManagementPopup from "./components/TaskLabelManagementPopup/TaskLabelManagementPopup";
 import CacheClient from "./client/CacheClient";
 import "./global.css";
+import ProjectDeletionPopup from "./components/ProjectDeletionPopup/ProjectDeletionPopup";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -58,6 +59,7 @@ export default function App() {
       <LabelRemovalPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <LabelCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
       <ProjectCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
+      <ProjectDeletionPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskDeletionPopup client={client} currentProject={currentProject} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskLabelManagementPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} />
       <Header client={client} currentProject={currentProject} />
