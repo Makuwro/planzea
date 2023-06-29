@@ -1,60 +1,127 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./HomePage.module.css";
-import { Link, useNavigate } from "react-router-dom";
-import Client from "../../client/Client";
-import Icon from "../Icon/Icon";
 import { SetState } from "../../App";
 import Project from "../../client/Project";
+import ProjectHeaderOptions from "../ProjectHeaderOptions/ProjectHeaderOptions";
+import ProjectListButton from "../ProjectListButton/ProjectListButton";
+import CacheClient from "../../client/CacheClient";
+import { useNavigate } from "react-router-dom";
 
-export default function HomePage({client, setDocumentTitle, setCurrentProject}: {client: Client; setDocumentTitle: SetState<string>; setCurrentProject: SetState<Project | null>}) {
+interface ProjectSelection {
+  project: Project; 
+  time: number;
+}
 
-  const navigate = useNavigate();
+export default function HomePage({client, setDocumentTitle}: {client: CacheClient; setDocumentTitle: SetState<string>;}) {
 
-  useEffect(() => {
-
-    setDocumentTitle("Projects");
-    setCurrentProject(null);
-
-  }, []);
-
-  const [projectComponents, setProjectComponents] = useState<ReactElement[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [ready, setReady] = useState<boolean>(false);
   useEffect(() => {
 
+    setDocumentTitle("Projects");
+
     (async () => {
 
-      const comps = [];
-      for (const project of await client.getProjects()) {
-
-        comps.push(
-          <li key={project.id}>
-            <Link to={`/personal/projects/${project.id}/`}>
-              {project.name}
-            </Link>
-          </li>
-        );
-
-      }
-      setProjectComponents(comps);
+      client.setCurrentProject(null);
+      setProjects(await client.getProjects());
       setReady(true);
 
     })();
 
   }, []);
 
+  const [projectSelection, setProjectSelection] = useState<ProjectSelection | null>(null);
+  const [projectSelectionPrevious, setProjectSelectionPrevious] = useState<ProjectSelection | null>(null);
+  const navigate = useNavigate();
+  useEffect(() => {
+
+    if (projectSelection) {
+      
+      if (projectSelectionPrevious && projectSelection.time - projectSelectionPrevious.time <= 500) {
+
+        navigate(`/personal/projects/${projectSelection.project.id}/tasks`);
+
+      } else {
+
+        client.setSelectedProjects([projectSelection.project]);
+
+      }
+
+    } else {
+
+      client.setSelectedProjects([]);
+
+    }
+
+  }, [projectSelection]);
+
+  useEffect(() => {
+
+    const onProjectCreate = (project: Project) => {
+
+      setProjects([...projects, project]);
+
+    };
+
+    const onProjectUpdate = (project: Project) => {
+
+      const taskIndex = projects.findIndex((possibleProject) => possibleProject.id === project.id);
+      if (taskIndex !== -1) {
+
+        const newProjects = [...projects];
+        newProjects[taskIndex] = project;
+        setProjects(newProjects);
+
+      }
+      
+    };
+
+    const onProjectDelete = (projectId: string) => {
+
+      const projectFilter = (possibleProject: Project) => possibleProject.id !== projectId;
+      setProjects(projects.filter(projectFilter));
+      client.setSelectedProjects(client.selectedProjects.filter(projectFilter));
+
+      if (projectSelection?.project.id === projectId) {
+
+        setProjectSelection(null);
+
+      }
+
+    };
+
+    client.addEventListener("projectCreate", onProjectCreate);
+    client.addEventListener("projectUpdate", onProjectUpdate);
+    client.addEventListener("projectDelete", onProjectDelete);
+
+    return () => {
+      
+      client.removeEventListener("projectCreate", onProjectCreate);
+      client.removeEventListener("projectUpdate", onProjectUpdate);
+      client.removeEventListener("projectDelete", onProjectDelete);
+      client.setSelectedProjects([]);
+
+    };
+
+
+  }, [projectSelection, projects, client]);
+
   return (
     <main id={styles.main}>
-      <section id={styles.options}>
-        <button onClick={() => navigate("?create=project", {replace: true})}>
-          <Icon name="add" />
-        </button>
-      </section>
+      <ProjectHeaderOptions projectId={projectSelection?.project.id} />
       {
         ready ? (
-          projectComponents[0] ? (
+          projects[0] ? (
             <section id={styles.projectListContainer}>
-              <ul>
-                {projectComponents}
+              <ul id={styles.projectList}>
+                {
+                  projects.map((project) => <ProjectListButton key={project.id} project={project} isSelected={projectSelection?.project.id === project.id} onClick={() => {
+                    
+                    setProjectSelectionPrevious(projectSelection);
+                    setProjectSelection({project, time: new Date().getTime()});
+                  
+                  }} />)
+                }
               </ul>
             </section>
           ) : (

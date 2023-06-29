@@ -1,0 +1,34 @@
+.project {
+  width: 100%;
+  background-color: transparent;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 40px;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  padding: 0 15px;
+}
+
+.project:hover {
+  background-color: rgb(230, 230, 230);
+  box-shadow: none;
+  border-radius: 5px;
+  cursor: initial;
+}
+
+.project:hover:active {
+  background-color: rgb(220, 220, 220);
+}
+
+.project.selected {
+  background-color: rgb(225, 225, 225);
+  border-color: var(--border);
+}
+
+.project > span {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
