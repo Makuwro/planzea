@@ -119,7 +119,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
 
         if (event.key === "Delete") {
 
-          navigate(`${location.pathname}?delete=task&id=${taskSelection.task.id}`, {replace: true});
+          navigate(`?delete=task&id=${taskSelection.task.id}`, {replace: true});
 
         }
 

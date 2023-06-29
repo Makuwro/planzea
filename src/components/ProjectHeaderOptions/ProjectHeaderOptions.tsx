@@ -3,7 +3,7 @@ import HeaderOptions from "../HeaderOptions/HeaderOptions";
 import { useNavigate } from "react-router-dom";
 import Icon from "../Icon/Icon";
 
-export default function ProjectHeaderOptions() {
+export default function ProjectHeaderOptions({projectId}: {projectId?: string}) {
 
   const navigate = useNavigate();
 
@@ -13,7 +13,7 @@ export default function ProjectHeaderOptions() {
         <button className="singlePixelBorder" onClick={() => navigate("?create=project", {replace: true})}>
           <Icon name="add" />
         </button>
-        <button disabled onClick={() => navigate("?delete=project&id=", {replace: true})}>
+        <button disabled={!projectId} onClick={projectId ? () => navigate(`?delete=project&id=${projectId}`, {replace: true}) : undefined}>
           <Icon name="delete" />
         </button>
       </span>

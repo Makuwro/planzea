@@ -16,6 +16,9 @@ export interface EventCallbacks {
   labelCreate: ((label: Label) => void) | (() => void);
   labelDelete: ((labelId: string) => void) | (() => void);
   labelUpdate: ((newLabel: Label, oldLabelProperties?: LabelProperties) => void) | ((newLabel: Label) => void) | (() => void);
+  projectCreate: ((project: Project) => void) | (() => void);
+  projectDelete: ((projectId: string) => void) | (() => void);
+  projectUpdate: ((newProject: Project, oldProjectProperties?: ProjectProperties) => void) | ((newProject: Project) => void) | (() => void);
   taskCreate: ((task: Task) => void) | (() => void);
   taskDelete: ((taskId: string) => void) | (() => void);
   taskUpdate: ((newTask: Task, oldTaskProperties?: TaskProperties) => void) | ((newTask: Task) => void) | (() => void);
@@ -57,6 +60,9 @@ export default class Client {
     labelCreate: [],
     labelDelete: [],
     labelUpdate: [],
+    projectCreate: [],
+    projectDelete: [],
+    projectUpdate: [],
     taskCreate: [],
     taskDelete: [],
     taskUpdate: []

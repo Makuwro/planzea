@@ -159,22 +159,22 @@ export default function Search({client, onMobileSearchChange}: {client: CacheCli
             items: [
               {
                 name: "Create project",
-                onClick: () => navigateIfNotAlreadyThere(`${location.pathname}?create=project`)
+                onClick: () => navigateIfNotAlreadyThere("?create=project")
               },
               {
                 name: "Create task",
                 isDisabled: !projectId,
-                onClick: () => navigateIfProjectExists(`${location.pathname}?create=task`)
+                onClick: () => navigateIfProjectExists("?create=task")
               },
               {
                 name: "Delete project",
                 isDisabled: !projectId,
-                onClick: () => navigateIfProjectExists(`${location.pathname}?delete=project&id=${projectId}`)
+                onClick: () => navigateIfProjectExists(`?delete=project&id=${projectId}`)
               },
               {
                 name: "Delete task",
                 isDisabled: !selectedTaskIds[0],
-                onClick: () => selectedTaskIds[0] ? navigateIfProjectExists(`${location.pathname}?delete=task&id=${selectedTaskIds[0]}`) : undefined
+                onClick: () => selectedTaskIds[0] ? navigateIfProjectExists(`?delete=task&id=${selectedTaskIds[0]}`) : undefined
               },
               {
                 name: "Manage project settings",

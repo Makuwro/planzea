@@ -29,10 +29,10 @@ export default function BacklogViewModificationOptions({project, onTaskCreate, s
         <button className="singlePixelBorder" onClick={createTask}>
           <Icon name="add" />
         </button>
-        <button disabled={Boolean(!selectedTask)} onClick={selectedTask ? () => navigate(`${location.pathname}?manage=task-labels&taskId=${selectedTask.id}`, {replace: true}) : undefined}>
+        <button disabled={Boolean(!selectedTask)} onClick={selectedTask ? () => navigate(`?manage=task-labels&taskId=${selectedTask.id}`, {replace: true}) : undefined}>
           <Icon name="label" />
         </button>
-        <button disabled={Boolean(!selectedTask)} onClick={selectedTask ? () => navigate(`${location.pathname}?delete=task&id=${selectedTask.id}`, {replace: true}) : undefined}>
+        <button disabled={Boolean(!selectedTask)} onClick={selectedTask ? () => navigate(`?delete=task&id=${selectedTask.id}`, {replace: true}) : undefined}>
           <Icon name="delete" />
         </button>
       </span>

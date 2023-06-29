@@ -5,6 +5,7 @@ import Task from "./Task";
 interface CacheEventCallbacks extends EventCallbacks {
   currentProjectChange: ((project: Project | null) => void) | (() => void);
   projectsArrayChange: ((projects: Project[]) => void) | (() => void);
+  projectSelectionChange: ((projects: Project[]) => void) | (() => void);
   taskBacklogSelectionChange: ((tasks: Task[]) => void) | (() => void);
 }
 
@@ -22,10 +23,12 @@ export default class CacheClient extends Client {
     ...this.eventCallbacks,
     currentProjectChange: [],
     taskBacklogSelectionChange: [],
+    projectSelectionChange: [],
     projectsArrayChange: []
   };
   readonly projects: Project[] | null = null;
   readonly selectedTasks: Task[] = [];
+  readonly selectedProjects: Project[] = [];
   readonly currentProject: Project | null = null;
 
   async getProjects(...parameters: Parameters<Client["getProjects"]>): Promise<Project[]> {
@@ -68,6 +71,14 @@ export default class CacheClient extends Client {
     (this as MutableCacheClient).currentProject = project;
 
     this.#fireEvent("currentProjectChange", project);
+
+  }
+
+  setSelectedProjects(projects: Project[]): void {
+
+    (this as MutableCacheClient).selectedProjects = projects;
+
+    this.#fireEvent("projectSelectionChange", projects);
 
   }
 
