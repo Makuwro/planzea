@@ -39,21 +39,19 @@
 }
 
 .dark {
-  --background: #282828;
+  --background: #0c0c0c;
   --background-box: #1c1c1c;
   --background-header: #1b1c1be8;
   --background-info: #1f1f1f;
   --background-input: #171717;
   --background-input-header: #2e2f2e;
   --background-popup-box: var(--background-box);
-  --border: #101010b0;
+  --border: #282828;
   --border-default: 1px solid var(--border);
   --destructive: #a33030;
   --grid: #242424;
   --text: #bcbcbc;
   --text-important: #e3ebe3;
-  --button: #2d4f24;
-  --button-disabled: #434343;
   --box-shadow-default: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   --sidebar-button: #365336;
 }
@@ -65,6 +63,10 @@ a {
 
 a:visited {
   color: var(--link);
+}
+
+label {
+  color: var(--text);
 }
 
 html {
@@ -122,6 +124,7 @@ input {
   background-color: var(--background-input);
   font-weight: 100;
   font-size: 16px;
+  color: var(--text);
 }
 
 input[type="checkbox"] {
