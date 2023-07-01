@@ -61,7 +61,7 @@ export default class CacheClient extends Client {
 
   addEventListener<EventName extends keyof EventCallbacksArray>(eventName: EventName, callback: CacheEventCallbacks[EventName]): void {
 
-    this.eventCallbacks[eventName].push(callback as () => void);
+    this.eventCallbacks[eventName].push(callback);
 
   }
 
@@ -77,7 +77,7 @@ export default class CacheClient extends Client {
 
   removeEventListener<EventName extends keyof EventCallbacksArray>(eventName: EventName, callback: CacheEventCallbacks[EventName]): void {
 
-    this.eventCallbacks[eventName] = (this.eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
+    this.eventCallbacks[eventName] = this.eventCallbacks[eventName].filter((possibleCallback) => possibleCallback !== callback) as EventCallbacksArray[EventName];
 
   }
 

@@ -181,8 +181,9 @@ export default class Client {
 
   async createTaskList(props: InitialTaskListProperties = {}) {
 
-    // Default the name.
+    // Set the defaults.
     props.name = props.name ?? "Tasks";
+    props.taskIds = props.taskIds ?? [];
 
     // Create the task list.
     const taskList = await this.#createObject(TaskList, props);
