@@ -291,7 +291,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
               <TaskPopupParentTaskSection childTask={task} client={client} parentTaskId={task.parentTaskId} project={project} />
             ) : null
           }
-          <TaskPopupSubTaskSection task={task} project={project} />
+          <TaskPopupSubTaskSection client={client} task={task} project={project} />
           <section>
             <label>Labels</label>
             <LabelInput resultsContainer={popupContainerRef?.current ?? undefined} client={client} labelIds={task.labelIds} taskId={task.id} onChange={async (labelIds) => await task.update({labelIds})} />

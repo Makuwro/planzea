@@ -1,11 +1,7 @@
 import Attachment, { InitialAttachmentProperties } from "./Attachment";
 import { Mutable } from "./CacheClient";
 import Client, { PropertiesUpdate } from "./Client";
-
-export interface TaskList {
-  name: string;
-  taskIds: string[];
-}
+import TaskList, { InitialTaskListProperties, TaskListProperties } from "./TaskList";
 
 export interface TaskProperties {
   id: string;
@@ -17,7 +13,7 @@ export interface TaskProperties {
   parentTaskId?: string;
   projectId: string;
   statusId: string;
-  taskLists?: TaskList[];
+  taskLists?: TaskListProperties[];
 }
 
 export type InitialTaskProperties = Omit<TaskProperties, "id">;
@@ -91,7 +87,7 @@ export default class Task {
    * This task's task lists.
    * @since v1.0.0
    */
-  readonly taskLists?: TaskList[];
+  readonly taskLists?: TaskListProperties[];
 
   constructor(props: TaskProperties, client: Client) {
 
@@ -112,6 +108,17 @@ export default class Task {
   async createAttachment(props: Omit<InitialAttachmentProperties, "taskIds">): Promise<Attachment> {
 
     return await this.#client.createAttachment({...props, taskIds: [this.id]});
+
+  }
+
+  async createTaskList(props?: InitialTaskListProperties): Promise<TaskList> {
+
+    const taskList = await this.#client.createTaskList(props);
+    const taskLists = this.taskLists ?? [];
+    taskLists.push(taskList);
+    await this.update({taskLists});
+
+    return taskList;
 
   }
 
@@ -146,21 +153,17 @@ export default class Task {
 
       // Create the default task list, if necessary.
       const taskLists = parentTask.taskLists ?? [];
-      let taskList = taskLists.find((list) => list.name === "Tasks");
-      const taskListIndex = taskList ? taskLists.indexOf(taskList) : taskLists.length - 1;
+      const taskListId = taskLists.find((list) => list.name === "Tasks")?.id;
+      let taskList = taskListId ? await this.#client.getTaskList(taskListId) : undefined;
       if (!taskList) {
-
-        taskList = {
-          name: "Tasks",
-          taskIds: []
-        };
+        
+        taskList = await this.createTaskList({name: "Tasks"});
+        await this.update({taskLists: [...taskLists, taskList]});
 
       }
 
       // Add this task to the list.
-      taskList.taskIds.push(this.id);
-      taskLists.splice(taskListIndex, 1, taskList);
-      await parentTask.update({taskLists});
+      await taskList.update({taskIds: [...taskList.taskIds, this.id]});
 
       // Remove the parentTaskId.
       await this.update({parentTaskId: undefined});

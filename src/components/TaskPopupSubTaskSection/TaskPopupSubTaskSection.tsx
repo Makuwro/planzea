@@ -4,10 +4,13 @@ import Project from "../../client/Project";
 import Icon from "../Icon/Icon";
 import styles from "./TaskPopupSubTaskSection.module.css";
 import Task from "../../client/Task";
+import TaskList from "../../client/TaskList";
+import Client from "../../client/Client";
 
-export default function TaskPopupSubTaskSection({project, task}: {project: Project, task: Task}) {
+export default function TaskPopupSubTaskSection({client, project, task}: {client: Client; project: Project; task: Task}) {
 
   const [newTaskNames, setNewTaskNames] = useState<string[]>([]);
+  const [taskLists, setTaskLists] = useState<TaskList[]>([]);
   const [subTasks, setSubTasks] = useState<Task[]>([]);
 
   const setNewTaskNamesFromIndex = (index: number, value: string) => {
@@ -18,31 +21,13 @@ export default function TaskPopupSubTaskSection({project, task}: {project: Proje
 
   };
 
-  async function createTask(index: number) {
-
-    // Make sure the task list exists.
-    const taskLists = task.taskLists;
-    const taskList = taskLists?.[index];
-    if (taskList) {
-
-      // Create a new task and and add it to the task list.
-      const subtask = await project.createTask({name: newTaskNames[index]});
-      taskList.taskIds.push(subtask.id);
-
-      // Update the task lists.
-      taskLists.splice(taskLists.indexOf(taskList), 1, taskList);
-      await task.update({taskLists});
-
-    }
-
-  }
-
   useEffect(() => {
 
     (async () => {
 
       setNewTaskNames([]);
       setSubTasks((await project.getTasks()).filter((possibleSubTask) => task.taskLists?.find((taskList) => taskList.taskIds.includes(possibleSubTask.id))));
+      setTaskLists((await client.getTaskLists()).filter((possibleTaskList) => task.taskLists?.find((taskList) => taskList.id === possibleTaskList.id)));
 
     })();
 
@@ -63,29 +48,26 @@ export default function TaskPopupSubTaskSection({project, task}: {project: Proje
     <section>
       <section>
         <button onClick={
-          async () => await task.update({taskLists: [...(task.taskLists ?? []), {
-            name: "Tasks",
-            taskIds: []
-          }]})
+          async () => await task.createTaskList()
         }>Create task list</button>
       </section>
       <ul id={styles.taskLists}>
         {
-          task.taskLists?.[0] ? (
-            task.taskLists.map((list, index) => (
-              <li key={index} className={styles.taskList}>
+          taskLists[0] ? (
+            taskLists.map((taskList, index) => (
+              <li key={taskList.id} className={styles.taskList}>
                 <section>
                   <section>
-                    <label>{list.name}</label>
-                    <button onClick={() => }>
+                    <label>{taskList.name}</label>
+                    <button onClick={async () => await taskList.delete()}>
                       <Icon name="delete" />
                     </button>
                   </section>
-                  <input type="text" placeholder="Add a task..." value={newTaskNames[index] ?? ""} onChange={(event) => setNewTaskNamesFromIndex(index, event.target.value)} onKeyDown={(event) => event.key === "Enter" ? createTask(index) : undefined} />
+                  <input type="text" placeholder="Add a task..." value={newTaskNames[index] ?? ""} onChange={(event) => setNewTaskNamesFromIndex(index, event.target.value)} onKeyDown={async (event) => event.key === "Enter" ? await taskList.update({taskIds: [...taskList.taskIds, (await project.createTask({name: newTaskNames[index]})).id]}) : undefined} />
                 </section>
                 <ul id={styles.tasks}>
                   {
-                    list.taskIds.map((taskId) => {
+                    taskList.taskIds.map((taskId) => {
 
                       const subTask = subTasks.find((possibleTask) => possibleTask.id === taskId);
                       if (subTask) {
