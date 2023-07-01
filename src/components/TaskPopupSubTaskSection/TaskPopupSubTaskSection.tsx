@@ -46,6 +46,7 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
     (async () => {
 
       const newSubTasks: TaskListContainer<Task[]> = {};
+      console.warn(2);
       for (const taskList of taskLists) {
 
         newSubTasks[taskList.id] = [];
@@ -83,9 +84,7 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
 
   async function removeTask(taskList: TaskList, taskId: string) {
 
-    const taskIds = [...taskList.taskIds];
-    taskIds.filter((possibleTaskId) => possibleTaskId !== taskId);
-    await taskList.update({taskIds});
+    await taskList.update({taskIds: [...taskList.taskIds].filter((possibleTaskId) => possibleTaskId !== taskId)});
     
   }
   
