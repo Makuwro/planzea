@@ -1,6 +1,11 @@
 import Attachment, { InitialAttachmentProperties } from "./Attachment";
 import Client, { PropertiesUpdate } from "./Client";
 
+export interface TaskList {
+  name: string;
+  tasks: string[];
+}
+
 export interface TaskProperties {
   id: string;
   name: string;
@@ -11,6 +16,7 @@ export interface TaskProperties {
   parentTaskId?: string;
   projectId: string;
   statusId: string;
+  taskLists?: TaskList[];
 }
 
 export type InitialTaskProperties = Omit<TaskProperties, "id">;
@@ -80,6 +86,12 @@ export default class Task {
    */
   statusId: string;
 
+  /**
+   * This task's task lists.
+   * @since v1.0.0
+   */
+  taskLists?: TaskList[];
+
   constructor(props: TaskProperties, client: Client) {
 
     this.id = props.id;
@@ -91,7 +103,29 @@ export default class Task {
     this.parentTaskId = props.parentTaskId;
     this.isLocked = props.isLocked;
     this.statusId = props.statusId;
+    this.taskLists = props.taskLists;
     this.#client = client;
+
+    if (this.parentTaskId) {
+
+      // Get the parent task.
+      const parentTask = await this.#client.getTask(this.parentTaskId);
+
+      // Update the parent task.
+      const currentTaskLists = parentTask.taskLists ?? [];
+      let initialTaskList = currentTaskLists.find((list) => list.name === "Tasks") ?? {
+        name: "Tasks",
+        tasks: []
+      };
+      currentTaskLists.splice();
+      await parentTask.update({
+        taskLists: [...(parentTask.taskLists ?? []), ]
+      });
+
+      // Remove the parentTaskId.
+      await this.update({parentTaskId: undefined});
+
+    }
 
   }
 
