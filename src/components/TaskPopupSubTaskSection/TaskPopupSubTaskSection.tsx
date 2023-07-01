@@ -15,10 +15,18 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
   const [taskLists, setTaskLists] = useState<TaskList[]>([]);
   const [subTasks, setSubTasks] = useState<TaskListContainer<Task[]>>({});
 
-  const setNewTaskNamesFromId = (taskListId: string, value: string) => {
+  const setNewTaskNamesFromId = (taskListId: string, value?: string) => {
 
     const newNames = {...newTaskNames};
-    newNames[taskListId] = value;
+    if (value) {
+
+      newNames[taskListId] = value;
+
+    } else {
+
+      delete newNames[taskListId];
+
+    }
     setNewTaskNames(newNames);
 
   };
@@ -29,13 +37,36 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
 
       // Get all tasks in the task lists.
       const taskLists = [];
+      const brokenTaskListIds: string[] = [];
       for (const taskListProperties of task.taskLists ?? []) {
 
-        const taskList = await client.getTaskList(taskListProperties.id);
-        taskLists.push(taskList);
+        try {
+          
+          const taskList = await client.getTaskList(taskListProperties.id);
+
+          if (!brokenTaskListIds[0]) {
+
+            taskLists.push(taskList);
+
+          }
+
+        } catch (err) {
+
+          brokenTaskListIds.push(taskListProperties.id);
+
+        }
 
       }
-      setTaskLists(taskLists);
+
+      if (brokenTaskListIds[0]) {
+
+        await task.update({taskLists: task.taskLists?.filter((possibleTaskList) => !brokenTaskListIds.includes(possibleTaskList.id))});
+
+      } else {
+        
+        setTaskLists(taskLists);
+
+      }
 
     })();
 
@@ -61,23 +92,49 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
   
     })();
 
+    const findTaskListIndex = (taskListId: string) => taskLists.findIndex((possibleTaskList) => possibleTaskList.id === taskListId);
+
+    const replaceTaskList = (taskListIndex: number, replacementList?: TaskList) => {
+
+      const newTaskLists = [...taskLists];
+      replacementList ? newTaskLists.splice(taskListIndex, 1, replacementList) : newTaskLists.splice(taskListIndex, 1);
+      setTaskLists(newTaskLists);
+
+    };
+
     const onTaskListUpdate = async (newTaskList: TaskList) => {
 
-      const index = taskLists.findIndex((possibleTaskList) => possibleTaskList.id === newTaskList.id);
+      const index = findTaskListIndex(newTaskList.id);
       if (index !== -1) {
 
-        const newTaskLists = [...taskLists];
-        newTaskLists.splice(index, 1, newTaskList);
-        setTaskLists(newTaskLists);
+        replaceTaskList(index, newTaskList);
         setNewTaskNamesFromId(newTaskList.id, "");
 
       }
 
     };
 
+    const onTaskListDelete = async (taskListId: string) => {
+
+      const index = findTaskListIndex(taskListId);
+      if (index !== -1) {
+
+        replaceTaskList(index);
+        setNewTaskNamesFromId(taskListId);
+
+      }
+
+    };
+
+    client.addEventListener("taskListDelete", onTaskListDelete);
     client.addEventListener("taskListUpdate", onTaskListUpdate);
 
-    return () => client.removeEventListener("taskListUpdate", onTaskListUpdate);
+    return () => {
+      
+      client.removeEventListener("taskListDelete", onTaskListDelete);
+      client.removeEventListener("taskListUpdate", onTaskListUpdate);
+
+    };
 
   }, [taskLists]);
 

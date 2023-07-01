@@ -24,6 +24,7 @@ export interface EventCallbacks {
   taskDelete: ((taskId: string) => void) | (() => void);
   taskUpdate: ((newTask: Task, oldTaskProperties?: TaskProperties) => void) | ((newTask: Task) => void) | (() => void);
   taskListCreate: ((taskList: TaskList) => void) | (() => void);
+  taskListDelete: ((taskListId: string) => void) | (() => void);
   taskListUpdate: ((newTaskList: TaskList, oldTaskListProperties?: TaskListProperties) => void) | ((newTaskList: TaskList) => void) | (() => void);
 }
 
@@ -70,6 +71,7 @@ export default class Client {
     taskDelete: [],
     taskUpdate: [],
     taskListCreate: [],
+    taskListDelete: [],
     taskListUpdate: []
   };
   personalProjectId?: string;
@@ -252,6 +254,24 @@ export default class Client {
 
     // Run each callback.
     this.#fireEvent("taskDelete", taskId);
+
+  }
+
+  async deleteTaskList(taskListId: string): Promise<void> {
+
+    // Delete this list.
+    await this.#db.taskLists.delete(taskListId);
+
+    // Update each task.
+    const taskListFilter = (possibleTaskList: TaskListProperties) => possibleTaskList.id === taskListId;
+    for (const task of (await this.getTasks()).filter((possibleTask) => possibleTask.taskLists?.find(taskListFilter))) {
+
+      await task.update({taskLists: task.taskLists?.filter(taskListFilter)});
+
+    }
+
+    // Fire event.
+    this.#fireEvent("taskListDelete", taskListId);
 
   }
 

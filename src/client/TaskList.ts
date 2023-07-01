@@ -31,7 +31,7 @@ export default class TaskList {
 
   async delete(): Promise<void> {
 
-
+    await this.#client.deleteTaskList(this.id);
 
   }
 
