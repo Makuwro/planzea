@@ -10,9 +10,10 @@ interface PopupProperties {
   maxWidth?: number;
   children: ReactNode;
   popupContainerRef?: RefObject<HTMLElement>;
+  popupContentPadding?: number;
 }
 
-export default function Popup({name, isOpen, onClose, maxWidth, children, actions, popupContainerRef}: PopupProperties) {
+export default function Popup({name, isOpen, onClose, maxWidth, children, actions, popupContainerRef, popupContentPadding}: PopupProperties) {
 
   const [isShown, setIsShown] = useState<boolean>(false);
 
@@ -33,7 +34,7 @@ export default function Popup({name, isOpen, onClose, maxWidth, children, action
     
     }}>
       <section id={styles.popup} style={maxWidth ? {
-        "--popup-width-max": `${maxWidth}px` 
+        "--popup-width-max": `${maxWidth}px`
       } as React.CSSProperties : undefined}>
         <section id={styles.popupHeader}>
           {
@@ -48,7 +49,7 @@ export default function Popup({name, isOpen, onClose, maxWidth, children, action
             </button>
           </span>
         </section>
-        <section id={styles.popupContent}>
+        <section id={styles.popupContent} style={popupContentPadding !== undefined ? {padding: popupContentPadding} : undefined}>
           {children}
         </section>
       </section>

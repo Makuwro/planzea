@@ -274,8 +274,8 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
         setTempDocumentTitle(null);
         navigate(`/personal/projects/${project.id}/tasks`);
 
-      }}>
-        <h1>{task.name}</h1>
+      }} popupContentPadding={0}>
+        <h1 id={styles.taskName}>{task.name}</h1>
         <section id={styles.details}>
           <section 
             id={styles.description} 
