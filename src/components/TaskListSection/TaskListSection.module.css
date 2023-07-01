@@ -22,6 +22,39 @@
   opacity: 0.5;
 }
 
+.tasks {
+  padding: 0;
+  margin: 16px 0 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tasks li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tasks a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.tasks li > span {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tasks li > span > span {
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
 .taskList.grabbing {
   cursor: grabbing;
   animation-name: swing;
@@ -32,13 +65,14 @@
   position: fixed;
   background-color: var(--background);
   z-index: 1;
+  box-sizing: border-box;
 }
 
 .taskListOptions {
   display: flex;
 }
 
-.taskListOptions > button, #tasks li > button {
+.taskListOptions > button, .tasks > li > button {
   background-color: transparent;
   height: 100%;
   color: var(--text);

@@ -120,7 +120,7 @@ export default function TaskListSection({ initialCoordinates, setTaskListSetting
           onMouseDown={(event) => event.stopPropagation()}
           onKeyDown={async (event) => event.key === "Enter" && taskListSettings.taskName ? await taskList.update({ taskIds: [...taskList.taskIds, (await project.createTask({ name: taskListSettings.taskName })).id] }) : undefined} />
       </section>
-      <ul id={styles.tasks}>
+      <ul className={styles.tasks}>
         {
           taskList.taskIds.map((taskId) => {
 
