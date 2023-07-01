@@ -45,7 +45,11 @@
   text-decoration: none;
 }
 
-.taskList > section > section > button, #tasks li > button {
+.taskListOptions {
+  display: flex;
+}
+
+.taskListOptions > button, #tasks li > button {
   background-color: transparent;
   height: 100%;
   color: var(--text);

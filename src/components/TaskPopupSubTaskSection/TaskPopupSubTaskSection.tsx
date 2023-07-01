@@ -9,25 +9,31 @@ import Client from "../../client/Client";
 
 type TaskListContainer<T> = {[taskListId: string]: T};
 
+type TaskListSettings = TaskListContainer<{
+  name?: string;
+  isEditingName?: boolean;
+  taskName?: string;
+}>;
+
 export default function TaskPopupSubTaskSection({client, project, task}: {client: Client; project: Project; task: Task}) {
 
-  const [newTaskNames, setNewTaskNames] = useState<TaskListContainer<string>>({});
+  const [newTaskListSettings, setNewTaskListSettings] = useState<TaskListSettings>({});
   const [taskLists, setTaskLists] = useState<TaskList[]>([]);
   const [subTasks, setSubTasks] = useState<TaskListContainer<Task[]>>({});
 
-  const setNewTaskNamesFromId = (taskListId: string, value?: string) => {
+  const setNewTaskSettingsById = (taskListId: string, value?: TaskListSettings[0]) => {
 
-    const newNames = {...newTaskNames};
+    const newSettings = {...newTaskListSettings};
     if (value) {
 
-      newNames[taskListId] = value;
+      newSettings[taskListId] = value;
 
     } else {
 
-      delete newNames[taskListId];
+      delete newSettings[taskListId];
 
     }
-    setNewTaskNames(newNames);
+    setNewTaskListSettings(newSettings);
 
   };
 
@@ -77,9 +83,11 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
     (async () => {
 
       const newSubTasks: TaskListContainer<Task[]> = {};
+      const newTaskListSettings: TaskListSettings = {};
       for (const taskList of taskLists) {
 
         newSubTasks[taskList.id] = [];
+        newTaskListSettings[taskList.id] = {};
         for (const taskId of taskList.taskIds) {
 
           newSubTasks[taskList.id].push(await client.getTask(taskId));
@@ -88,6 +96,7 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
 
       }
 
+      setNewTaskListSettings(newTaskListSettings);
       setSubTasks(newSubTasks);
   
     })();
@@ -108,7 +117,7 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
       if (index !== -1) {
 
         replaceTaskList(index, newTaskList);
-        setNewTaskNamesFromId(newTaskList.id, "");
+        setNewTaskSettingsById(newTaskList.id, {});
 
       }
 
@@ -120,7 +129,7 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
       if (index !== -1) {
 
         replaceTaskList(index);
-        setNewTaskNamesFromId(taskListId);
+        setNewTaskSettingsById(taskListId);
 
       }
 
@@ -154,46 +163,69 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
       <ul id={styles.taskLists}>
         {
           taskLists[0] ? (
-            taskLists.map((taskList) => (
-              <li key={taskList.id} className={styles.taskList}>
-                <section>
+            taskLists.map((taskList) => {
+              
+              const taskListSettings = newTaskListSettings[taskList.id];
+              const isEditingName = taskListSettings?.isEditingName;
+              const newTaskListName = taskListSettings?.name;
+              return taskListSettings ? (
+                <li key={taskList.id} className={styles.taskList}>
                   <section>
-                    <label>{taskList.name}</label>
-                    <button onClick={async () => await taskList.delete()}>
-                      <Icon name="delete" />
-                    </button>
-                  </section>
-                  <input type="text" placeholder="Add a task..." value={newTaskNames[taskList.id] ?? ""} onChange={(event) => setNewTaskNamesFromId(taskList.id, event.target.value)} onKeyDown={async (event) => event.key === "Enter" ? await taskList.update({taskIds: [...taskList.taskIds, (await project.createTask({name: newTaskNames[taskList.id]})).id]}) : undefined} />
-                </section>
-                <ul id={styles.tasks}>
-                  {
-                    taskList.taskIds.map((taskId) => {
-
-                      const subTask = subTasks[taskList.id]?.find((possibleTask) => possibleTask.id === taskId);
-                      if (subTask) {
-
-                        const status = project.statuses.find((status) => status.id === subTask.statusId);
-                        return (
-                          <li key={taskId}>
-                            <span>
-                              <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
-                              <Link to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
-                            </span>
-                            <button onClick={async () => await removeTask(taskList, taskId)}>
-                              <Icon name="close" />
-                            </button>
-                          </li>
-                        );
-                        
+                    <section>
+                      {
+                        isEditingName ? (
+                          <input 
+                            type="text" 
+                            value={newTaskListName ?? ""} 
+                            placeholder={taskList.name} 
+                            onChange={(event) => setNewTaskSettingsById(taskList.id, {...taskListSettings, name: event.target.value})} 
+                            onKeyDown={async (event) => event.key === "Enter" ? taskListSettings.name && taskListSettings.name !== taskList.name ? await taskList.update({name: taskListSettings.name}) : setNewTaskSettingsById(taskList.id, {...taskListSettings, isEditingName: false}) : undefined} />
+                        ) : (
+                          <label>{taskList.name}</label>
+                        )
                       }
+                      <span className={styles.taskListOptions}>
+                        <button onClick={() => setNewTaskSettingsById(taskList.id, {...taskListSettings, isEditingName: !isEditingName})}>
+                          <Icon name={`edit${isEditingName ? "_off" : ""}`} />
+                        </button>
+                        <button onClick={async () => await taskList.delete()}>
+                          <Icon name="delete" />
+                        </button>
+                      </span>
+                    </section>
+                    <input type="text" placeholder="Add a task..." value={taskListSettings.taskName ?? ""} onChange={(event) => setNewTaskSettingsById(taskList.id, {...taskListSettings, taskName: event.target.value})} onKeyDown={async (event) => event.key === "Enter" && taskListSettings.taskName ? await taskList.update({taskIds: [...taskList.taskIds, (await project.createTask({name: taskListSettings.taskName})).id]}) : undefined} />
+                  </section>
+                  <ul id={styles.tasks}>
+                    {
+                      taskList.taskIds.map((taskId) => {
 
-                      return null;
+                        const subTask = subTasks[taskList.id]?.find((possibleTask) => possibleTask.id === taskId);
+                        if (subTask) {
 
-                    })
-                  }
-                </ul>
-              </li>
-            ))
+                          const status = project.statuses.find((status) => status.id === subTask.statusId);
+                          return (
+                            <li key={taskId}>
+                              <span>
+                                <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
+                                <Link to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
+                              </span>
+                              <button onClick={async () => await removeTask(taskList, taskId)}>
+                                <Icon name="close" />
+                              </button>
+                            </li>
+                          );
+                          
+                        }
+
+                        return null;
+
+                      })
+                    }
+                  </ul>
+                </li>
+              ) : undefined;
+
+            })
           ) : null
         }
       </ul>
