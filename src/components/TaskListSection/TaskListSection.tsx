@@ -19,7 +19,7 @@ interface TaskListSectionProperties {
   taskObjects: Task[]; 
   initialCoordinates?: Coordinates | null;
   coordinates?: Coordinates | null;
-  setTaskListBoundary?: (bounds: [top: number, bottom: number]) => void;
+  setTaskListBoundary?: (bounds: number) => void;
   popupContainerRef?: RefObject<HTMLElement>; 
 }
 
@@ -59,18 +59,18 @@ export default function TaskListSection({ coordinates, initialCoordinates, setTa
 
   }, [rect]);
 
+  const ref = useRef<HTMLLIElement>(null);
   useEffect(() => {
 
     if (setTaskListBoundary && ref.current) {
 
       const box = ref.current.getBoundingClientRect();
-      setTaskListBoundary([box.top, box.top + box.height]);
+      setTaskListBoundary(box.top);
 
     }
 
-  }, [setTaskListBoundary]);
+  }, [rect]);
 
-  const ref = useRef<HTMLLIElement>(null);
   const comp = (
     <li
       ref={ref}

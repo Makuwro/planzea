@@ -149,7 +149,7 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
   }, [taskLists]);
 
   const [grabbedTaskList, setGrabbedTaskList] = useState<TaskList | null>(null);
-  const [taskListBoundaries, setTaskListBoundaries] = useState<Coordinates[] | null>(null);
+  const [taskListBoundaries, setTaskListBoundaries] = useState<number[] | null>(null);
   const [initialCoordinates, setInitialCoordinates] = useState<Coordinates | null>([0, 0]);
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   useEffect(() => {
@@ -182,10 +182,10 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
       if (grabbedTaskList && taskListBoundaries) {
 
         setCoordinates([event.clientX, event.clientY]);
-        let newIndex = -1;
+        let newIndex = 0;
         for (const boundary of taskListBoundaries) {
 
-          if (boundary[0] > event.clientY || boundary[1] <= event.clientY) {
+          if (boundary > event.clientY) {
 
             break;
 
@@ -227,6 +227,8 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
   
   const [originalBoxRef, setOriginalBox] = useState<RefObject<HTMLElement> | null>(null);
 
+  console.log(taskListBoundaries);
+
   return (
     <section>
       <section>
@@ -262,14 +264,19 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
                     
                     setGrabbedTaskList(taskList);
                     setOriginalBox(originalBoxRef);
+                    setCoordinates(initialCoordinates);
                     setInitialCoordinates(initialCoordinates);
                   
                   }}
-                  setTaskListBoundary={([top, bottom]) => {
+                  setTaskListBoundary={(boundary) => {
                     
-                    const boundaries = [...(taskListBoundaries ?? [])];
-                    boundaries.splice(index, 0, [top, bottom]);
-                    setTaskListBoundaries(boundaries);
+                    setTaskListBoundaries((oldBoundaries) => {
+
+                      const boundaries = [...(oldBoundaries ?? [])];
+                      boundaries[index] = boundary;
+                      return boundaries;
+
+                    });
                   
                   }}
                   setTaskListSettings={(newSettings) => setNewTaskSettingsById(taskList.id, newSettings)}
