@@ -7,20 +7,31 @@ import Task from "../../client/Task";
 
 export default function TaskPopupSubTaskSection({project, task}: {project: Project, task: Task}) {
 
-  const [newTaskName, setNewTaskName] = useState<string>("");
+  const [newTaskNames, setNewTaskNames] = useState<string[]>([]);
   const [subTasks, setSubTasks] = useState<Task[]>([]);
 
-  async function createTask(event: React.KeyboardEvent) {
+  const setNewTaskNamesFromIndex = (index: number, value: string) => {
 
-    if (event.key === "Enter") {
+    const newNames = [...newTaskNames];
+    newNames[index] = value;
+    setNewTaskNames(newNames);
 
-      const subtask = await project.createTask({
-        parentTaskId: task.id,
-        name: newTaskName
-      });
+  };
 
-      setSubTasks([...subTasks, subtask]);
-      setNewTaskName("");
+  async function createTask(index: number) {
+
+    // Make sure the task list exists.
+    const taskLists = task.taskLists;
+    const taskList = taskLists?.[index];
+    if (taskList) {
+
+      // Create a new task and and add it to the task list.
+      const subtask = await project.createTask({name: newTaskNames[index]});
+      taskList.taskIds.push(subtask.id);
+
+      // Update the task lists.
+      taskLists.splice(taskLists.indexOf(taskList), 1, taskList);
+      await task.update({taskLists});
 
     }
 
@@ -30,6 +41,7 @@ export default function TaskPopupSubTaskSection({project, task}: {project: Proje
 
     (async () => {
 
+      setNewTaskNames([]);
       setSubTasks((await project.getTasks()).filter((possibleSubTask) => task.taskLists?.find((taskList) => taskList.taskIds.includes(possibleSubTask.id))));
 
     })();
@@ -62,7 +74,7 @@ export default function TaskPopupSubTaskSection({project, task}: {project: Proje
           task.taskLists.map((list, index) => (
             <section key={index}>
               <label>{list.name}</label>
-              <input type="text" placeholder="Add a task..." value={newTaskName} onChange={(event) => setNewTaskName(event.target.value)} onKeyDown={createTask} />
+              <input type="text" placeholder="Add a task..." value={newTaskNames[index] ?? ""} onChange={(event) => setNewTaskNamesFromIndex(index, event.target.value)} onKeyDown={(event) => event.key === "Enter" ? createTask(index) : undefined} />
               <ul id={styles.tasks}>
                 {
                   list.taskIds.map((taskId) => {
