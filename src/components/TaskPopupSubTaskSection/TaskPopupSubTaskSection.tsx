@@ -46,7 +46,6 @@ export default function TaskPopupSubTaskSection({client, project, task}: {client
     (async () => {
 
       const newSubTasks: TaskListContainer<Task[]> = {};
-      console.warn(2);
       for (const taskList of taskLists) {
 
         newSubTasks[taskList.id] = [];
