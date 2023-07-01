@@ -18,10 +18,12 @@ interface TaskListSectionProperties {
   onGrab?: (originalBox: RefObject<HTMLElement>, initialCoordinates: Coordinates) => void; 
   taskObjects: Task[]; 
   initialCoordinates?: Coordinates | null;
+  coordinates?: Coordinates | null;
+  setTaskListBoundary?: (bounds: [top: number, bottom: number]) => void;
   popupContainerRef?: RefObject<HTMLElement>; 
 }
 
-export default function TaskListSection({ initialCoordinates, setTaskListSettings, taskListSettings, taskList, onGrab, isGrabbed, originalBoxRef, taskObjects, project, popupContainerRef }: TaskListSectionProperties) {
+export default function TaskListSection({ coordinates, initialCoordinates, setTaskListSettings, taskListSettings, taskList, onGrab, isGrabbed, originalBoxRef, taskObjects, project, popupContainerRef, setTaskListBoundary }: TaskListSectionProperties) {
 
   const isEditingName = taskListSettings?.isEditingName;
   const newTaskListName = taskListSettings?.name;
@@ -34,42 +36,39 @@ export default function TaskListSection({ initialCoordinates, setTaskListSetting
 
   const box = originalBoxRef?.current;
   const [rect, setRect] = box ? useState<DOMRect | null>(box.getBoundingClientRect()) : [undefined, undefined];
-  const [coordinates, setCoordinates] = rect && box && initialCoordinates ? useState<[number, number]>([initialCoordinates[0], initialCoordinates[1]]) : [undefined, undefined];
 
   useEffect(() => {
 
-    if (setCoordinates) {
+    if (box && rect) {
 
       const onResize = () => {
 
-        if (box && rect) {
+        setRect(box.getBoundingClientRect());
 
-          // console.log(2);
-          setRect(box.getBoundingClientRect());
-
-        }
-
-      };
-
-      const onMouseMove = (event: MouseEvent) => {
-  
-        setCoordinates([event.clientX, event.clientY]);
-  
       };
 
       window.addEventListener("resize", onResize);
-      window.addEventListener("mousemove", onMouseMove);
 
       return () => {
         
         window.removeEventListener("resize", onResize);
-        window.removeEventListener("mousemove", onMouseMove);
 
       };
 
     }
 
-  }, [originalBoxRef, popupContainerRef]);
+  }, [rect]);
+
+  useEffect(() => {
+
+    if (setTaskListBoundary && ref.current) {
+
+      const box = ref.current.getBoundingClientRect();
+      setTaskListBoundary([box.top, box.top + box.height]);
+
+    }
+
+  }, [setTaskListBoundary]);
 
   const ref = useRef<HTMLLIElement>(null);
   const comp = (

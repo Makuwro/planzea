@@ -149,30 +149,84 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
   }, [taskLists]);
 
   const [grabbedTaskList, setGrabbedTaskList] = useState<TaskList | null>(null);
+  const [taskListBoundaries, setTaskListBoundaries] = useState<Coordinates[] | null>(null);
+  const [initialCoordinates, setInitialCoordinates] = useState<Coordinates | null>([0, 0]);
+  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   useEffect(() => {
 
-    const onMouseUp = () => {
+    const onMouseUp = async () => {
 
       if (grabbedTaskList) {
 
         setGrabbedTaskList(null);
 
+        // Check if any of the indices changed.
+        const newTaskListIds = taskLists.map((taskList) => taskList.id);
+        for (let i = 0; newTaskListIds.length > i; i++) {
+
+          if (newTaskListIds[i] !== task.taskLists?.[i].id) {
+
+            await task.update({taskLists: taskLists.map((taskList) => ({name: taskList.name, id: taskList.id, taskIds: taskList.taskIds}))});
+            break;
+
+          }
+
+        }
+
       }
 
     };
 
+    const onMouseMove = (event: MouseEvent) => {
+  
+      if (grabbedTaskList && taskListBoundaries) {
+
+        setCoordinates([event.clientX, event.clientY]);
+        let newIndex = -1;
+        for (const boundary of taskListBoundaries) {
+
+          if (boundary[0] > event.clientY || boundary[1] <= event.clientY) {
+
+            break;
+
+          }
+
+          newIndex++;
+          
+        }
+
+        if (newIndex > -1) {
+
+          const grabbedTaskListIndex = taskLists.indexOf(grabbedTaskList);
+          if (grabbedTaskListIndex > -1 && newIndex !== grabbedTaskListIndex) {
+
+            const newTaskLists = [...taskLists];
+            newTaskLists.splice(grabbedTaskListIndex, 1);
+            newTaskLists.splice(newIndex, 0, grabbedTaskList);
+            setTaskLists(newTaskLists);
+
+          }
+
+        }
+
+      }
+
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
 
     return () => {
       
+      window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
 
     };
 
-  }, [grabbedTaskList]);
+  }, [coordinates, grabbedTaskList, taskListBoundaries]);
   
   const [originalBoxRef, setOriginalBox] = useState<RefObject<HTMLElement> | null>(null);
-  const [initialCoordinates, setInitialCoordinates] = useState<Coordinates | null>(null);
+
   return (
     <section>
       <section>
@@ -188,6 +242,7 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
               taskList={grabbedTaskList}
               taskListSettings={newTaskListSettings[grabbedTaskList.id]}
               taskObjects={subTasks[grabbedTaskList.id]}
+              coordinates={coordinates}
               initialCoordinates={initialCoordinates}
               popupContainerRef={popupContainerRef}
               project={project} />
@@ -195,7 +250,7 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
         }
         {
           taskLists[0] ? (
-            taskLists.map((taskList) => {
+            taskLists.map((taskList, index) => {
               
               const taskListSettings = newTaskListSettings[taskList.id];
               return taskListSettings ? (
@@ -208,6 +263,13 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
                     setGrabbedTaskList(taskList);
                     setOriginalBox(originalBoxRef);
                     setInitialCoordinates(initialCoordinates);
+                  
+                  }}
+                  setTaskListBoundary={([top, bottom]) => {
+                    
+                    const boundaries = [...(taskListBoundaries ?? [])];
+                    boundaries.splice(index, 0, [top, bottom]);
+                    setTaskListBoundaries(boundaries);
                   
                   }}
                   setTaskListSettings={(newSettings) => setNewTaskSettingsById(taskList.id, newSettings)}
