@@ -49,34 +49,43 @@ export default function TaskPopupSubTaskSection({project, task}: {project: Proje
   
   return (
     <section>
-      <label>Sub-tasks</label>
       <section>
-        <input type="text" placeholder="Add a task..." value={newTaskName} onChange={(event) => setNewTaskName(event.target.value)} onKeyDown={createTask} />
-        {
-          subTasks[0] ? (
-            <ul id={styles.tasks}>
-              {
-                subTasks.map((subTask) => {
-
-                  const status = project.statuses.find((status) => status.id === subTask.statusId);
-                  return (
-                    <li key={subTask.id}>
-                      <span>
-                        <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
-                        <Link to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
-                      </span>
-                      <button onClick={async () => await deleteSubTask(subTask)}>
-                        <Icon name="close" />
-                      </button>
-                    </li>
-                  );
-
-                })
-              }
-            </ul>
-          ) : null
-        }
+        <button>Create task list</button>
       </section>
+      {
+        subTasks[0] ? (
+          <>
+            <label>Sub-tasks</label>
+            <section>
+              <input type="checkbox" disabled />
+              <label>Hide this task from the backlog</label>
+            </section>
+            <section>
+              <input type="text" placeholder="Add a task..." value={newTaskName} onChange={(event) => setNewTaskName(event.target.value)} onKeyDown={createTask} />
+              <ul id={styles.tasks}>
+                {
+                  subTasks.map((subTask) => {
+
+                    const status = project.statuses.find((status) => status.id === subTask.statusId);
+                    return (
+                      <li key={subTask.id}>
+                        <span>
+                          <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
+                          <Link to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
+                        </span>
+                        <button onClick={async () => await deleteSubTask(subTask)}>
+                          <Icon name="close" />
+                        </button>
+                      </li>
+                    );
+
+                  })
+                }
+              </ul>
+            </section>
+          </>
+        ) : null
+      }
     </section>
   );
 

@@ -26,7 +26,7 @@ export default function TaskPopupParentTaskSection({childTask, client, parentTas
 
     return (
       <section>
-        <label>Parent task</label>
+        <label>Tracked by</label>
         <section id={styles.task}>
           <span>
             <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>

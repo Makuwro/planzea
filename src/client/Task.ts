@@ -19,15 +19,65 @@ export default class Task {
 
   static readonly tableName = "tasks" as const;
 
+  /**
+   * A reference to the client.
+   * @since v1.0.0
+   */
   readonly #client: Client;
+
+  /**
+   * This task's ID.
+   * @since v1.0.0
+   */
   readonly id: string;
+  
+  /**
+   * This task's name.
+   * @since v1.0.0
+   */
   name: string;
+
+  /**
+   * This task's description in Markdown.
+   * @since v1.0.0
+   */
   description?: string;
+
+  /**
+   * This task's due date represented in the number of milliseconds since epoch.
+   * @since v1.0.0
+   */
   dueDate?: string;
+
+  /**
+   * The lock status of this task. A task cannot be modified while it is locked.
+   * @since v1.0.0
+   */
   isLocked?: boolean;
+
+  /**
+   * This task's label IDs.
+   * @since v1.0.0
+   */
   labelIds: string[];
+
+  /**
+   * The ID of this task's parent task.
+   * @since v1.0.0
+   * @deprecated v1.1.0
+   */
   parentTaskId?: string;
+
+  /**
+   * This task's project ID.
+   * @since v1.0.0
+   */
   projectId: string;
+
+  /**
+   * This task's status ID.
+   * @since v1.0.0
+   */
   statusId: string;
 
   constructor(props: TaskProperties, client: Client) {
