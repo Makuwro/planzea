@@ -1,0 +1,73 @@
+@keyframes swing {
+  
+  0% {
+    rotate: 0deg;
+  }
+
+  33% {
+    rotate: 0.5deg;
+  }
+
+  66% {
+    rotate: -0.5deg;
+  }
+
+  100% {
+    rotate: 0deg;
+  }
+
+}
+
+.lowOpacity {
+  opacity: 0.5;
+}
+
+.taskList.grabbing {
+  cursor: grabbing;
+  animation-name: swing;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-duration: 2s;
+  position: fixed;
+  background-color: var(--background);
+  z-index: 1;
+}
+
+.taskListOptions {
+  display: flex;
+}
+
+.taskListOptions > button, #tasks li > button {
+  background-color: transparent;
+  height: 100%;
+  color: var(--text);
+  height: 30.1px;
+  aspect-ratio: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: none;
+}
+
+.taskList {
+  box-shadow: var(--box-shadow-default);
+  padding: 15px;
+  border-radius: 5px;
+  list-style: none;
+  transition: rotate 0.05s;
+  rotate: 0deg;
+  cursor: grab;
+}
+
+.taskList > section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.taskList > section > section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
