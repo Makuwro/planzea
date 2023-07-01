@@ -74,8 +74,15 @@ export default function TaskPopupSubTaskSection({project, task}: {project: Proje
           task.taskLists?.[0] ? (
             task.taskLists.map((list, index) => (
               <li key={index} className={styles.taskList}>
-                <label>{list.name}</label>
-                <input type="text" placeholder="Add a task..." value={newTaskNames[index] ?? ""} onChange={(event) => setNewTaskNamesFromIndex(index, event.target.value)} onKeyDown={(event) => event.key === "Enter" ? createTask(index) : undefined} />
+                <section>
+                  <section>
+                    <label>{list.name}</label>
+                    <button onClick={() => }>
+                      <Icon name="delete" />
+                    </button>
+                  </section>
+                  <input type="text" placeholder="Add a task..." value={newTaskNames[index] ?? ""} onChange={(event) => setNewTaskNamesFromIndex(index, event.target.value)} onKeyDown={(event) => event.key === "Enter" ? createTask(index) : undefined} />
+                </section>
                 <ul id={styles.tasks}>
                   {
                     list.taskIds.map((taskId) => {

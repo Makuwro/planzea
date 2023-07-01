@@ -5,6 +5,18 @@
   list-style: none;
 }
 
+.taskList > section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.taskList > section > section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 #taskLists {
   display: flex;
   flex-direction: column;
@@ -33,7 +45,7 @@
   text-decoration: none;
 }
 
-#tasks li > button {
+.taskList > section > section > button, #tasks li > button {
   background-color: transparent;
   height: 100%;
   color: var(--text);
