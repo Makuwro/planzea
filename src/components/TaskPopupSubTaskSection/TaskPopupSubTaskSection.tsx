@@ -59,47 +59,39 @@ export default function TaskPopupSubTaskSection({project, task}: {project: Proje
       </section>
       {
         task.taskLists?.[0] ? (
-          <>
-            <section>
-              <input type="checkbox" disabled />
-              <label>Hide this task from the backlog</label>
-            </section>
-            {
-              task.taskLists.map((list, index) => (
-                <section key={index}>
-                  <label>{list.name}</label>
-                  <input type="text" placeholder="Add a task..." value={newTaskName} onChange={(event) => setNewTaskName(event.target.value)} onKeyDown={createTask} />
-                  <ul id={styles.tasks}>
-                    {
-                      list.taskIds.map((taskId) => {
+          task.taskLists.map((list, index) => (
+            <section key={index}>
+              <label>{list.name}</label>
+              <input type="text" placeholder="Add a task..." value={newTaskName} onChange={(event) => setNewTaskName(event.target.value)} onKeyDown={createTask} />
+              <ul id={styles.tasks}>
+                {
+                  list.taskIds.map((taskId) => {
 
-                        const subTask = subTasks.find((possibleTask) => possibleTask.id === taskId);
-                        if (subTask) {
+                    const subTask = subTasks.find((possibleTask) => possibleTask.id === taskId);
+                    if (subTask) {
 
-                          const status = project.statuses.find((status) => status.id === subTask.statusId);
-                          return (
-                            <li key={subTask.id}>
-                              <span>
-                                <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
-                                <Link to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
-                              </span>
-                              <button onClick={async () => await deleteSubTask(subTask)}>
-                                <Icon name="close" />
-                              </button>
-                            </li>
-                          );
-                          
-                        }
-
-                        return null;
-
-                      })
+                      const status = project.statuses.find((status) => status.id === subTask.statusId);
+                      return (
+                        <li key={subTask.id}>
+                          <span>
+                            <span style={{color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}`}}>{status?.name}</span>
+                            <Link to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
+                          </span>
+                          <button onClick={async () => await deleteSubTask(subTask)}>
+                            <Icon name="close" />
+                          </button>
+                        </li>
+                      );
+                      
                     }
-                  </ul>
-                </section>
-              ))
-            }
-          </>
+
+                    return null;
+
+                  })
+                }
+              </ul>
+            </section>
+          ))
         ) : null
       }
     </section>
