@@ -107,44 +107,14 @@ export default class Client {
 
   }
 
-  async #getObjects(constructor: typeof Attachment, filter?: Partial<AttachmentProperties>, exclusiveKeys?: [(keyof AttachmentProperties)?]): Promise<Attachment[]>;
-  async #getObjects(constructor: typeof Task, filter?: Partial<TaskProperties>, exclusiveKeys?: [(keyof TaskProperties)?]): Promise<Task[]>;
-  async #getObjects(constructor: typeof Label, filter?: Partial<LabelProperties>, exclusiveKeys?: [(keyof LabelProperties)?]): Promise<Label[]>;
-  async #getObjects(constructor: typeof Project, filter?: Partial<ProjectProperties>, exclusiveKeys?: [(keyof ProjectProperties)?]): Promise<Project[]>;
-  async #getObjects(constructor: PlanzeaObjectConstructor, filter: Partial<PlanzeaObjectProperties> = {}, exclusiveKeys: [(keyof PlanzeaObjectProperties)?] = []): Promise<PlanzeaObject[]> {
+  async #getObjects(constructor: typeof Attachment): Promise<Attachment[]>;
+  async #getObjects(constructor: typeof Task): Promise<Task[]>;
+  async #getObjects(constructor: typeof Label): Promise<Label[]>;
+  async #getObjects(constructor: typeof Project): Promise<Project[]>;
+  async #getObjects(constructor: PlanzeaObjectConstructor): Promise<PlanzeaObject[]> {
 
     const objects = [];
-    const issuePropertiesArray = (await this.#db[constructor.tableName].toArray() as PlanzeaObjectProperties[]).filter((object) => {
-
-      for (const key of Object.keys(filter) as (keyof TaskProperties)[]) {
-
-        const issueValue = object[key];
-        const filterValue = filter[key];
-        if (issueValue instanceof Array && filterValue instanceof Array) {
-
-          for (const item of filterValue) {
-
-            const includesKey = issueValue.includes(item);
-            if (exclusiveKeys.includes(key) ? includesKey : !includesKey) {
-
-              return false;
-
-            }
-
-          }
-
-        } else if (exclusiveKeys.includes(key) ? issueValue === filterValue : issueValue !== filterValue) {
-
-          return false;
-
-        }
-
-      }
-
-      return true;
-
-    });
-
+    const issuePropertiesArray = await this.#db[constructor.tableName].toArray() as PlanzeaObjectProperties[];
 
     for (const properties of issuePropertiesArray) {
 
@@ -235,55 +205,30 @@ export default class Client {
    * Deletes a task from the database.
    * @param taskId The task's ID.
    */
-  async deleteTask(taskId: string, shouldDeleteSubtasks = true): Promise<void> {
+  async deleteTask(taskId: string): Promise<void> {
 
-    // Get all descendant tasks.
-    const descendantTasks: string[] = [];
-    for (const task of await this.getTasks()) {
+    // Delete all attachments.
+    for (const attachment of (await this.getAttachments()).filter((possibleTaskAttachment) => possibleTaskAttachment.taskIds.includes(taskId))) {
 
-      if (task.parentTaskId === taskId || (shouldDeleteSubtasks && descendantTasks.find((possibleTask) => possibleTask === task.parentTaskId))) {
+      attachment.taskIds = attachment.taskIds.filter((possibleTaskId) => possibleTaskId === taskId);
+      if (attachment.taskIds[0]) {
 
-        descendantTasks.push(task.id);
-
-      }
-
-    }
-    
-    // Delete or promote descendant tasks.
-    for (const descendantTaskId of [...descendantTasks, taskId]) {
-
-      if (taskId === descendantTaskId || shouldDeleteSubtasks) {
-        
-        // Delete all attachments.
-        for (const attachment of await this.getAttachments()) {
-
-          attachment.taskIds = attachment.taskIds.filter((possibleTaskId) => possibleTaskId === taskId);
-          if (attachment.taskIds[0]) {
-  
-            await attachment.update(attachment);
-  
-          } else {
-  
-            await attachment.delete();
-  
-          }
-  
-        }
-  
-        // Delete the task.
-        await this.#db.tasks.delete(taskId);
-  
-        // Run each callback.
-        this.#fireEvent("taskDelete", taskId);
+        await attachment.update(attachment);
 
       } else {
 
-        await this.updateTask(descendantTaskId, {parentTaskId: undefined});
+        await attachment.delete();
 
       }
 
     }
-    
+
+    // Delete the task.
+    await this.#db.tasks.delete(taskId);
+
+    // Run each callback.
+    this.#fireEvent("taskDelete", taskId);
+
   }
 
   async deleteLabel(labelId: string): Promise<void> {
@@ -298,7 +243,7 @@ export default class Client {
   async deleteProject(projectId: string): Promise<void> {
 
     // Delete each project task.
-    for (const task of await this.getTasks({projectId})) {
+    for (const task of (await this.getTasks()).filter((possibleProjectTask) => possibleProjectTask.projectId === projectId)) {
 
       await task.delete();
 
@@ -368,15 +313,20 @@ export default class Client {
 
   }
 
-  async getAttachments(filter: Partial<AttachmentProperties> = {}, exclusiveKeys: [(keyof AttachmentProperties)?] = []): Promise<Attachment[]> {
+  async getAttachments(): Promise<Attachment[]> {
 
-    return await this.#getObjects(Attachment, filter, exclusiveKeys);
+    return await this.#getObjects(Attachment);
 
   }
 
   async getTask(taskId: string): Promise<Task> {
 
-    return await this.#getObject(Task, taskId);
+    const task = await this.#getObject(Task, taskId);
+
+    // TODO: Remove in v2.0.0
+    await task.upgradeParentTask();
+
+    return task;
 
   }
 
@@ -384,9 +334,18 @@ export default class Client {
    * Gets all client tasks.
    * @returns An array of `Task` objects.
    */
-  async getTasks(filter: Partial<TaskProperties> = {}, exclusiveKeys: [(keyof TaskProperties)?] = []): Promise<Task[]> {
+  async getTasks(): Promise<Task[]> {
 
-    return await this.#getObjects(Task, filter, exclusiveKeys);
+    const tasks = await this.#getObjects(Task);
+
+    // TODO: Remove in v2.0.0
+    for (const task of tasks) {
+
+      await task.upgradeParentTask();
+
+    }
+
+    return tasks;
 
   }
 
@@ -400,9 +359,9 @@ export default class Client {
    * Gets all client labels.
    * @returns An array of `Label` objects.
    */
-  async getLabels(filter: Partial<LabelProperties> = {}, exclusiveKeys: [(keyof LabelProperties)?] = []): Promise<Label[]> {
+  async getLabels(): Promise<Label[]> {
 
-    return await this.#getObjects(Label, filter, exclusiveKeys);
+    return await this.#getObjects(Label);
 
   }
 
@@ -412,9 +371,9 @@ export default class Client {
 
   }
 
-  async getProjects(filter: Partial<ProjectProperties> = {}, exclusiveKeys: [(keyof ProjectProperties)?] = []): Promise<Project[]> {
+  async getProjects(): Promise<Project[]> {
 
-    return await this.#getObjects(Project, filter, exclusiveKeys);
+    return await this.#getObjects(Project);
 
   }
 

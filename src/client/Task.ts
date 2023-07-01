@@ -117,13 +117,13 @@ export default class Task {
 
   async getAttachments(): Promise<Attachment[]> {
 
-    return await this.#client.getAttachments({taskIds: [this.id]});
+    return (await this.#client.getAttachments()).filter((possibleTaskAttachment) => possibleTaskAttachment.taskIds.includes(this.id));
 
   }
 
-  async delete(shouldDeleteSubtasks = true) {
+  async delete() {
 
-    await this.#client.deleteTask(this.id, shouldDeleteSubtasks);
+    await this.#client.deleteTask(this.id);
 
   }
 

@@ -98,13 +98,13 @@ export default class Project {
 
   async getTasks(): Promise<Issue[]> {
 
-    return this.#client.getTasks({projectId: this.id});
+    return (await this.#client.getTasks()).filter((possibleProjectTask) => possibleProjectTask.projectId === this.id);
 
   }
 
   async getLabels(): Promise<Label[]> {
 
-    return this.#client.getLabels({projects: [this.id]});
+    return (await this.#client.getLabels()).filter((possibleProjectLabel) => possibleProjectLabel.projects?.includes(this.id));
 
   }
 
