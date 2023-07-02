@@ -19,6 +19,7 @@ export type TaskListSettings = TaskListContainer<{
 
 export default function TaskPopupSubTaskSection({client, project, task, popupContainerRef}: {client: Client; project: Project; task: Task; popupContainerRef: RefObject<HTMLElement>}) {
 
+  const [ready, setReady] = useState(false);
   const [newTaskListSettings, setNewTaskListSettings] = useState<TaskListSettings>({});
   const [taskLists, setTaskLists] = useState<TaskList[]>([]);
   const [subTasks, setSubTasks] = useState<TaskListContainer<Task[]>>({});
@@ -122,6 +123,7 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
 
       setNewTaskListSettings(newTaskListSettings);
       setSubTasks(newSubTasks);
+      setReady(true);
   
     })();
 
@@ -251,7 +253,7 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
   
   const [originalBoxRef, setOriginalBox] = useState<RefObject<HTMLElement> | null>(null);
 
-  return (
+  return ready ? (
     <section>
       <section>
         <button onClick={
@@ -312,6 +314,6 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
         }
       </ul>
     </section>
-  );
+  ) : null;
 
 }

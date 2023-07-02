@@ -130,10 +130,10 @@ export default function TaskListSection({ coordinates, initialCoordinates, setTa
               return (
                 <li key={taskId}>
                   <span>
-                    <span style={{ color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}` }}>{status?.name}</span>
-                    <Link to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
+                    <span onMouseDown={(event) => event.stopPropagation()} style={{ color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}` }}>{status?.name}</span>
+                    <Link onMouseDown={(event) => event.stopPropagation()} to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
                   </span>
-                  <button onClick={async () => await removeTask(taskList, taskId)}>
+                  <button onMouseDown={(event) => event.stopPropagation()} onClick={async () => await removeTask(taskList, taskId)}>
                     <Icon name="close" />
                   </button>
                 </li>
