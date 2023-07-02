@@ -59,9 +59,25 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
   const dueDate = task.dueDate ? new Date(task.dueDate) : undefined;
   const dueMonth = dueDate ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][dueDate.getMonth()] : undefined;
 
+  // Keep track of touch times.
+  const [touchStartTime, setTouchStartTime] = useState<number>(0);
+
   return (
     <li>
-      <section className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`} onClick={onClick}>
+      <section className={`${styles.task}${isSelected ? ` ${styles.selected}` : ""}`} onClick={onClick} onTouchStart={() => setTouchStartTime(new Date().getTime())} onTouchEnd={() => {
+
+        const touchEndTime = new Date().getTime();
+
+        if (touchEndTime - touchStartTime <= 500) {
+
+          onClick();
+          onClick();
+
+        }
+
+        setTouchStartTime(0);
+
+      }}>
         <span>
           <section className={styles.statusContainer} onClick={(event) => event.stopPropagation()}>
             <button className={styles.status} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} ref={statusButtonRef} style={{backgroundColor: statusHexBG}} />
