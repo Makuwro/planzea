@@ -157,8 +157,7 @@ export default class Task {
       let taskList = taskListId ? await this.#client.getTaskList(taskListId) : undefined;
       if (!taskList) {
         
-        taskList = await this.createTaskList({name: "Tasks"});
-        await this.update({taskLists: [...taskLists, taskList]});
+        taskList = await this.#client.createTaskList({name: "Tasks"});
 
       }
 
@@ -168,6 +167,7 @@ export default class Task {
       // Remove the parentTaskId.
       await this.update({parentTaskId: undefined});
       (this as Mutable<Task>).parentTaskId = undefined;
+      console.log(2);
 
     }
 

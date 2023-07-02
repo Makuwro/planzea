@@ -400,6 +400,7 @@ export default class Client {
       await task.upgradeParentTask();
 
     }
+    
 
     return tasks;
 
