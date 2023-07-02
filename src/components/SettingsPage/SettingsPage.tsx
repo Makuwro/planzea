@@ -24,12 +24,9 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
 
     if (project && settingName && projectId) {
 
-      const selectedNavIndex = navItems.findIndex((item) => item.name.toLowerCase() === settingName.toLowerCase());
-      if (selectedNavIndex !== -1) {
-
-        setSelectedNavIndex(selectedNavIndex);
-
-      } else {
+      const selectedNavIndex = navItems.findIndex((item) => item.name !== "Overview" && item.name.toLowerCase() === settingName.toLowerCase());
+      setSelectedNavIndex(selectedNavIndex);
+      if (selectedNavIndex === -1) {
 
         navigate(`/personal/projects/${projectId}/settings`, {replace: true});
 
@@ -42,6 +39,15 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
   useEffect(() => {
 
     setNavItems([
+      {
+        name: "Overview",
+        iconName: "folder",
+        element: (
+          <section>
+            <h1>Overview</h1>
+          </section>
+        )
+      },
       {
         name: "Labels",
         iconName: "label",
@@ -75,19 +81,19 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
 
   }, [client, projectId]);
 
-  return project && projectId ? (
+  return project && navItems[0] && projectId ? (
     <main id={styles.main}>
       <nav>
         {
           navItems.map((item) => (
-            <Link key={item.name} to={`/personal/projects/${project.id}/settings/${item.name.toLowerCase()}`}>
-              <Icon name="label" />
-              <span>Labels</span>
+            <Link key={item.name} to={`/personal/projects/${project.id}/settings${item.name !== "Overview" ? `/${item.name.toLowerCase()}` : ""}`}>
+              <Icon name={item.iconName} />
+              <span>{item.name}</span>
             </Link>
           ))
         }
       </nav>
-      {selectedNavIndex !== -1 && navItems[selectedNavIndex] ? navItems[selectedNavIndex].element : null}
+      {navItems[selectedNavIndex !== -1 ? selectedNavIndex : 0].element}
     </main>
   ) : null;
 
