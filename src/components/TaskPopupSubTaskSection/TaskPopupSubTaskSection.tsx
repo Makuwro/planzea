@@ -287,7 +287,7 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
                 newTaskLists.splice(newIndex, 0, taskList);
                 await task.update({taskLists: newTaskLists});
 
-              }
+              };
               return taskListSettings ? (
                 <TaskListSection 
                   key={taskList.id} 
