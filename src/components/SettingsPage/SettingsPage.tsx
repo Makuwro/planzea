@@ -6,6 +6,7 @@ import Project from "../../client/Project";
 import Icon, { IconName } from "../Icon/Icon";
 import LabelManagementPage from "../LabelManagementPage/LabelManagementPage";
 import styles from "./SettingsPage.module.css";
+import StatusManagementPage from "../StatusManagementPage/StatusManagementPage";
 
 interface SettingsPageProperties {
   client: CacheClient;
@@ -52,6 +53,11 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
         name: "Labels",
         iconName: "label",
         element: <LabelManagementPage client={client} project={project} setDocumentTitle={setDocumentTitle} />
+      },
+      {
+        name: "Statuses",
+        iconName: "done",
+        element: <StatusManagementPage client={client} project={project} setDocumentTitle={setDocumentTitle} />
       }
     ]);
 
