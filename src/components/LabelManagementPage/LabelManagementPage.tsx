@@ -3,7 +3,7 @@ import Client from "../../client/Client";
 import styles from "./LabelManagementPage.module.css";
 import Project from "../../client/Project";
 import Label from "../../client/Label";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SettingsPageOption from "../SettingsPageOption/SettingsPageOption";
 
 export default function LabelManagementPage({client, project, setDocumentTitle}: {client: Client; project: Project | null; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
