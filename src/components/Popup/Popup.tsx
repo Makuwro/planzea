@@ -24,8 +24,6 @@ export default function Popup({name, isOpen, onClose, maxWidth, children, action
 
   }, [isOpen]);
 
-  const stopPropagation = (event: React.MouseEvent) => event.stopPropagation();
-
   const ref = popupContainerRef ?? useRef<HTMLElement>(null);
 
   return (
@@ -40,7 +38,7 @@ export default function Popup({name, isOpen, onClose, maxWidth, children, action
     }}>
       <section id={styles.popup} style={maxWidth ? {
         "--popup-width-max": `${maxWidth}px`
-      } as React.CSSProperties : undefined} onMouseDown={stopPropagation} onMouseUp={stopPropagation}>
+      } as React.CSSProperties : undefined}>
         <section id={styles.popupHeader}>
           {
             name ? (
