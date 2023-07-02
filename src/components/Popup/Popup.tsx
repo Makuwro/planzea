@@ -1,4 +1,4 @@
-import React, { ReactElement, RefObject, useEffect, useState } from "react";
+import React, { ReactElement, RefObject, useEffect, useRef, useState } from "react";
 import styles from "./Popup.module.css";
 import Icon from "../Icon/Icon";
 
@@ -16,6 +16,7 @@ interface PopupProperties {
 export default function Popup({name, isOpen, onClose, maxWidth, children, actions, popupContainerRef, popupContentPadding}: PopupProperties) {
 
   const [isShown, setIsShown] = useState<boolean>(false);
+  const [isBackgroundMouseDown, setIsBackgroundMouseDown] = useState<boolean>(false);
 
   useEffect(() => {
 
@@ -23,8 +24,12 @@ export default function Popup({name, isOpen, onClose, maxWidth, children, action
 
   }, [isOpen]);
 
+  const stopPropagation = (event: React.MouseEvent) => event.stopPropagation();
+
+  const ref = popupContainerRef ?? useRef<HTMLElement>(null);
+
   return (
-    <section ref={popupContainerRef} id={styles.popupContainer} className={isShown ? styles.open : undefined} onTransitionEnd={() => {
+    <section ref={ref} onMouseDown={() => setIsBackgroundMouseDown(true)} onMouseUp={(event) => isBackgroundMouseDown && event.target === ref?.current ? setIsShown(false) : setIsBackgroundMouseDown(false)} id={styles.popupContainer} className={isShown ? styles.open : undefined} onTransitionEnd={() => {
       
       if (!isShown) {
 
@@ -35,7 +40,7 @@ export default function Popup({name, isOpen, onClose, maxWidth, children, action
     }}>
       <section id={styles.popup} style={maxWidth ? {
         "--popup-width-max": `${maxWidth}px`
-      } as React.CSSProperties : undefined}>
+      } as React.CSSProperties : undefined} onMouseDown={stopPropagation} onMouseUp={stopPropagation}>
         <section id={styles.popupHeader}>
           {
             name ? (
