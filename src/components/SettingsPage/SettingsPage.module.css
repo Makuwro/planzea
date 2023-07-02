@@ -30,19 +30,21 @@
   }
   
   .marker {
-    height: 15px;
-    width: 3px;
     border-radius: 5px;
     background-color: var(--link);
     position: fixed;
     margin-left: -10px;
     box-shadow: var(--box-shadow-default);
+    opacity: 0;
+    transition: 0.15s;
+    width: 3px;
+    height: 0px;
   }
 
   .navItem {
     display: flex;
     align-items: center;
-    color: var(--text-important);
+    color: var(--text);
     text-decoration: none;
     border-radius: 5px;
     padding: 5px 10px;
@@ -52,6 +54,12 @@
 
   .navItem.selected {
     filter: brightness(0.9);
+    color: var(--text-important);
+  }
+
+  .navItem.selected > .marker {
+    opacity: 1;
+    height: 15px;
   }
 
   .navItemText {
@@ -61,7 +69,6 @@
   }
 
   .navItemText > span {
-    
     filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.256));
   }
 

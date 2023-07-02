@@ -96,7 +96,7 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
             const isSelected = selectedNavIndex === index;
             return (
               <Link className={`${styles.navItem}${isSelected ? ` ${styles.selected}` : ""}`} key={item.name} to={`/personal/projects/${project.id}/settings${item.name !== "Overview" ? `/${item.name.toLowerCase()}` : ""}`}>
-                {isSelected ? <span className={styles.marker} /> : null }
+                <span className={styles.marker} />
                 <span className={styles.navItemText}>
                   <Icon name={item.iconName} />
                   <span>{item.name}</span>
