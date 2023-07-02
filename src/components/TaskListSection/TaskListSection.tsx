@@ -84,7 +84,7 @@ export default function TaskListSection({ coordinates, initialCoordinates, setTa
       onMouseDown={(event) => {
 
         event.preventDefault();
-        if (onGrab) onGrab(ref, [event.clientX, event.clientY]);
+        if (event.buttons === 1 && onGrab) onGrab(ref, [event.clientX, event.clientY]);
 
       }}>
       <section>
