@@ -73,6 +73,8 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
 
   }, [rect]);
 
+  const stopPropagation = (event: React.MouseEvent) => event.stopPropagation();
+
   const comp = (
     <li
       ref={ref}
@@ -98,13 +100,13 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
                 value={newTaskListName ?? ""}
                 placeholder={taskList.name}
                 onChange={(event) => setTaskListSettings ? setTaskListSettings({ ...taskListSettings, name: event.target.value }) : undefined}
-                onMouseDown={(event) => event.stopPropagation()}
+                onMouseDown={stopPropagation}
                 onKeyDown={(async (event) => setTaskListSettings ? event.key === "Enter" ? taskListSettings.name && taskListSettings.name !== taskList.name ? await taskList.update({ name: taskListSettings.name }) : setTaskListSettings({ ...taskListSettings, isEditingName: false }) : undefined : undefined)} />
             ) : (
-              <label onMouseDown={(event) => event.stopPropagation()}>{taskList.name}</label>
+              <label onMouseDown={stopPropagation}>{taskList.name}</label>
             )
           }
-          <span className={styles.taskListOptions} onMouseDown={(event) => event.stopPropagation()}>
+          <span className={styles.taskListOptions} onMouseDown={stopPropagation}>
             <button disabled={!onMoveUp} onClick={onMoveUp}>
               <Icon name="arrow_upward" />
             </button>
@@ -124,7 +126,7 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
           placeholder="Add a task..."
           value={taskListSettings.taskName ?? ""}
           onChange={(event) => setTaskListSettings ? setTaskListSettings({ ...taskListSettings, taskName: event.target.value }) : undefined}
-          onMouseDown={(event) => event.stopPropagation()}
+          onMouseDown={stopPropagation}
           onKeyDown={async (event) => event.key === "Enter" && taskListSettings.taskName ? await taskList.update({ taskIds: [...taskList.taskIds, (await project.createTask({ name: taskListSettings.taskName })).id] }) : undefined} />
       </section>
       <ul className={styles.tasks}>
@@ -138,10 +140,10 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
               return (
                 <li key={taskId}>
                   <span>
-                    <span onMouseDown={(event) => event.stopPropagation()} style={{ color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}` }}>{status?.name}</span>
-                    <Link onMouseDown={(event) => event.stopPropagation()} to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
+                    <span onMouseDown={stopPropagation} style={{ color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}` }}>{status?.name}</span>
+                    <Link onMouseDown={stopPropagation} to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
                   </span>
-                  <button onMouseDown={(event) => event.stopPropagation()} onClick={async () => await removeTask(taskList, taskId)}>
+                  <button onMouseDown={stopPropagation} onClick={async () => await removeTask(taskList, taskId)}>
                     <Icon name="close" />
                   </button>
                 </li>
