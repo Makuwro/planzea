@@ -207,6 +207,7 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
       if (grabbedTaskList && taskListBoundaries) {
 
         setCoordinates([event.clientX, event.clientY]);
+
         let newIndex = 0;
         for (const boundary of taskListBoundaries) {
 
@@ -279,6 +280,14 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
             taskLists.map((taskList, index) => {
               
               const taskListSettings = newTaskListSettings[taskList.id];
+              const updateTaskListPosition = async (newIndex: number) => {
+
+                const newTaskLists = [...taskLists];
+                newTaskLists.splice(index, 1);
+                newTaskLists.splice(newIndex, 0, taskList);
+                await task.update({taskLists: newTaskLists});
+
+              }
               return taskListSettings ? (
                 <TaskListSection 
                   key={taskList.id} 
@@ -292,22 +301,8 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
                     setInitialCoordinates(initialCoordinates);
                   
                   }}
-                  onMoveUp={index !== 0 ? async () => {
-
-                    const newTaskLists = [...taskLists];
-                    newTaskLists.splice(index, 1);
-                    newTaskLists.splice(index - 1, 0, taskList);
-                    await task.update({taskLists: newTaskLists});
-
-                  }: undefined}
-                  onMoveDown={index !== taskLists.length - 1 ? async () => {
-
-                    const newTaskLists = [...taskLists];
-                    newTaskLists.splice(index, 1);
-                    newTaskLists.splice(index + 1, 0, taskList);
-                    await task.update({taskLists: newTaskLists});
-
-                  } : undefined}
+                  onMoveUp={index !== 0 ? async () => await updateTaskListPosition(index - 1) : undefined}
+                  onMoveDown={index !== taskLists.length - 1 ? async () => await updateTaskListPosition(index + 1) : undefined}
                   setTaskListBoundary={(boundary) => {
                     
                     setTaskListBoundaries((oldBoundaries) => {
