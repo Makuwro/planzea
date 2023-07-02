@@ -21,9 +21,11 @@ interface TaskListSectionProperties {
   coordinates?: Coordinates | null;
   setTaskListBoundary?: (bounds: number) => void;
   popupContainerRef?: RefObject<HTMLElement>; 
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 }
 
-export default function TaskListSection({ coordinates, initialCoordinates, setTaskListSettings, taskListSettings, taskList, onGrab, isGrabbed, originalBoxRef, taskObjects, project, popupContainerRef, setTaskListBoundary }: TaskListSectionProperties) {
+export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, initialCoordinates, setTaskListSettings, taskListSettings, taskList, onGrab, isGrabbed, originalBoxRef, taskObjects, project, popupContainerRef, setTaskListBoundary }: TaskListSectionProperties) {
 
   const isEditingName = taskListSettings?.isEditingName;
   const newTaskListName = taskListSettings?.name;
@@ -103,6 +105,12 @@ export default function TaskListSection({ coordinates, initialCoordinates, setTa
             )
           }
           <span className={styles.taskListOptions} onMouseDown={(event) => event.stopPropagation()}>
+            <button disabled={!onMoveUp} onClick={onMoveUp}>
+              <Icon name="arrow_upward" />
+            </button>
+            <button disabled={!onMoveDown} onClick={onMoveDown}>
+              <Icon name="arrow_downward" />
+            </button>
             <button onClick={setTaskListSettings ? () => setTaskListSettings({ ...taskListSettings, isEditingName: !isEditingName }) : undefined}>
               <Icon name={`edit${isEditingName ? "_off" : ""}`} />
             </button>

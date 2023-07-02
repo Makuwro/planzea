@@ -292,6 +292,22 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
                     setInitialCoordinates(initialCoordinates);
                   
                   }}
+                  onMoveUp={index !== 0 ? async () => {
+
+                    const newTaskLists = [...taskLists];
+                    newTaskLists.splice(index, 1);
+                    newTaskLists.splice(index - 1, 0, taskList);
+                    await task.update({taskLists: newTaskLists});
+
+                  }: undefined}
+                  onMoveDown={index !== taskLists.length - 1 ? async () => {
+
+                    const newTaskLists = [...taskLists];
+                    newTaskLists.splice(index, 1);
+                    newTaskLists.splice(index + 1, 0, taskList);
+                    await task.update({taskLists: newTaskLists});
+
+                  } : undefined}
                   setTaskListBoundary={(boundary) => {
                     
                     setTaskListBoundaries((oldBoundaries) => {
