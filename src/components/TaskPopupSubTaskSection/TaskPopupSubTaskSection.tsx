@@ -228,8 +228,6 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
   
   const [originalBoxRef, setOriginalBox] = useState<RefObject<HTMLElement> | null>(null);
 
-  console.log(taskListBoundaries);
-
   return (
     <section>
       <section>
