@@ -142,7 +142,7 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
             <section id={styles.taskListContainer}>
               <ul id={styles.taskList}>
                 {
-                  tasks.filter((task) => !task.parentTaskId).map((task) => <BacklogTask key={task.id} task={task} project={project} isSelected={taskSelection?.task.id === task.id} onClick={() => {
+                  tasks.map((task) => <BacklogTask key={task.id} task={task} project={project} isSelected={taskSelection?.task.id === task.id} onClick={() => {
                     
                     const newTaskSelection = {task, time: new Date().getTime()};
                     client.setSelectedTasks([newTaskSelection.task]);
