@@ -17,7 +17,7 @@ export class ClientDatabase extends Dexie {
   constructor() {
 
     super("contents");
-    this.version(1).stores({
+    this.version(2).stores({
       attachments: "&id, name, description, issueIds",
       tasks: "&id, dueDate, name, description, status",
       taskLists: "&id, taskIds",
