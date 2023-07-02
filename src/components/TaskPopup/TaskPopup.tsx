@@ -274,8 +274,8 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
         setTempDocumentTitle(null);
         navigate(`/personal/projects/${project.id}/tasks`);
 
-      }}>
-        <h1>{task.name}</h1>
+      }} popupContentPadding={0}>
+        <h1 id={styles.taskName}>{task.name}</h1>
         <section id={styles.details}>
           <section 
             id={styles.description} 
@@ -291,7 +291,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
               <TaskPopupParentTaskSection childTask={task} client={client} parentTaskId={task.parentTaskId} project={project} />
             ) : null
           }
-          <TaskPopupSubTaskSection task={task} project={project} />
+          <TaskPopupSubTaskSection popupContainerRef={popupContainerRef} client={client} task={task} project={project} />
           <section>
             <label>Labels</label>
             <LabelInput resultsContainer={popupContainerRef?.current ?? undefined} client={client} labelIds={task.labelIds} taskId={task.id} onChange={async (labelIds) => await task.update({labelIds})} />

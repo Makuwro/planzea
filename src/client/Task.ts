@@ -1,5 +1,7 @@
 import Attachment, { InitialAttachmentProperties } from "./Attachment";
+import { Mutable } from "./CacheClient";
 import Client, { PropertiesUpdate } from "./Client";
+import TaskList, { InitialTaskListProperties, TaskListProperties } from "./TaskList";
 
 export interface TaskProperties {
   id: string;
@@ -11,6 +13,7 @@ export interface TaskProperties {
   parentTaskId?: string;
   projectId: string;
   statusId: string;
+  taskLists?: TaskListProperties[];
 }
 
 export type InitialTaskProperties = Omit<TaskProperties, "id">;
@@ -19,16 +22,72 @@ export default class Task {
 
   static readonly tableName = "tasks" as const;
 
+  /**
+   * A reference to the client.
+   * @since v1.0.0
+   */
   readonly #client: Client;
+
+  /**
+   * This task's ID.
+   * @since v1.0.0
+   */
   readonly id: string;
-  name: string;
-  description?: string;
-  dueDate?: string;
-  isLocked?: boolean;
-  labelIds: string[];
-  parentTaskId?: string;
-  projectId: string;
-  statusId: string;
+  
+  /**
+   * This task's name.
+   * @since v1.0.0
+   */
+  readonly name: string;
+
+  /**
+   * This task's description in Markdown.
+   * @since v1.0.0
+   */
+  readonly description?: string;
+
+  /**
+   * This task's due date represented in the number of milliseconds since epoch.
+   * @since v1.0.0
+   */
+  readonly dueDate?: string;
+
+  /**
+   * The lock status of this task. A task cannot be modified while it is locked.
+   * @since v1.0.0
+   */
+  readonly isLocked?: boolean;
+
+  /**
+   * This task's label IDs.
+   * @since v1.0.0
+   */
+  readonly labelIds: string[];
+
+  /**
+   * The ID of this task's parent task.
+   * @since v1.0.0
+   * @deprecated v1.1.0
+   */
+  readonly parentTaskId?: string;
+
+  /**
+   * This task's project ID.
+   * @since v1.0.0
+   */
+  readonly projectId: string;
+
+  /**
+   * This task's status ID.
+   * @since v1.0.0
+   */
+  readonly statusId: string;
+
+  /**
+   * This task's task lists.
+   * @since v1.0.0
+   */
+  readonly taskLists?: TaskListProperties[];
 
   constructor(props: TaskProperties, client: Client) {
 
@@ -41,6 +100,7 @@ export default class Task {
     this.parentTaskId = props.parentTaskId;
     this.isLocked = props.isLocked;
     this.statusId = props.statusId;
+    this.taskLists = props.taskLists;
     this.#client = client;
 
   }
@@ -51,21 +111,65 @@ export default class Task {
 
   }
 
-  async getAttachments(): Promise<Attachment[]> {
+  async createTaskList(props?: InitialTaskListProperties): Promise<TaskList> {
 
-    return await this.#client.getAttachments({taskIds: [this.id]});
+    const taskList = await this.#client.createTaskList(props);
+    const taskLists = this.taskLists ?? [];
+    taskLists.push(taskList);
+    await this.update({taskLists});
+
+    return taskList;
 
   }
 
-  async delete(shouldDeleteSubtasks = true) {
+  async getAttachments(): Promise<Attachment[]> {
 
-    await this.#client.deleteTask(this.id, shouldDeleteSubtasks);
+    return (await this.#client.getAttachments()).filter((possibleTaskAttachment) => possibleTaskAttachment.taskIds.includes(this.id));
+
+  }
+
+  async delete() {
+
+    await this.#client.deleteTask(this.id);
 
   }
 
   async update(newProperties: PropertiesUpdate<TaskProperties>): Promise<void> {
 
     await this.#client.updateTask(this.id, newProperties);
+
+  }
+
+  /**
+   * This method will be removed in v2.0.0.
+   * @since v1.1.0
+   */
+  async upgradeParentTask(): Promise<void> {
+    
+    if (this.parentTaskId) {
+
+      // Get the parent task.
+      const parentTask = await this.#client.getTask(this.parentTaskId);
+
+      // Create the default task list, if necessary.
+      const taskLists = parentTask.taskLists ?? [];
+      const taskListId = taskLists.find((list) => list.name === "Tasks")?.id;
+      let taskList = taskListId ? await this.#client.getTaskList(taskListId) : undefined;
+      if (!taskList) {
+        
+        taskList = await this.#client.createTaskList({name: "Tasks"});
+
+      }
+
+      // Add this task to the list.
+      await taskList.update({taskIds: [...taskList.taskIds, this.id]});
+
+      // Remove the parentTaskId.
+      await this.update({parentTaskId: undefined});
+      (this as Mutable<Task>).parentTaskId = undefined;
+      console.log(2);
+
+    }
 
   }
 

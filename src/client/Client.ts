@@ -5,11 +5,13 @@ import Task, { InitialTaskProperties, TaskProperties } from "./Task";
 import Label, { InitialLabelProperties, LabelProperties } from "./Label";
 import Project, { defaultStatuses, InitialProjectProperties, ProjectProperties } from "./Project";
 import "dexie-export-import";
+import TaskList, { InitialTaskListProperties, TaskListProperties } from "./TaskList";
+import { ContentNotFoundError } from "./errors/ContentNotFoundError";
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
-export type PlanzeaObject = Attachment | Task | Label | Project;
-export type PlanzeaObjectConstructor = typeof Attachment | typeof Task | typeof Label | typeof Project;
+export type PlanzeaObject = Attachment | Task | TaskList | Label | Project;
+export type PlanzeaObjectConstructor = typeof Attachment | typeof TaskList | typeof Task | typeof Label | typeof Project;
 export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties;
 
 export interface EventCallbacks {
@@ -22,6 +24,9 @@ export interface EventCallbacks {
   taskCreate: ((task: Task) => void) | (() => void);
   taskDelete: ((taskId: string) => void) | (() => void);
   taskUpdate: ((newTask: Task, oldTaskProperties?: TaskProperties) => void) | ((newTask: Task) => void) | (() => void);
+  taskListCreate: ((taskList: TaskList) => void) | (() => void);
+  taskListDelete: ((taskListId: string) => void) | (() => void);
+  taskListUpdate: ((newTaskList: TaskList, oldTaskListProperties?: TaskListProperties) => void) | ((newTaskList: TaskList) => void) | (() => void);
 }
 
 type EventCallbacksArray = {
@@ -65,15 +70,19 @@ export default class Client {
     projectUpdate: [],
     taskCreate: [],
     taskDelete: [],
-    taskUpdate: []
+    taskUpdate: [],
+    taskListCreate: [],
+    taskListDelete: [],
+    taskListUpdate: []
   };
   personalProjectId?: string;
 
   async #createObject(constructor: typeof Attachment, props: InitialAttachmentProperties): Promise<Attachment>;
   async #createObject(constructor: typeof Task, props: InitialTaskProperties): Promise<Task>;
+  async #createObject(constructor: typeof TaskList, props: InitialTaskListProperties): Promise<TaskList>;
   async #createObject(constructor: typeof Label, props: InitialLabelProperties): Promise<Label>;
   async #createObject(constructor: typeof Project, props: InitialProjectProperties): Promise<Project>;
-  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialTaskProperties | InitialLabelProperties | InitialProjectProperties): Promise<PlanzeaObject> {
+  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialTaskProperties | InitialTaskListProperties | InitialLabelProperties | InitialProjectProperties): Promise<PlanzeaObject> {
 
     const { tableName } = constructor;
     const isProject = constructor === Project;
@@ -91,6 +100,7 @@ export default class Client {
 
   async #getObject(constructor: typeof Attachment, objectId: string): Promise<Attachment>;
   async #getObject(constructor: typeof Task, objectId: string): Promise<Task>;
+  async #getObject(constructor: typeof TaskList, objectId: string): Promise<TaskList>;
   async #getObject(constructor: typeof Label, objectId: string): Promise<Label>;
   async #getObject(constructor: typeof Project, objectId: string): Promise<Project>;
   async #getObject(constructor: PlanzeaObjectConstructor, objectId: string): Promise<PlanzeaObject> {
@@ -99,7 +109,7 @@ export default class Client {
 
     if (!properties) {
 
-      throw new Error();
+      throw new ContentNotFoundError(objectId);
 
     }
 
@@ -107,44 +117,15 @@ export default class Client {
 
   }
 
-  async #getObjects(constructor: typeof Attachment, filter?: Partial<AttachmentProperties>, exclusiveKeys?: [(keyof AttachmentProperties)?]): Promise<Attachment[]>;
-  async #getObjects(constructor: typeof Task, filter?: Partial<TaskProperties>, exclusiveKeys?: [(keyof TaskProperties)?]): Promise<Task[]>;
-  async #getObjects(constructor: typeof Label, filter?: Partial<LabelProperties>, exclusiveKeys?: [(keyof LabelProperties)?]): Promise<Label[]>;
-  async #getObjects(constructor: typeof Project, filter?: Partial<ProjectProperties>, exclusiveKeys?: [(keyof ProjectProperties)?]): Promise<Project[]>;
-  async #getObjects(constructor: PlanzeaObjectConstructor, filter: Partial<PlanzeaObjectProperties> = {}, exclusiveKeys: [(keyof PlanzeaObjectProperties)?] = []): Promise<PlanzeaObject[]> {
+  async #getObjects(constructor: typeof Attachment): Promise<Attachment[]>;
+  async #getObjects(constructor: typeof Task): Promise<Task[]>;
+  async #getObjects(constructor: typeof TaskList): Promise<TaskList[]>;
+  async #getObjects(constructor: typeof Label): Promise<Label[]>;
+  async #getObjects(constructor: typeof Project): Promise<Project[]>;
+  async #getObjects(constructor: PlanzeaObjectConstructor): Promise<PlanzeaObject[]> {
 
     const objects = [];
-    const issuePropertiesArray = (await this.#db[constructor.tableName].toArray() as PlanzeaObjectProperties[]).filter((object) => {
-
-      for (const key of Object.keys(filter) as (keyof TaskProperties)[]) {
-
-        const issueValue = object[key];
-        const filterValue = filter[key];
-        if (issueValue instanceof Array && filterValue instanceof Array) {
-
-          for (const item of filterValue) {
-
-            const includesKey = issueValue.includes(item);
-            if (exclusiveKeys.includes(key) ? includesKey : !includesKey) {
-
-              return false;
-
-            }
-
-          }
-
-        } else if (exclusiveKeys.includes(key) ? issueValue === filterValue : issueValue !== filterValue) {
-
-          return false;
-
-        }
-
-      }
-
-      return true;
-
-    });
-
+    const issuePropertiesArray = await this.#db[constructor.tableName].toArray() as PlanzeaObjectProperties[];
 
     for (const properties of issuePropertiesArray) {
 
@@ -161,7 +142,7 @@ export default class Client {
    * @param tableName The name of the table.
    * @returns An unused ID string.
    */
-  async #getUnusedId(tableName: "attachments" | "tasks" | "labels" | "projects"): Promise<string> {
+  async #getUnusedId(tableName: (typeof Attachment | typeof Task | typeof TaskList | typeof Label | typeof Project)["tableName"]): Promise<string> {
 
     let id = null;
     do {
@@ -201,6 +182,22 @@ export default class Client {
     
   }
 
+  async createTaskList(props: InitialTaskListProperties = {}) {
+
+    // Set the defaults.
+    props.name = props.name ?? "Tasks";
+    props.taskIds = props.taskIds ?? [];
+
+    // Create the task list.
+    const taskList = await this.#createObject(TaskList, props);
+
+    // Fire the event.
+    this.#fireEvent("taskListCreate", taskList);
+
+    return taskList;
+
+  }
+
   async createLabel(props: InitialLabelProperties): Promise<Label> {
 
     // Create the label.
@@ -235,55 +232,48 @@ export default class Client {
    * Deletes a task from the database.
    * @param taskId The task's ID.
    */
-  async deleteTask(taskId: string, shouldDeleteSubtasks = true): Promise<void> {
+  async deleteTask(taskId: string): Promise<void> {
 
-    // Get all descendant tasks.
-    const descendantTasks: string[] = [];
-    for (const task of await this.getTasks()) {
+    // Delete all attachments.
+    for (const attachment of (await this.getAttachments()).filter((possibleTaskAttachment) => possibleTaskAttachment.taskIds.includes(taskId))) {
 
-      if (task.parentTaskId === taskId || (shouldDeleteSubtasks && descendantTasks.find((possibleTask) => possibleTask === task.parentTaskId))) {
+      attachment.taskIds = attachment.taskIds.filter((possibleTaskId) => possibleTaskId === taskId);
+      if (attachment.taskIds[0]) {
 
-        descendantTasks.push(task.id);
-
-      }
-
-    }
-    
-    // Delete or promote descendant tasks.
-    for (const descendantTaskId of [...descendantTasks, taskId]) {
-
-      if (taskId === descendantTaskId || shouldDeleteSubtasks) {
-        
-        // Delete all attachments.
-        for (const attachment of await this.getAttachments()) {
-
-          attachment.taskIds = attachment.taskIds.filter((possibleTaskId) => possibleTaskId === taskId);
-          if (attachment.taskIds[0]) {
-  
-            await attachment.update(attachment);
-  
-          } else {
-  
-            await attachment.delete();
-  
-          }
-  
-        }
-  
-        // Delete the task.
-        await this.#db.tasks.delete(taskId);
-  
-        // Run each callback.
-        this.#fireEvent("taskDelete", taskId);
+        await attachment.update(attachment);
 
       } else {
 
-        await this.updateTask(descendantTaskId, {parentTaskId: undefined});
+        await attachment.delete();
 
       }
 
     }
-    
+
+    // Delete the task.
+    await this.#db.tasks.delete(taskId);
+
+    // Run each callback.
+    this.#fireEvent("taskDelete", taskId);
+
+  }
+
+  async deleteTaskList(taskListId: string): Promise<void> {
+
+    // Delete this list.
+    await this.#db.taskLists.delete(taskListId);
+
+    // Update each task.
+    const taskListFilter = (possibleTaskList: TaskListProperties) => possibleTaskList.id === taskListId;
+    for (const task of (await this.getTasks()).filter((possibleTask) => possibleTask.taskLists?.find(taskListFilter))) {
+
+      await task.update({taskLists: task.taskLists?.filter(taskListFilter)});
+
+    }
+
+    // Fire event.
+    this.#fireEvent("taskListDelete", taskListId);
+
   }
 
   async deleteLabel(labelId: string): Promise<void> {
@@ -298,7 +288,7 @@ export default class Client {
   async deleteProject(projectId: string): Promise<void> {
 
     // Delete each project task.
-    for (const task of await this.getTasks({projectId})) {
+    for (const task of (await this.getTasks()).filter((possibleProjectTask) => possibleProjectTask.projectId === projectId)) {
 
       await task.delete();
 
@@ -368,15 +358,32 @@ export default class Client {
 
   }
 
-  async getAttachments(filter: Partial<AttachmentProperties> = {}, exclusiveKeys: [(keyof AttachmentProperties)?] = []): Promise<Attachment[]> {
+  async getAttachments(): Promise<Attachment[]> {
 
-    return await this.#getObjects(Attachment, filter, exclusiveKeys);
+    return await this.#getObjects(Attachment);
 
   }
 
   async getTask(taskId: string): Promise<Task> {
 
-    return await this.#getObject(Task, taskId);
+    const task = await this.#getObject(Task, taskId);
+
+    // TODO: Remove in v2.0.0
+    await task.upgradeParentTask();
+
+    return task;
+
+  }
+
+  async getTaskList(taskListId: string): Promise<TaskList> {
+
+    return await this.#getObject(TaskList, taskListId);
+
+  }
+
+  async getTaskLists(): Promise<TaskList[]> {
+
+    return await this.#getObjects(TaskList);
 
   }
 
@@ -384,9 +391,19 @@ export default class Client {
    * Gets all client tasks.
    * @returns An array of `Task` objects.
    */
-  async getTasks(filter: Partial<TaskProperties> = {}, exclusiveKeys: [(keyof TaskProperties)?] = []): Promise<Task[]> {
+  async getTasks(): Promise<Task[]> {
 
-    return await this.#getObjects(Task, filter, exclusiveKeys);
+    const tasks = await this.#getObjects(Task);
+
+    // TODO: Remove in v2.0.0
+    for (const task of tasks) {
+
+      await task.upgradeParentTask();
+
+    }
+    
+
+    return tasks;
 
   }
 
@@ -400,9 +417,9 @@ export default class Client {
    * Gets all client labels.
    * @returns An array of `Label` objects.
    */
-  async getLabels(filter: Partial<LabelProperties> = {}, exclusiveKeys: [(keyof LabelProperties)?] = []): Promise<Label[]> {
+  async getLabels(): Promise<Label[]> {
 
-    return await this.#getObjects(Label, filter, exclusiveKeys);
+    return await this.#getObjects(Label);
 
   }
 
@@ -412,9 +429,9 @@ export default class Client {
 
   }
 
-  async getProjects(filter: Partial<ProjectProperties> = {}, exclusiveKeys: [(keyof ProjectProperties)?] = []): Promise<Project[]> {
+  async getProjects(): Promise<Project[]> {
 
-    return await this.#getObjects(Project, filter, exclusiveKeys);
+    return await this.#getObjects(Project);
 
   }
 
@@ -465,6 +482,20 @@ export default class Client {
     // Fire the event.
     const task = await this.getTask(taskId);
     this.#fireEvent("taskUpdate", task, oldTaskProperties);
+
+  }
+
+  async updateTaskList(taskListId: string, newProperties: PropertiesUpdate<TaskListProperties>): Promise<void> {
+
+    // Get current task properties.
+    const oldTasklistProperties = await this.#db.taskLists.get(taskListId);
+
+    // Update the task.
+    await this.#db.taskLists.update(taskListId, newProperties);
+
+    // Fire the event.
+    const taskList = await this.getTaskList(taskListId);
+    this.#fireEvent("taskListUpdate", taskList, oldTasklistProperties);
 
   }
 

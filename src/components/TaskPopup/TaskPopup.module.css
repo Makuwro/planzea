@@ -1,5 +1,3 @@
-
-
 #description {
   display: flex;
   flex-direction: column;
@@ -21,6 +19,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  padding: 0 15px 15px;
   overflow-y: auto;
 }
 
@@ -45,21 +44,6 @@
   position: fixed;
 }
 
-#popupContent > nav {
-  border-bottom: 1px solid var(--border);
-  margin: 0 -15px;
-  padding: 0 15px 15px;
-}
-
-#popupContent > nav > button {
-  background-color: transparent;
-  font-weight: 300;
-  padding: 5px 10px;
-  color: var(--text);
-}
-
-#popupContent > nav > button.selected {
-  font-weight: 400;
-  color: var(--link);
-  background-color: var(--link-selected);
+#taskName {
+  padding: 15px 15px 0;
 }

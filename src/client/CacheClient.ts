@@ -13,8 +13,8 @@ type EventCallbacksArray = {
   [EventName in keyof CacheEventCallbacks]: CacheEventCallbacks[EventName][];
 };
 
-type MutableCacheClient = {
-  -readonly [K in keyof CacheClient]: CacheClient[K];
+export type Mutable<T> = {
+  -readonly [K in keyof T]: T[K];
 };
 
 export default class CacheClient extends Client {
@@ -38,7 +38,7 @@ export default class CacheClient extends Client {
     // Add project to cache.
     if (this.projects) {
       
-      (this as MutableCacheClient).projects = [...this.projects, project];
+      (this as Mutable<CacheClient>).projects = [...this.projects, project];
 
     }
 
@@ -50,7 +50,7 @@ export default class CacheClient extends Client {
 
     if (!this.projects) {
 
-      (this as MutableCacheClient).projects = await super.getProjects(...parameters);
+      (this as Mutable<CacheClient>).projects = await super.getProjects(...parameters);
       this.#fireEvent("projectsArrayChange", this.projects ?? []);
 
     }
@@ -61,7 +61,7 @@ export default class CacheClient extends Client {
 
   addEventListener<EventName extends keyof EventCallbacksArray>(eventName: EventName, callback: CacheEventCallbacks[EventName]): void {
 
-    this.eventCallbacks[eventName].push(callback as () => void);
+    this.eventCallbacks[eventName].push(callback);
 
   }
 
@@ -77,13 +77,13 @@ export default class CacheClient extends Client {
 
   removeEventListener<EventName extends keyof EventCallbacksArray>(eventName: EventName, callback: CacheEventCallbacks[EventName]): void {
 
-    this.eventCallbacks[eventName] = (this.eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
+    this.eventCallbacks[eventName] = this.eventCallbacks[eventName].filter((possibleCallback) => possibleCallback !== callback) as EventCallbacksArray[EventName];
 
   }
 
   setCurrentProject(project: Project | null): void {
 
-    (this as MutableCacheClient).currentProject = project;
+    (this as Mutable<CacheClient>).currentProject = project;
 
     this.#fireEvent("currentProjectChange", project);
 
@@ -91,7 +91,7 @@ export default class CacheClient extends Client {
 
   setSelectedProjects(projects: Project[]): void {
 
-    (this as MutableCacheClient).selectedProjects = projects;
+    (this as Mutable<CacheClient>).selectedProjects = projects;
 
     this.#fireEvent("projectSelectionChange", projects);
 
@@ -99,7 +99,7 @@ export default class CacheClient extends Client {
 
   setSelectedTasks(tasks: Task[]): void {
 
-    (this as MutableCacheClient).selectedTasks = tasks;
+    (this as Mutable<CacheClient>).selectedTasks = tasks;
 
     this.#fireEvent("taskBacklogSelectionChange", tasks);
 
