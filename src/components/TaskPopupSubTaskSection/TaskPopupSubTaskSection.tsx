@@ -187,6 +187,7 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
 
           if (boundary > event.clientY) {
 
+            newIndex--;
             break;
 
           }
