@@ -4,7 +4,7 @@
   margin: 0;
 }
 
-#list, #main, .labelDescription, #listContainer {
+#list, .labelDescription, #listContainer {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -30,14 +30,6 @@
 .labelActions {
   display: flex;
   gap: 15px;
-}
-
-#main {
-  padding: 15px;
-  box-sizing: border-box;
-  overflow-y: auto;
-  height: calc(100% - var(--height-header));
-  align-items: center;
 }
 
 #content {

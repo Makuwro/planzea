@@ -1,0 +1,10 @@
+#main {
+  padding: 15px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  height: calc(100% - var(--height-header));
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
