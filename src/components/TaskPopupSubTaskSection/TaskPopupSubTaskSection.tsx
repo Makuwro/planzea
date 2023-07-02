@@ -5,6 +5,7 @@ import Task from "../../client/Task";
 import TaskList from "../../client/TaskList";
 import Client from "../../client/Client";
 import TaskListSection from "../TaskListSection/TaskListSection";
+import { ContentNotFoundError } from "../../client/errors/ContentNotFoundError";
 
 type TaskListContainer<T> = {[taskListId: string]: T};
 
@@ -89,9 +90,31 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
 
         newSubTasks[taskList.id] = [];
         newTaskListSettings[taskList.id] = {};
+        const badIds: string[] = [];
         for (const taskId of taskList.taskIds) {
 
-          newSubTasks[taskList.id].push(await client.getTask(taskId));
+          try {
+
+            const task = await client.getTask(taskId);
+            newSubTasks[taskList.id].push(task);
+
+          } catch (err) {
+
+            if (err instanceof ContentNotFoundError) {
+
+              badIds.push(err.id);
+
+            }
+
+          }
+
+        }
+
+        if (badIds[0]) {
+
+          console.warn(`Removing ${badIds.length} ID${badIds[1] ? "s" : ""} from Task List ${taskList.id} because their respective tasks couldn't be found.`);
+          await taskList.update({taskIds: taskList.taskIds.filter((possibleTaskId) => !badIds.includes(possibleTaskId))});
+          break;
 
         }
 

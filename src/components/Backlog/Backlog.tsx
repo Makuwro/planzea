@@ -21,7 +21,6 @@ export default function Backlog({client, setCurrentProject, setDocumentTitle}: {
 
       if (project && params.projectId === project.id) {
 
-        console.log(await project.getTasks());
         setTasks(await project.getTasks());
         setCurrentProject(project);
         setDocumentTitle(project.name);

@@ -6,6 +6,7 @@ import Label, { InitialLabelProperties, LabelProperties } from "./Label";
 import Project, { defaultStatuses, InitialProjectProperties, ProjectProperties } from "./Project";
 import "dexie-export-import";
 import TaskList, { InitialTaskListProperties, TaskListProperties } from "./TaskList";
+import { ContentNotFoundError } from "./errors/ContentNotFoundError";
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
@@ -108,7 +109,7 @@ export default class Client {
 
     if (!properties) {
 
-      throw new Error();
+      throw new ContentNotFoundError(objectId);
 
     }
 
