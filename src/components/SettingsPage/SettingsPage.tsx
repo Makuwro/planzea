@@ -16,16 +16,16 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
 
   const [project, setProject] = useState<Project | null>(client.currentProject);
   const [navItems, setNavItems] = useState<{name: string; iconName: IconName; element: ReactElement}[]>([]);
-  const [selectedNavIndex, setSelectedNavIndex] = useState<number>(-1);
+  const [selectedNavIndex, setSelectedNavIndex] = useState<number>(0);
   const {projectId, settingName} = useParams<{projectId: string; settingName: string}>();
 
   const navigate = useNavigate();
   useEffect(() => {
 
-    if (project && settingName && projectId) {
+    if (project && projectId) {
 
-      const selectedNavIndex = navItems.findIndex((item) => item.name !== "Overview" && item.name.toLowerCase() === settingName.toLowerCase());
-      setSelectedNavIndex(selectedNavIndex);
+      const selectedNavIndex = navItems.findIndex((item) => settingName ? item.name.toLowerCase() === settingName.toLowerCase() : item.name === "Overview");
+      setSelectedNavIndex(selectedNavIndex === -1 ? 0 : selectedNavIndex);
       if (selectedNavIndex === -1) {
 
         navigate(`/personal/projects/${projectId}/settings`, {replace: true});
@@ -41,7 +41,7 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
     setNavItems([
       {
         name: "Overview",
-        iconName: "folder",
+        iconName: "info",
         element: (
           <section>
             <h1>Overview</h1>
@@ -83,17 +83,27 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
 
   return project && navItems[0] && projectId ? (
     <main id={styles.main}>
-      <nav>
+      <nav id={styles.nav}>
         {
-          navItems.map((item) => (
-            <Link key={item.name} to={`/personal/projects/${project.id}/settings${item.name !== "Overview" ? `/${item.name.toLowerCase()}` : ""}`}>
-              <Icon name={item.iconName} />
-              <span>{item.name}</span>
-            </Link>
-          ))
+          navItems.map((item, index) => {
+            
+            const isSelected = selectedNavIndex === index;
+            return (
+              <Link className={`${styles.navItem}${isSelected ? ` ${styles.selected}` : ""}`} key={item.name} to={`/personal/projects/${project.id}/settings${item.name !== "Overview" ? `/${item.name.toLowerCase()}` : ""}`}>
+                {isSelected ? <span className={styles.marker} /> : null }
+                <span className={styles.navItemText}>
+                  <Icon name={item.iconName} />
+                  <span>{item.name}</span>
+                </span>
+              </Link>
+            );
+
+          })
         }
       </nav>
-      {navItems[selectedNavIndex !== -1 ? selectedNavIndex : 0].element}
+      <section id={styles.page}>
+        {navItems[selectedNavIndex !== -1 ? selectedNavIndex : 0].element}
+      </section>
     </main>
   ) : null;
 

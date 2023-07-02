@@ -61,10 +61,6 @@ a {
   font-weight: 300;
 }
 
-a:visited {
-  color: var(--link);
-}
-
 label {
   color: var(--text);
 }
