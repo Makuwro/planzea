@@ -417,6 +417,7 @@ export default class Client {
 
     }
 
+    // Fix tasks.
     for (const taskProperties of (await this.#db.tasks.toArray()).filter((possibleTask) => possibleTask.parentTaskId)) {
 
       if (taskProperties.parentTaskId) {
@@ -439,6 +440,24 @@ export default class Client {
 
         // Remove the parentTaskId.
         await this.updateTask(taskProperties.id, {parentTaskId: undefined});
+
+      }
+
+    }
+
+    // Fix projects.
+    for (const projectProperties of (await this.#db.projects.toArray()).filter((possibleProject) => possibleProject.defaultStatusId || possibleProject.statuses)) {
+
+      if (projectProperties.statuses) {
+
+        const statusIds = [];
+        for (const statusInfo of projectProperties.statuses) {
+
+          statusIds.push((await this.createStatus(statusInfo)).id);
+
+        }
+
+        await this.updateProject(projectProperties.id, {statusIds, defaultStatusId: undefined, statuses: undefined});
 
       }
 
