@@ -1,5 +1,4 @@
 import Attachment, { InitialAttachmentProperties } from "./Attachment";
-import { Mutable } from "./CacheClient";
 import Client, { PropertiesUpdate } from "./Client";
 import TaskList, { InitialTaskListProperties, TaskListProperties } from "./TaskList";
 
@@ -67,7 +66,7 @@ export default class Task {
   /**
    * The ID of this task's parent task.
    * @since v1.0.0
-   * @deprecated v1.1.0
+   * @deprecated since v1.1.0. Removing in v2.0.0.
    */
   readonly parentTaskId?: string;
 
@@ -137,39 +136,6 @@ export default class Task {
   async update(newProperties: PropertiesUpdate<TaskProperties>): Promise<void> {
 
     await this.#client.updateTask(this.id, newProperties);
-
-  }
-
-  /**
-   * This method will be removed in v2.0.0.
-   * @since v1.1.0
-   */
-  async upgradeParentTask(): Promise<void> {
-    
-    if (this.parentTaskId) {
-
-      // Get the parent task.
-      const parentTask = await this.#client.getTask(this.parentTaskId);
-
-      // Create the default task list, if necessary.
-      const taskLists = parentTask.taskLists ?? [];
-      const taskListId = taskLists.find((list) => list.name === "Tasks")?.id;
-      let taskList = taskListId ? await this.#client.getTaskList(taskListId) : undefined;
-      if (!taskList) {
-        
-        taskList = await this.#client.createTaskList({name: "Tasks"});
-
-      }
-
-      // Add this task to the list.
-      await taskList.update({taskIds: [...taskList.taskIds, this.id]});
-
-      // Remove the parentTaskId.
-      await this.update({parentTaskId: undefined});
-      (this as Mutable<Task>).parentTaskId = undefined;
-      console.log(2);
-
-    }
 
   }
 

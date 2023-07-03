@@ -4,7 +4,7 @@ import Label, { InitialLabelProperties } from "./Label";
 import Task from "./Task";
 import Status from "./Status";
 
-export interface StatusProperties {
+interface DeprecatedStatusProperties {
   id: string;
   name: string;
   backgroundColor: number;
@@ -12,42 +12,18 @@ export interface StatusProperties {
   nextStatusId: string;
 }
 
-export const defaultStatuses: StatusProperties[] = [
-  {
-    id: "dns",
-    name: "Not Started",
-    backgroundColor: 15527148,
-    textColor: 6251368,
-    nextStatusId: "dip"
-  },
-  {
-    id: "dip",
-    name: "In Progress",
-    backgroundColor: 5412849,
-    textColor: 16777215,
-    nextStatusId: "dc"
-  },
-  {
-    id: "dc",
-    name: "Completed",
-    backgroundColor: 3055966,
-    textColor: 16777215,
-    nextStatusId: "dns"
-  }
-];
-
 export interface ProjectProperties {
   id: string;
   name: string;
-  defaultStatusId: string;
+  defaultStatusId?: string;
   description?: string;
   isArchived?: boolean;
   isRecycled?: boolean;
-  statuses: StatusProperties[];
+  statuses?: DeprecatedStatusProperties[];
   statusIds: string[];
 }
 
-export type InitialProjectProperties = Omit<ProjectProperties, "id" | "statuses" | "defaultStatusId" | "statusIds">;
+export type InitialProjectProperties = Optional<Omit<ProjectProperties, "id" | "statuses" | "defaultStatusId">, "statusIds">;
 
 export default class Project {
 
@@ -70,8 +46,9 @@ export default class Project {
   
   /**
    * @since v1.0.0
+   * @deprecated since v1.1.0. Removing in v2.0.0.
    */
-  readonly defaultStatusId: string;
+  readonly defaultStatusId?: string;
   
   /**
    * @since v1.0.0
@@ -89,15 +66,15 @@ export default class Project {
   readonly isRecycled?: boolean;
 
   /**
-   * @deprecated since v1.1.0
    * @since v1.0.0
+   * @deprecated since v1.1.0. Removing in v2.0.0.
    */
-  statuses: StatusProperties[];
+  statuses?: DeprecatedStatusProperties[];
 
   /**
    * @since v1.1.0
    */
-  statusIds: string[] = [];
+  statusIds: string[];
 
   constructor(props: ProjectProperties, client: Client) {
 
@@ -117,7 +94,7 @@ export default class Project {
 
     return await this.#client.createTask({
       ...props, 
-      statusId: props.statusId ?? this.defaultStatusId, 
+      statusId: this.statusIds[0], 
       labelIds: props.labelIds ?? [],
       projectId: this.id
     });

@@ -9,9 +9,9 @@ import TaskPopupAttachmentSection from "../TaskPopupAttachmentSection/TaskPopupA
 import TaskPopupSubTaskSection from "../TaskPopupSubTaskSection/TaskPopupSubTaskSection";
 import Project from "../../client/Project";
 import Popup from "../Popup/Popup";
-import TaskPopupParentTaskSection from "../TaskPopupParentTaskSection/TaskPopupParentTaskSection";
 import { SetState } from "../../App";
 import LabelInput from "../LabelInput/LabelInput";
+import Status from "../../client/Status";
 
 export default function TaskPopup({client, setTempDocumentTitle, project, setCurrentProject}: {setTempDocumentTitle: SetState<string | null>; client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
@@ -111,6 +111,27 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
     }
 
   }, [task, project]);
+
+  const [statuses, setStatuses] = useState<Status[]>([]);
+  useEffect(() => {
+
+    (async () => {
+
+      if (project) {
+
+        const newStatuses = [];
+        for (const statusId of project.statusIds) {
+
+          newStatuses.push(await client.getStatus(statusId));
+
+        }
+        setStatuses(newStatuses);
+
+      }
+
+    })();
+
+  }, [project]);
 
   const descriptionRef = useRef<HTMLElement>(null);
   async function updateDescription() {
@@ -286,12 +307,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
             onBlur={updateDescription}>
             {descriptionComponents}
           </section>
-          {
-            task.parentTaskId ? (
-              <TaskPopupParentTaskSection childTask={task} client={client} parentTaskId={task.parentTaskId} project={project} />
-            ) : null
-          }
-          <TaskPopupSubTaskSection popupContainerRef={popupContainerRef} client={client} task={task} project={project} />
+          <TaskPopupSubTaskSection statuses={statuses} popupContainerRef={popupContainerRef} client={client} task={task} project={project} />
           <section>
             <label>Labels</label>
             <LabelInput resultsContainer={popupContainerRef?.current ?? undefined} client={client} labelIds={task.labelIds} taskId={task.id} onChange={async (labelIds) => await task.update({labelIds})} />

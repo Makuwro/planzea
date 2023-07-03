@@ -6,6 +6,7 @@ import completeSound from "../../complete.ogg";
 import Label from "../../client/Label";
 import ContextMenu from "../ContextMenu/ContextMenu";
 import LabelButton from "../LabelButton/LabelButton";
+import Status from "../../client/Status";
 
 interface BacklogTaskComponentProperties {
   isSelected: boolean;
@@ -18,9 +19,24 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
 
   const [isStatusSelectorOpen, setIsStatusSelectorOpen] = useState<boolean>(false);
   const statusButtonRef = useRef<HTMLButtonElement>(null);
+  const [statuses, setStatuses] = useState<Status[]>([]);
 
-  const status = project.statuses.find((status) => status.id === task.statusId);
-  const statusHexBG = status ? `#${status.backgroundColor.toString(16)}` : undefined;
+  useEffect(() => {
+
+    (async () => {
+      
+      if (project) {
+        
+        setStatuses(await project.getStatuses());
+
+      }
+
+    })();
+
+  }, [project]);
+
+  const status = statuses.find((status) => status.id === task.statusId);
+  const statusHexBG = status ? `#${status?.backgroundColor?.toString(16) ?? "fff"}` : undefined;
 
   async function setStatus(newStatusId: string) {
 
@@ -97,7 +113,7 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
           {dueMonth && dueDate ? <span>{dueMonth} {dueDate.getDate() + 1}</span> : null}
         </span>
       </section>
-      {isStatusSelectorOpen ? <ContextMenu isOpen options={project.statuses.map((status) => ({label: status.name, onClick: (event) => {
+      {isStatusSelectorOpen ? <ContextMenu isOpen options={statuses.map((status) => ({label: status.name, onClick: (event) => {
         
         event.stopPropagation();
         setStatus(status.id);

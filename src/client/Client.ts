@@ -3,7 +3,7 @@ import Attachment, { AttachmentProperties, InitialAttachmentProperties } from ".
 import { ClientDatabase } from "./ClientDatabase";
 import Task, { InitialTaskProperties, TaskProperties } from "./Task";
 import Label, { InitialLabelProperties, LabelProperties } from "./Label";
-import Project, { defaultStatuses, InitialProjectProperties, ProjectProperties } from "./Project";
+import Project, { InitialProjectProperties, ProjectProperties } from "./Project";
 import "dexie-export-import";
 import TaskList, { InitialTaskListProperties, TaskListProperties } from "./TaskList";
 import { ContentNotFoundError } from "./errors/ContentNotFoundError";
@@ -97,12 +97,9 @@ export default class Client {
   async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialLabelProperties | InitialStatusProperties | InitialTaskProperties | InitialTaskListProperties | InitialProjectProperties): Promise<PlanzeaObject> {
 
     const { tableName } = constructor;
-    const isProject = constructor === Project;
     const content = new constructor({
       ...props,
-      id: await this.#getUnusedId(tableName), 
-      statuses: isProject ? defaultStatuses : undefined,
-      defaultStatusId: isProject ? "dns" : undefined
+      id: await this.#getUnusedId(tableName),
     } as PlanzeaObjectProperties, this);
 
     await clientDatabase[tableName].add(content as unknown as PlanzeaObjectProperties);
@@ -245,6 +242,35 @@ export default class Client {
 
   async createProject(props: InitialProjectProperties): Promise<Project> {
 
+    let statusCompleted, statusInProgress, statusNotStarted;
+    if (!props.statusIds) {
+
+      statusCompleted = await this.createStatus({
+        name: "Completed",
+        backgroundColor: 3055966,
+        textColor: 16777215
+      });
+  
+      statusInProgress = await this.createStatus({
+        name: "In Progress",
+        backgroundColor: 5412849,
+        textColor: 16777215,
+        nextStatusId: statusCompleted.id
+      });
+  
+      statusNotStarted = await this.createStatus({
+        name: "Not Started",
+        backgroundColor: 15527148,
+        textColor: 6251368,
+        nextStatusId: statusInProgress.id
+      });
+
+      await statusCompleted.update({nextStatusId: statusNotStarted.id});
+
+      props.statusIds = [statusNotStarted.id, statusInProgress.id, statusCompleted.id];
+
+    }
+
     const project = await this.#createObject(Project, props);
 
     // Fire the event.
@@ -386,8 +412,35 @@ export default class Client {
 
       // Create a personal project.
       const personalProject = await this.createProject({name: "Personal"});
-      this.#db.settings.put(personalProject.id, "personalProjectId");
+      await this.#db.settings.put(personalProject.id, "personalProjectId");
       this.personalProjectId = personalProject.id;
+
+    }
+
+    for (const taskProperties of (await this.#db.tasks.toArray()).filter((possibleTask) => possibleTask.parentTaskId)) {
+
+      if (taskProperties.parentTaskId) {
+
+        // Get the parent task.
+        const parentTask = await this.getTask(taskProperties.parentTaskId);
+
+        // Create the default task list, if necessary.
+        const taskLists = parentTask.taskLists ?? [];
+        const taskListId = taskLists.find((list) => list.name === "Tasks")?.id;
+        let taskList = taskListId ? await this.getTaskList(taskListId) : undefined;
+        if (!taskList) {
+          
+          taskList = await this.createTaskList({name: "Tasks"});
+
+        }
+
+        // Add this task to the list.
+        await taskList.update({taskIds: [...taskList.taskIds, taskProperties.id]});
+
+        // Remove the parentTaskId.
+        await this.updateTask(taskProperties.id, {parentTaskId: undefined});
+
+      }
 
     }
     
@@ -407,12 +460,7 @@ export default class Client {
 
   async getTask(taskId: string): Promise<Task> {
 
-    const task = await this.#getObject(Task, taskId);
-
-    // TODO: Remove in v2.0.0
-    await task.upgradeParentTask();
-
-    return task;
+    return await this.#getObject(Task, taskId);
 
   }
 
@@ -434,17 +482,7 @@ export default class Client {
    */
   async getTasks(): Promise<Task[]> {
 
-    const tasks = await this.#getObjects(Task);
-
-    // TODO: Remove in v2.0.0
-    for (const task of tasks) {
-
-      await task.upgradeParentTask();
-
-    }
-    
-
-    return tasks;
+    return await this.#getObjects(Task);
 
   }
 

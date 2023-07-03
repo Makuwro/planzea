@@ -1,11 +1,14 @@
 import Client, { PropertiesUpdate } from "./Client";
 
 export interface StatusProperties {
+  backgroundColor?: number;
   id: string;
   name: string;
   description?: string;
   projects?: string[];
-  color?: string;
+  textColor?: number;
+  nextStatusId?: string;
+  localProjectId?: string;
 }
 
 export type InitialStatusProperties = Omit<StatusProperties, "id">;
@@ -16,40 +19,56 @@ export default class Status {
   
   /**
    * A reference to the client.
-   * @since v1.0.0
+   * @since v1.1.0
    */
   readonly #client: Client;
 
   /**
+   * This status' background color.
+   * @since v1.1.0
+   */
+  readonly backgroundColor?: number;
+
+  /**
+   * This status' description.
+   * @since v1.1.0
+   */
+  readonly description?: string;
+
+  /**
    * This status' ID.
-   * @since v1.0.0
+   * @since v1.1.0
    */
   readonly id: string;
 
   /**
    * This status' name.
-   * @since v1.0.0
+   * @since v1.1.0
    */
   readonly name: string;
 
   /**
-   * This status' description.
-   * @since v1.0.0
+   * @since v1.1.0
    */
-  readonly description?: string;
+  readonly nextStatusId?: StatusProperties["nextStatusId"];
+
+  readonly localProjectId?: StatusProperties["localProjectId"];
 
   /**
-   * This status' default color.
-   * @since v1.0.0
+   * This status' text color.
+   * @since v1.1.0
    */
-  readonly color?: string;
+  readonly textColor?: number;
 
   constructor(props: StatusProperties, client: Client) {
 
+    this.backgroundColor = props.backgroundColor;
     this.id = props.id;
     this.name = props.name;
+    this.nextStatusId = props.nextStatusId;
     this.description = props.description;
-    this.color = props.color;
+    this.textColor = props.textColor;
+    this.localProjectId;
     this.#client = client;
 
   }

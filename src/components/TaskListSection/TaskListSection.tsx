@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Task from "../../client/Task";
 import Project from "../../client/Project";
 import { createPortal } from "react-dom";
+import Status from "../../client/Status";
 
 interface TaskListSectionProperties { 
   setTaskListSettings?: (taskListSettings: TaskListSettings[string]) => void; 
@@ -23,9 +24,10 @@ interface TaskListSectionProperties {
   popupContainerRef?: RefObject<HTMLElement>; 
   onMoveUp?: () => void;
   onMoveDown?: () => void;
+  statuses: Status[];
 }
 
-export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, initialCoordinates, setTaskListSettings, taskListSettings, taskList, onGrab, isGrabbed, originalBoxRef, taskObjects, project, popupContainerRef, setTaskListBoundary }: TaskListSectionProperties) {
+export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, initialCoordinates, setTaskListSettings, taskListSettings, taskList, onGrab, isGrabbed, originalBoxRef, taskObjects, project, popupContainerRef, setTaskListBoundary, statuses }: TaskListSectionProperties) {
 
   const isEditingName = taskListSettings?.isEditingName;
   const newTaskListName = taskListSettings?.name;
@@ -136,11 +138,11 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
             const subTask = taskObjects?.find((possibleTask) => possibleTask.id === taskId);
             if (subTask) {
 
-              const status = project.statuses.find((status) => status.id === subTask.statusId);
+              const status = statuses.find((status) => status.id === subTask.statusId);
               return (
                 <li key={taskId}>
                   <span>
-                    <span onMouseDown={stopPropagation} style={{ color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}` }}>{status?.name}</span>
+                    <span onMouseDown={stopPropagation} style={{ color: `#${status?.textColor?.toString(16) ?? "000"}`, backgroundColor: `#${status?.backgroundColor?.toString(16) ?? "fff"}` }}>{status?.name}</span>
                     <Link onMouseDown={stopPropagation} to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
                   </span>
                   <button onMouseDown={stopPropagation} onClick={async () => await removeTask(taskList, taskId)}>
