@@ -293,7 +293,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
             currentStatus ? (
               <span>
                 <button id={styles.status}>
-                  <span id={styles.statusIcon} />
+                  <span id={styles.statusIcon} style={currentStatus?.color ? {backgroundColor: `#${currentStatus.color.toString(16)}`} : undefined} />
                   <span>
                     {currentStatus.name}
                   </span>
