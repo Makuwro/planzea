@@ -45,5 +45,13 @@
 }
 
 #taskName {
-  padding: 15px 15px 0;
+  padding: 15px 0 0;
+}
+
+#status {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  padding: 0px 15px;
+  box-shadow: var(--box-shadow-default);
 }

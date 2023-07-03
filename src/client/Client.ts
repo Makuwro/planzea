@@ -453,7 +453,14 @@ export default class Client {
         const statusIds = [];
         for (const statusInfo of projectProperties.statuses) {
 
-          statusIds.push((await this.createStatus(statusInfo)).id);
+          const newStatusId = (await this.createStatus(statusInfo)).id;
+          statusIds.push(newStatusId);
+
+          for (const taskProperties of (await this.#db.tasks.toArray()).filter((possibleTask) => possibleTask.statusId === statusInfo.id)) {
+
+            await this.updateTask(taskProperties.id, {statusId: newStatusId});
+
+          }
 
         }
 

@@ -284,11 +284,24 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
     currentDate.setDate(currentDate.getDate() - 1);
     const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
 
+    const currentStatus = statuses.find((possibleStatus) => possibleStatus.id === task.statusId);
+
     return (
       <Popup popupContainerRef={popupContainerRef} actions={
-        <button onClick={() => navigate(`?delete=task&id=${task.id}`, {replace: true})}>
-          <Icon name="delete" />
-        </button>
+        <>
+          {
+            currentStatus ? (
+              <span>
+                <button id={styles.status}>
+                  {currentStatus.name}
+                </button>
+              </span>
+            ) : null
+          }
+          <button onClick={() => navigate(`?delete=task&id=${task.id}`, {replace: true})}>
+            <Icon name="delete" />
+          </button>
+        </>
       } isOpen={isOpen} name={task.name} onClose={() => {
 
         setTask(null);
@@ -296,8 +309,8 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
         navigate(`/personal/projects/${project.id}/tasks`);
 
       }} popupContentPadding={0}>
-        <h1 id={styles.taskName}>{task.name}</h1>
         <section id={styles.details}>
+          <h1 id={styles.taskName}>{task.name}</h1>
           <section 
             id={styles.description} 
             ref={descriptionRef}
