@@ -8,6 +8,7 @@ import Task from "../../client/Task";
 import Project from "../../client/Project";
 import { createPortal } from "react-dom";
 import Status from "../../client/Status";
+import StatusSelector from "../StatusSelector/StatusSelector";
 
 interface TaskListSectionProperties { 
   setTaskListSettings?: (taskListSettings: TaskListSettings[string]) => void; 
@@ -142,7 +143,9 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
               return (
                 <li key={taskId}>
                   <span>
-                    <span className="statusIcon" onMouseDown={stopPropagation} style={{ backgroundColor: `#${status?.color?.toString(16) ?? "fff"}` }} />
+                    {
+                      status ? <StatusSelector selectedStatus={status} statuses={statuses} onChange={async (newStatus) => await subTask.update({statusId: newStatus.id})} /> : null
+                    }
                     <Link onMouseDown={stopPropagation} to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
                   </span>
                   <button onMouseDown={stopPropagation} onClick={async () => await removeTask(taskList, taskId)}>

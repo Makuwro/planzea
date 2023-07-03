@@ -12,6 +12,8 @@ import Popup from "../Popup/Popup";
 import { SetState } from "../../App";
 import LabelInput from "../LabelInput/LabelInput";
 import Status from "../../client/Status";
+import ContextMenu from "../ContextMenu/ContextMenu";
+import StatusSelector from "../StatusSelector/StatusSelector";
 
 export default function TaskPopup({client, setTempDocumentTitle, project, setCurrentProject}: {setTempDocumentTitle: SetState<string | null>; client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
@@ -292,12 +294,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
           {
             currentStatus ? (
               <span>
-                <button id={styles.status}>
-                  <span id={styles.statusIcon} style={currentStatus?.color ? {backgroundColor: `#${currentStatus.color.toString(16)}`} : undefined} />
-                  <span>
-                    {currentStatus.name}
-                  </span>
-                </button>
+                <StatusSelector showName selectedStatus={currentStatus} onChange={async (newStatus) => await task.update({statusId: newStatus.id})} statuses={statuses} />
               </span>
             ) : null
           }

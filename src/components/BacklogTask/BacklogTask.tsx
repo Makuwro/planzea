@@ -7,6 +7,7 @@ import Label from "../../client/Label";
 import ContextMenu from "../ContextMenu/ContextMenu";
 import LabelButton from "../LabelButton/LabelButton";
 import Status from "../../client/Status";
+import StatusSelector from "../StatusSelector/StatusSelector";
 
 interface BacklogTaskComponentProperties {
   isSelected: boolean;
@@ -38,7 +39,6 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
   }, [project]);
 
   const status = statuses.find((status) => status.id === task.statusId);
-  const statusHexBG = status ? `#${status?.color?.toString(16) ?? "fff"}` : undefined;
 
   async function setStatus(newStatusId: string) {
 
@@ -97,9 +97,9 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
 
       }}>
         <span>
-          <section className={styles.statusContainer} onClick={(event) => event.stopPropagation()}>
-            <button className={"statusIcon"} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} ref={statusButtonRef} style={{backgroundColor: statusHexBG}} />
-          </section>
+          {
+            status ? <StatusSelector statuses={statuses} selectedStatus={status} onChange={async (newStatus) => await task.update({statusId: newStatus.id})} /> : null
+          }
           <span>
             {task.name}
           </span>
@@ -115,12 +115,12 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
           {dueMonth && dueDate ? <span>{dueMonth} {dueDate.getDate() + 1}</span> : null}
         </span>
       </section>
-      {isStatusSelectorOpen ? <ContextMenu isOpen options={statuses.map((status) => ({label: status.name, onClick: (event) => {
+      <ContextMenu isOpen={isStatusSelectorOpen} options={statuses.map((status) => ({label: status.name, onClick: (event) => {
         
         event.stopPropagation();
         setStatus(status.id);
       
-      }}))} onOutsideClick={() => setIsStatusSelectorOpen(false)} triggerElement={statusButtonRef.current} /> : null}
+      }}))} onOutsideClick={() => setIsStatusSelectorOpen(false)} triggerElement={statusButtonRef.current} />
     </li>
   );
 
