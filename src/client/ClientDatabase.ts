@@ -4,27 +4,30 @@ import { TaskProperties } from "./Task.js";
 import { LabelProperties } from "./Label.js";
 import { ProjectProperties } from "./Project.js";
 import { TaskListProperties } from "./TaskList.js";
+import { StatusProperties } from "./Status.js";
 
 export class ClientDatabase extends Dexie {
 
   readonly attachments!: Table<AttachmentProperties>;
+  readonly labels!: Table<LabelProperties>;
+  readonly settings!: Table<string>;
+  readonly statuses!: Table<StatusProperties>;
   readonly tasks!: Table<TaskProperties>;
   readonly taskLists!: Table<TaskListProperties>;
-  readonly labels!: Table<LabelProperties>;
   readonly projects!: Table<ProjectProperties>;
-  readonly settings!: Table<string>;
 
   constructor() {
 
     super("contents");
 
     this.version(2).stores({
-      attachments: "&id, name, description, issueIds",
+      attachments: "&id, name",
+      labels: "&id, name",
+      settings: ",personalProjectId",
+      statuses: "&id, name, description",
       tasks: "&id, dueDate, name, description, status",
       taskLists: "&id, taskIds",
-      labels: "&id, name, description",
       projects: "&id, name, description",
-      settings: ",personalProjectId"
     });
 
   }

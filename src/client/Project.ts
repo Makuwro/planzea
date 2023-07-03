@@ -2,6 +2,7 @@ import Client, { Optional, PropertiesUpdate } from "./Client";
 import Issue, { InitialTaskProperties } from "./Task";
 import Label, { InitialLabelProperties } from "./Label";
 import Task from "./Task";
+import Status from "./Status";
 
 export interface StatusProperties {
   id: string;
@@ -43,22 +44,60 @@ export interface ProjectProperties {
   isArchived?: boolean;
   isRecycled?: boolean;
   statuses: StatusProperties[];
+  statusIds: string[];
 }
 
-export type InitialProjectProperties = Omit<ProjectProperties, "id" | "statuses" | "defaultStatusId">;
+export type InitialProjectProperties = Omit<ProjectProperties, "id" | "statuses" | "defaultStatusId" | "statusIds">;
 
 export default class Project {
 
   static readonly tableName = "projects" as const;
   
-  readonly id: string;
-  name: string;
-  defaultStatusId: string;
-  description?: string;
-  isArchived?: boolean;
-  isRecycled?: boolean;
-  statuses: StatusProperties[];
+  /**
+   * @since v1.0.0
+   */
   readonly #client: Client;
+
+  /**
+   * @since v1.0.0
+   */
+  readonly id: string;
+  
+  /**
+   * @since v1.0.0
+   */
+  readonly name: string;
+  
+  /**
+   * @since v1.0.0
+   */
+  readonly defaultStatusId: string;
+  
+  /**
+   * @since v1.0.0
+   */
+  readonly description?: string;
+  
+  /**
+   * @since v1.0.0
+   */
+  readonly isArchived?: boolean;
+  
+  /**
+   * @since v1.0.0
+   */
+  readonly isRecycled?: boolean;
+
+  /**
+   * @deprecated since v1.1.0
+   * @since v1.0.0
+   */
+  statuses: StatusProperties[];
+
+  /**
+   * @since v1.1.0
+   */
+  statusIds: string[] = [];
 
   constructor(props: ProjectProperties, client: Client) {
 
@@ -69,6 +108,7 @@ export default class Project {
     this.isArchived = props.isArchived;
     this.isRecycled = props.isRecycled;
     this.statuses = props.statuses;
+    this.statusIds = props.statusIds;
     this.#client = client;
 
   }
@@ -105,6 +145,12 @@ export default class Project {
   async getLabels(): Promise<Label[]> {
 
     return (await this.#client.getLabels()).filter((possibleProjectLabel) => possibleProjectLabel.projects?.includes(this.id));
+
+  }
+
+  async getStatuses(): Promise<Status[]> {
+
+    return (await this.#client.getStatuses()).filter((status) => this.statusIds.includes(status.id));
 
   }
 

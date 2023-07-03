@@ -2,20 +2,20 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Client from "../../client/Client";
 import styles from "./StatusManagementPage.module.css";
 import Project from "../../client/Project";
-import Label from "../../client/Label";
 import { useNavigate } from "react-router-dom";
 import SettingsPageOption from "../SettingsPageOption/SettingsPageOption";
+import Status from "../../client/Status";
 
 export default function StatusManagementPage({client, project, setDocumentTitle}: {client: Client; project: Project | null; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
 
-  const [labels, setLabels] = useState<Label[]>([]);
+  const [statuses, setStatuses] = useState<Status[]>([]);
   useEffect(() => {
 
     (async () => {
 
       if (project) {
 
-        setLabels(await project.getLabels());
+        setStatuses(await project.getStatuses());
         setDocumentTitle(`Statuses ▪ ${project.name} project settings`);
 
       }
@@ -28,33 +28,33 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
 
     if (project) {
 
-      const onLabelCreate = (label: Label) => {
+      const onLabelCreate = (status: Status) => {
 
-        setLabels((labels) => [...labels, label]);
-
-      };
-
-      const onLabelDelete = (labelId: string) => {
-
-        setLabels((labels) => labels.filter((possibleLabel) => possibleLabel.id !== labelId));
+        setStatuses((statuses) => [...statuses, status]);
 
       };
 
-      const onLabelUpdate = (newLabel: Label) => {
+      const onLabelDelete = (statusId: string) => {
 
-        setLabels((labels) => labels.map((label) => label.id === newLabel.id ? newLabel : label));
+        setStatuses((statuses) => statuses.filter((possibleStatus) => possibleStatus.id !== statusId));
 
       };
 
-      client.addEventListener("labelCreate", onLabelCreate);
-      client.addEventListener("labelDelete", onLabelDelete);
-      client.addEventListener("labelUpdate", onLabelUpdate);
+      const onLabelUpdate = (newStatus: Status) => {
+
+        setStatuses((statuses) => statuses.map((status) => status.id === newStatus.id ? newStatus : status));
+
+      };
+
+      client.addEventListener("statusCreate", onLabelCreate);
+      client.addEventListener("statusDelete", onLabelDelete);
+      client.addEventListener("statusUpdate", onLabelUpdate);
       
       return () => {
         
-        client.removeEventListener("labelCreate", onLabelCreate);
-        client.removeEventListener("labelDelete", onLabelDelete);
-        client.removeEventListener("labelUpdate", onLabelUpdate);
+        client.removeEventListener("statusCreate", onLabelCreate);
+        client.removeEventListener("statusDelete", onLabelDelete);
+        client.removeEventListener("statusUpdate", onLabelUpdate);
 
       };
 
@@ -77,12 +77,12 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
         </section>
         <ul id={styles.list}>
           {
-            labels.map((label) => (
-              <SettingsPageOption key={label.id} isOpen={openOptions[label.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [label.id]: isOpen})} name={label.name}>
-                {label.description}
+            statuses.map((status) => (
+              <SettingsPageOption key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={status.name}>
+                {status.description}
                 <span className={styles.labelActions}>
-                  <button onClick={() => navigate(`?edit=label&id=${label.id}`, {replace: true})}>Edit</button>
-                  <button onClick={() => navigate(`?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
+                  <button onClick={() => navigate(`?edit=status&id=${status.id}`, {replace: true})}>Edit</button>
+                  <button onClick={() => navigate(`?remove=status&id=${status.id}`, {replace: true})}>Remove</button>
                 </span>
               </SettingsPageOption>
             ))

@@ -7,26 +7,34 @@ import Project, { defaultStatuses, InitialProjectProperties, ProjectProperties }
 import "dexie-export-import";
 import TaskList, { InitialTaskListProperties, TaskListProperties } from "./TaskList";
 import { ContentNotFoundError } from "./errors/ContentNotFoundError";
+import Status, { InitialStatusProperties, StatusProperties } from "./Status";
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
-export type PlanzeaObject = Attachment | Task | TaskList | Label | Project;
-export type PlanzeaObjectConstructor = typeof Attachment | typeof TaskList | typeof Task | typeof Label | typeof Project;
+export type PlanzeaObject = Attachment | Label | Status | Task | TaskList | Project;
+export type PlanzeaObjectConstructor = typeof Attachment | typeof Label | typeof Status | typeof TaskList | typeof Task | typeof Project;
 export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties;
 
+export type ContentCreateEventCallback<ContentType> = ((content: ContentType) => void) | (() => void);
+export type ContentDeleteEventCallback = ((contentId: string) => void) | (() => void);
+export type ContentUpdateEventCallback<ContentType, ContentProperties> = ((newContent: ContentType, oldContentProperties?: ContentProperties) => void) | ((newContent: ContentType) => void) | (() => void);
+
 export interface EventCallbacks {
-  labelCreate: ((label: Label) => void) | (() => void);
-  labelDelete: ((labelId: string) => void) | (() => void);
-  labelUpdate: ((newLabel: Label, oldLabelProperties?: LabelProperties) => void) | ((newLabel: Label) => void) | (() => void);
-  projectCreate: ((project: Project) => void) | (() => void);
-  projectDelete: ((projectId: string) => void) | (() => void);
-  projectUpdate: ((newProject: Project, oldProjectProperties?: ProjectProperties) => void) | ((newProject: Project) => void) | (() => void);
-  taskCreate: ((task: Task) => void) | (() => void);
-  taskDelete: ((taskId: string) => void) | (() => void);
-  taskUpdate: ((newTask: Task, oldTaskProperties?: TaskProperties) => void) | ((newTask: Task) => void) | (() => void);
-  taskListCreate: ((taskList: TaskList) => void) | (() => void);
-  taskListDelete: ((taskListId: string) => void) | (() => void);
-  taskListUpdate: ((newTaskList: TaskList, oldTaskListProperties?: TaskListProperties) => void) | ((newTaskList: TaskList) => void) | (() => void);
+  labelCreate: ContentCreateEventCallback<Label>;
+  labelDelete: ContentDeleteEventCallback;
+  labelUpdate: ContentUpdateEventCallback<Label, LabelProperties>;
+  projectCreate: ContentCreateEventCallback<Project>;
+  projectDelete: ContentDeleteEventCallback;
+  projectUpdate: ContentUpdateEventCallback<Project, ProjectProperties>;
+  statusCreate: ContentCreateEventCallback<Status>;
+  statusDelete: ContentDeleteEventCallback;
+  statusUpdate: ContentUpdateEventCallback<Status, StatusProperties>;
+  taskCreate: ContentCreateEventCallback<Task>;
+  taskDelete: ContentDeleteEventCallback;
+  taskUpdate: ContentUpdateEventCallback<Task, TaskProperties>;
+  taskListCreate: ContentCreateEventCallback<TaskList>;
+  taskListDelete: ContentDeleteEventCallback;
+  taskListUpdate: ContentUpdateEventCallback<TaskList, TaskListProperties>;
 }
 
 type EventCallbacksArray = {
@@ -68,6 +76,9 @@ export default class Client {
     projectCreate: [],
     projectDelete: [],
     projectUpdate: [],
+    statusCreate: [],
+    statusDelete: [],
+    statusUpdate: [],
     taskCreate: [],
     taskDelete: [],
     taskUpdate: [],
@@ -78,11 +89,12 @@ export default class Client {
   personalProjectId?: string;
 
   async #createObject(constructor: typeof Attachment, props: InitialAttachmentProperties): Promise<Attachment>;
+  async #createObject(constructor: typeof Label, props: InitialLabelProperties): Promise<Label>;
+  async #createObject(constructor: typeof Status, props: InitialStatusProperties): Promise<Status>;
   async #createObject(constructor: typeof Task, props: InitialTaskProperties): Promise<Task>;
   async #createObject(constructor: typeof TaskList, props: InitialTaskListProperties): Promise<TaskList>;
-  async #createObject(constructor: typeof Label, props: InitialLabelProperties): Promise<Label>;
   async #createObject(constructor: typeof Project, props: InitialProjectProperties): Promise<Project>;
-  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialTaskProperties | InitialTaskListProperties | InitialLabelProperties | InitialProjectProperties): Promise<PlanzeaObject> {
+  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialLabelProperties | InitialStatusProperties | InitialTaskProperties | InitialTaskListProperties | InitialProjectProperties): Promise<PlanzeaObject> {
 
     const { tableName } = constructor;
     const isProject = constructor === Project;
@@ -99,9 +111,10 @@ export default class Client {
   }
 
   async #getObject(constructor: typeof Attachment, objectId: string): Promise<Attachment>;
+  async #getObject(constructor: typeof Label, objectId: string): Promise<Label>;
+  async #getObject(constructor: typeof Status, objectId: string): Promise<Status>;
   async #getObject(constructor: typeof Task, objectId: string): Promise<Task>;
   async #getObject(constructor: typeof TaskList, objectId: string): Promise<TaskList>;
-  async #getObject(constructor: typeof Label, objectId: string): Promise<Label>;
   async #getObject(constructor: typeof Project, objectId: string): Promise<Project>;
   async #getObject(constructor: PlanzeaObjectConstructor, objectId: string): Promise<PlanzeaObject> {
 
@@ -118,9 +131,10 @@ export default class Client {
   }
 
   async #getObjects(constructor: typeof Attachment): Promise<Attachment[]>;
+  async #getObjects(constructor: typeof Label): Promise<Label[]>;
+  async #getObjects(constructor: typeof Status): Promise<Status[]>;
   async #getObjects(constructor: typeof Task): Promise<Task[]>;
   async #getObjects(constructor: typeof TaskList): Promise<TaskList[]>;
-  async #getObjects(constructor: typeof Label): Promise<Label[]>;
   async #getObjects(constructor: typeof Project): Promise<Project[]>;
   async #getObjects(constructor: PlanzeaObjectConstructor): Promise<PlanzeaObject[]> {
 
@@ -142,7 +156,7 @@ export default class Client {
    * @param tableName The name of the table.
    * @returns An unused ID string.
    */
-  async #getUnusedId(tableName: (typeof Attachment | typeof Task | typeof TaskList | typeof Label | typeof Project)["tableName"]): Promise<string> {
+  async #getUnusedId(tableName: PlanzeaObjectConstructor["tableName"]): Promise<string> {
 
     let id = null;
     do {
@@ -166,10 +180,41 @@ export default class Client {
 
   }
 
+  async createLabel(props: InitialLabelProperties): Promise<Label> {
+
+    // Create the label.
+    const label = await this.#createObject(Label, props);
+
+    // Fire the event.
+    this.#fireEvent("labelCreate", label);
+
+    // Return the label.
+    return label;
+
+  }
+
   /**
-   * Adds an issue to the database.
-   * @param props Issue properties.
-   * @returns An `Issue` object.
+   * Adds a status to the database.
+   * @param props Status properties.
+   * @since v1.1.0
+   * @returns A `Status` object.
+   */
+  async createStatus(props: InitialStatusProperties): Promise<Status> {
+
+    const status = await this.#createObject(Status, props);
+
+    // Fire the event.
+    this.#fireEvent("statusCreate", status);
+
+    return status;
+
+  }
+
+  /**
+   * Adds a task to the database.
+   * @param props Task properties.
+   * @since v1.0.0
+   * @returns A `Task` object.
    */
   async createTask(props: InitialTaskProperties): Promise<Task> {
 
@@ -198,19 +243,6 @@ export default class Client {
 
   }
 
-  async createLabel(props: InitialLabelProperties): Promise<Label> {
-
-    // Create the label.
-    const label = await this.#createObject(Label, props);
-
-    // Fire the event.
-    this.#fireEvent("labelCreate", label);
-
-    // Return the label.
-    return label;
-
-  }
-
   async createProject(props: InitialProjectProperties): Promise<Project> {
 
     const project = await this.#createObject(Project, props);
@@ -225,6 +257,24 @@ export default class Client {
   async deleteAttachment(attachmentId: string): Promise<void> {
 
     await this.#db.attachments.delete(attachmentId);
+
+  }
+
+  async deleteLabel(labelId: string): Promise<void> {
+
+    await this.#db.labels.delete(labelId);
+
+    // Run each callback.
+    this.#fireEvent("labelDelete", labelId);
+
+  }
+
+  async deleteStatus(statusId: string): Promise<void> {
+
+    await this.#db.labels.delete(statusId);
+
+    // Run each callback.
+    this.#fireEvent("labelDelete", statusId);
 
   }
 
@@ -273,15 +323,6 @@ export default class Client {
 
     // Fire event.
     this.#fireEvent("taskListDelete", taskListId);
-
-  }
-
-  async deleteLabel(labelId: string): Promise<void> {
-
-    await this.#db.labels.delete(labelId);
-
-    // Run each callback.
-    this.#fireEvent("labelDelete", labelId);
 
   }
 
@@ -423,6 +464,18 @@ export default class Client {
 
   }
 
+  async getStatus(statusId: string): Promise<Status> {
+
+    return await this.#getObject(Status, statusId);
+
+  }
+
+  async getStatuses(): Promise<Status[]> {
+
+    return await this.#getObjects(Status);
+
+  }
+
   async getProject(projectId: string): Promise<Project> {
 
     return await this.#getObject(Project, projectId);
@@ -465,6 +518,21 @@ export default class Client {
     
   }
 
+  async removeStatusFromProject(statusId: string, projectId: string): Promise<void> {
+
+    const label = await this.getLabel(statusId);
+
+    if (label.projects) {
+
+      // Remove the label from the project.
+      await label.update({
+        projects: label.projects.filter((possibleProjectId) => possibleProjectId !== projectId)
+      });
+
+    }
+    
+  }
+
   async updateAttachment(attachmentId: string, newProperties: PropertiesUpdate<AttachmentProperties>): Promise<void> {
 
     await this.#db.attachments.update(attachmentId, newProperties);
@@ -482,6 +550,19 @@ export default class Client {
     // Fire the event.
     const task = await this.getTask(taskId);
     this.#fireEvent("taskUpdate", task, oldTaskProperties);
+
+  }
+
+  async updateStatus(statusId: string, newProperties: PropertiesUpdate<StatusProperties>): Promise<void> {
+
+    // Get current project properties.
+    const oldStatusProperties = await this.#db.statuses.get(statusId);
+
+    // Update the project.
+    await this.#db.statuses.update(statusId, newProperties);
+
+    // Fire the event.
+    this.#fireEvent("statusUpdate", await this.getStatus(statusId), oldStatusProperties);
 
   }
 
