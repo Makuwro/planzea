@@ -5,6 +5,7 @@ import Project from "../../client/Project";
 import { useNavigate } from "react-router-dom";
 import SettingsPageOption from "../SettingsPageOption/SettingsPageOption";
 import Status from "../../client/Status";
+import Icon from "../Icon/Icon";
 
 export default function StatusManagementPage({client, project, setDocumentTitle}: {client: Client; project: Project | null; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
 
@@ -77,15 +78,52 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
         </section>
         <ul id={styles.list}>
           {
-            statuses.map((status) => (
-              <SettingsPageOption key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={status.name}>
-                {status.description}
-                <span className={styles.labelActions}>
-                  <button onClick={() => navigate(`?edit=status&id=${status.id}`, {replace: true})}>Edit</button>
-                  <button onClick={() => navigate(`?remove=status&id=${status.id}`, {replace: true})}>Remove</button>
-                </span>
-              </SettingsPageOption>
-            ))
+            statuses.map((status) => {
+              
+              const isOnlyStatus = statuses.length !== 1;
+
+              return (
+                <SettingsPageOption key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={status.name}>
+                  {
+                    status === statuses[0] ? (
+                      <section className={"info"}>
+                        <Icon name="info" />
+                        <p>This is the default status because it's on the top of the list.</p>
+                      </section>
+                    ) : null
+                  }
+                  {
+                    isOnlyStatus ? (
+                      <section className={"warning"}>
+                        <Icon name="warning" />
+                        <p>You can't delete this status because it's the only one in this project.</p>
+                      </section>
+                    ) : null
+                  }
+                  <section>
+                    <label>Description</label>
+                    {status.description}
+                  </section>
+                  <section>
+                    <label>Background color</label>
+                    <input type="text" placeholder="#ffffff" />
+                  </section>
+                  <section>
+                    <label>Text color</label>
+                    <input type="text" placeholder="#000000" />
+                  </section>
+                  <section>
+                    <label>Next status</label>
+                    <b>None</b>
+                  </section>
+                  <span className={styles.labelActions}>
+                    <button disabled>Save</button>
+                    <button className="destructive" onClick={() => navigate(`?delete=status&id=${status.id}`, {replace: true})} disabled={isOnlyStatus}>Delete</button>
+                  </span>
+                </SettingsPageOption>
+              );
+
+            })
           }
         </ul>
       </section>

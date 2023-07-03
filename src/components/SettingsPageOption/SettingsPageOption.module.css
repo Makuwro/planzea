@@ -29,4 +29,7 @@
   padding: 15px;
   border-top: 1px solid var(--border);
   box-sizing: border-box;
+  gap: 15px;
+  display: flex;
+  flex-direction: column;
 }

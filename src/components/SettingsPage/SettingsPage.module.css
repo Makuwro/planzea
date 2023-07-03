@@ -1,17 +1,75 @@
 #main {
-  padding: 15px;
   box-sizing: border-box;
-  overflow-y: auto;
   align-items: center;
   display: flex;
   flex-direction: column;
   gap: 15px;
+  overflow: hidden;
 }
 
 #page {
   flex-grow: 1;
   justify-content: center;
   display: flex;
+  height: 100%;
+  overflow-y: auto;
+}
+
+#page > section {
+  padding: 0 15px 15px;
+}
+
+#nav {
+  display: flex;
+  gap: 15px;
+  padding: 0 15px;
+  justify-content: left;
+  box-sizing: border-box;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  color: var(--text);
+  text-decoration: none;
+  flex-direction: column-reverse;
+  gap: 5px;
+}
+
+.navItem:hover {
+  filter: brightness(0.92);
+}
+
+.navItem.selected {
+  filter: brightness(0.9);
+  color: var(--text-important);
+}
+
+.navItemText {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.navItemText > span {
+  filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.256));
+}
+
+.marker {
+  border-radius: 5px;
+  background-color: var(--link);
+  opacity: 0;
+  transition: 0.3s;
+  width: 0px;
+  height: 3px;
+}
+
+.navItem.selected > .marker {
+  opacity: 1;
+  width: 15px;
 }
 
 @media screen and (min-width: 720px) {
@@ -22,54 +80,33 @@
   }
 
   #nav {
-    display: flex;
     flex-direction: column;
-    gap: 10px;
-    width: 100%;
+    justify-content: initial;
     max-width: 275px;
+    padding: 0 15px;
+    gap: 10px;
   }
   
   .marker {
-    border-radius: 5px;
-    background-color: var(--link);
     position: fixed;
     margin-left: -10px;
     box-shadow: var(--box-shadow-default);
-    opacity: 0;
-    transition: 0.15s;
     width: 3px;
     height: 0px;
   }
 
   .navItem {
-    display: flex;
-    align-items: center;
-    color: var(--text);
-    text-decoration: none;
     border-radius: 5px;
     padding: 5px 10px;
     background-color: var(--background);
     transition: 0.1s;
-  }
-
-  .navItem.selected {
-    filter: brightness(0.9);
-    color: var(--text-important);
+    gap: 0;
+    flex-direction: row;
   }
 
   .navItem.selected > .marker {
-    opacity: 1;
     height: 15px;
-  }
-
-  .navItemText {
-    align-items: center;
-    gap: 10px;
-    display: flex;
-  }
-
-  .navItemText > span {
-    filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.256));
+    width: 3px;
   }
 
   .navItem :global(.material-icons) {
@@ -78,7 +115,6 @@
   
   .navItem:hover {
     box-shadow: var(--box-shadow-default);
-    filter: brightness(0.92);
   }
 
 }

@@ -91,6 +91,22 @@ button {
   font-weight: 300;
 }
 
+button[disabled] {
+  filter: grayscale(1) brightness(1.2);
+}
+
+button[disabled].destructive {
+  background-color: var(--button);
+}
+
+button[disabled]:hover {
+  filter: grayscale(1) brightness(1.15);
+}
+
+button[disabled]:hover:active {
+  filter: grayscale(1) brightness(1.1);
+}
+
 button[disabled] span {
   color: var(--text-disabled);
 }
@@ -147,4 +163,26 @@ h1 {
 
 .singlePixelBorder {
   border: 1px solid var(--border);
+}
+
+.info {
+  background-color: var(--border);
+}
+
+.info, .warning {
+  border-radius: 5px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: var(--box-shadow-default);
+}
+
+.warning {
+  background-color: rgb(250, 200, 107);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
 }
