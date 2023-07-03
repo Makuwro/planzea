@@ -29,7 +29,7 @@ export default function TaskPopupParentTaskSection({childTask, client, parentTas
         <label>Tracked by</label>
         <section id={styles.task}>
           <span>
-            <span style={{color: `#${status?.textColor?.toString(16) ?? "000"}`, backgroundColor: `#${status?.backgroundColor?.toString(16) ?? "fff"}`}}>{status?.name}</span>
+            <span style={{color: `#${status?.color?.toString(16) ?? "gray"}`, backgroundColor: `#${status?.color?.toString(16) ?? "fff"}`}}>{status?.name}</span>
             <Link to={`/personal/projects/${parentTask.projectId}/tasks/${parentTask.id}`}>{parentTask.name}</Link>
           </span>
           <button onClick={async () => await childTask.update({parentTaskId: undefined})}>

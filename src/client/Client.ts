@@ -13,7 +13,7 @@ export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
 export type PlanzeaObject = Attachment | Label | Status | Task | TaskList | Project;
 export type PlanzeaObjectConstructor = typeof Attachment | typeof Label | typeof Status | typeof TaskList | typeof Task | typeof Project;
-export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties;
+export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties & StatusProperties;
 
 export type ContentCreateEventCallback<ContentType> = ((content: ContentType) => void) | (() => void);
 export type ContentDeleteEventCallback = ((contentId: string) => void) | (() => void);
@@ -247,21 +247,18 @@ export default class Client {
 
       statusCompleted = await this.createStatus({
         name: "Completed",
-        backgroundColor: 3055966,
-        textColor: 16777215
+        color: 3055966
       });
   
       statusInProgress = await this.createStatus({
         name: "In Progress",
-        backgroundColor: 5412849,
-        textColor: 16777215,
+        color: 5412849,
         nextStatusId: statusCompleted.id
       });
   
       statusNotStarted = await this.createStatus({
         name: "Not Started",
-        backgroundColor: 15527148,
-        textColor: 6251368,
+        color: 15527148,
         nextStatusId: statusInProgress.id
       });
 

@@ -1,12 +1,11 @@
 import Client, { PropertiesUpdate } from "./Client";
 
 export interface StatusProperties {
-  backgroundColor?: number;
   id: string;
-  name: string;
+  color?: number;
   description?: string;
+  name: string;
   projects?: string[];
-  textColor?: number;
   nextStatusId?: string;
   localProjectId?: string;
 }
@@ -24,10 +23,10 @@ export default class Status {
   readonly #client: Client;
 
   /**
-   * This status' background color.
+   * This status' color.
    * @since v1.1.0
    */
-  readonly backgroundColor?: number;
+  readonly color?: StatusProperties["color"];
 
   /**
    * This status' description.
@@ -54,20 +53,13 @@ export default class Status {
 
   readonly localProjectId?: StatusProperties["localProjectId"];
 
-  /**
-   * This status' text color.
-   * @since v1.1.0
-   */
-  readonly textColor?: number;
-
   constructor(props: StatusProperties, client: Client) {
 
-    this.backgroundColor = props.backgroundColor;
+    this.color = props.color;
     this.id = props.id;
     this.name = props.name;
     this.nextStatusId = props.nextStatusId;
     this.description = props.description;
-    this.textColor = props.textColor;
     this.localProjectId;
     this.#client = client;
 

@@ -293,7 +293,10 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
             currentStatus ? (
               <span>
                 <button id={styles.status}>
-                  {currentStatus.name}
+                  <span id={styles.statusIcon} />
+                  <span>
+                    {currentStatus.name}
+                  </span>
                 </button>
               </span>
             ) : null

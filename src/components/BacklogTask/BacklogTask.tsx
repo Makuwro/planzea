@@ -27,6 +27,8 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
       
       if (project) {
         
+        console.log(project.statusIds);
+        console.log(await project.getStatuses());
         setStatuses(await project.getStatuses());
 
       }
@@ -36,7 +38,7 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
   }, [project]);
 
   const status = statuses.find((status) => status.id === task.statusId);
-  const statusHexBG = status ? `#${status?.backgroundColor?.toString(16) ?? "fff"}` : undefined;
+  const statusHexBG = status ? `#${status?.color?.toString(16) ?? "fff"}` : undefined;
 
   async function setStatus(newStatusId: string) {
 
@@ -96,9 +98,9 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
       }}>
         <span>
           <section className={styles.statusContainer} onClick={(event) => event.stopPropagation()}>
-            <button className={styles.status} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} ref={statusButtonRef} style={{backgroundColor: statusHexBG}} />
+            <button className={"statusIcon"} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} ref={statusButtonRef} style={{backgroundColor: statusHexBG}} />
           </section>
-          <span style={task.statusId === "dc" ? {color: "#9d9d9d"} : undefined}>
+          <span>
             {task.name}
           </span>
           <ul className={styles.labels}>

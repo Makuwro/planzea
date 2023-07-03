@@ -127,7 +127,7 @@ export default class Project {
 
   async getStatuses(): Promise<Status[]> {
 
-    return (await this.#client.getStatuses()).filter((status) => this.statusIds.includes(status.id));
+    return (await this.#client.getStatuses()).filter((status) => this.statusIds.includes(status.id)).sort((statusA, statusB) => this.statusIds.indexOf(statusA.id) - this.statusIds.indexOf(statusB.id));
 
   }
 

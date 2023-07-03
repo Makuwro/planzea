@@ -80,7 +80,7 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
           {
             statuses.map((status) => {
               
-              const isOnlyStatus = statuses.length !== 1;
+              const isOnlyStatus = statuses.length === 1;
 
               return (
                 <SettingsPageOption key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={status.name}>

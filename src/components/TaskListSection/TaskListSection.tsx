@@ -142,7 +142,7 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
               return (
                 <li key={taskId}>
                   <span>
-                    <span onMouseDown={stopPropagation} style={{ color: `#${status?.textColor?.toString(16) ?? "000"}`, backgroundColor: `#${status?.backgroundColor?.toString(16) ?? "fff"}` }}>{status?.name}</span>
+                    <span className="statusIcon" onMouseDown={stopPropagation} style={{ backgroundColor: `#${status?.color?.toString(16) ?? "fff"}` }} />
                     <Link onMouseDown={stopPropagation} to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
                   </span>
                   <button onMouseDown={stopPropagation} onClick={async () => await removeTask(taskList, taskId)}>

@@ -52,6 +52,16 @@
   height: 30px;
   display: flex;
   align-items: center;
-  padding: 0px 15px;
-  box-shadow: var(--box-shadow-default);
+  padding: 0px 10px;
+  background: none;
+  color: var(--text);
+  border: 1px solid var(--border);
+  gap: 8px;
+}
+
+#statusIcon {
+  border-radius: 100%;
+  width: 15px;
+  height: 15px;
+  background-color: gray;
 }
