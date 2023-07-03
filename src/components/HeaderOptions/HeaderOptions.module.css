@@ -27,3 +27,7 @@
   cursor: initial;
   padding: 0;
 }
+
+#options button[disabled] {
+  background-color: transparent;
+}
