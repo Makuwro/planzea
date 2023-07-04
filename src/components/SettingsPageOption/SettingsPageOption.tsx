@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./SettingsPageOption.module.css";
 import Icon from "../Icon/Icon";
 
-export default function SettingsPageOption({name, isOpen, onToggle, children}: {name: string; isOpen?: boolean; onToggle: (isOpen: boolean) => void; children: ReactNode}) {
+export default function SettingsPageOption({name, isOpen, onToggle, children}: {name: ReactNode; isOpen?: boolean; onToggle: (isOpen: boolean) => void; children: ReactNode}) {
 
   return (
     <li className={styles.isOpen}>

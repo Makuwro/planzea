@@ -65,6 +65,11 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
 
   const navigate = useNavigate();
   const [openOptions, setOpenOptions] = useState<{[key: string]: boolean}>({});
+  const [newStatusInfo, setNewStatusInfo] = useState<{[statusId: string]: {
+    name?: string;
+    color?: string;
+    description?: string;
+  }}>({});
 
   return (
     <section id={styles.content}>
@@ -81,11 +86,25 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
             statuses.map((status) => {
               
               const isOnlyStatus = statuses.length === 1;
+              const isDefaultStatus = status === statuses[0];
 
               return (
-                <SettingsPageOption key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={status.name}>
+                <SettingsPageOption key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={
+                  <>
+                    <span>
+                      {status.name}
+                    </span>
+                    {
+                      isDefaultStatus ? (
+                        <span style={{marginLeft: "10px", backgroundColor: "var(--border)", padding: "0px 5px", borderRadius: "5px", boxShadow: "var(--box-shadow-default)"}}>
+                          Default
+                        </span>
+                      ) : null
+                    }
+                  </>
+                }>
                   {
-                    status === statuses[0] ? (
+                    isDefaultStatus ? (
                       <section className={"info"}>
                         <Icon name="info" />
                         <p>This is the default status because it's on the top of the list.</p>
@@ -101,20 +120,12 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
                     ) : null
                   }
                   <section>
-                    <label>Description</label>
-                    {status.description}
+                    <label>Name</label>
+                    <input type="text" placeholder={status.name} value={newStatusInfo[status.id]?.name ?? ""} />
                   </section>
                   <section>
-                    <label>Background color</label>
-                    <input type="text" placeholder="#ffffff" />
-                  </section>
-                  <section>
-                    <label>Text color</label>
-                    <input type="text" placeholder="#000000" />
-                  </section>
-                  <section>
-                    <label>Next status</label>
-                    <b>None</b>
+                    <label>Color</label>
+                    <input type="text" placeholder="#ffffff" value={(newStatusInfo[status.id]?.color ?? status.color)?.toString(16) ?? ""} />
                   </section>
                   <span className={styles.labelActions}>
                     <button disabled>Save</button>
