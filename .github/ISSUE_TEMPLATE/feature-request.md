@@ -1,20 +1,16 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Suggest an idea for Planzea
 title: ''
-labels: ["Feature Request 💡"]
+labels: ["New Features ✨️"]
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+<!-- Describe the feature and why you want Makuwro to add it. -->
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
-
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+<!-- What will it take for this issue to be completed? -->
+```[tasklist]
+### Completion criteria
+- [ ] 
+```
