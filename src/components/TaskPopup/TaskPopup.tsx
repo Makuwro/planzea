@@ -12,7 +12,6 @@ import Popup from "../Popup/Popup";
 import { SetState } from "../../App";
 import LabelInput from "../LabelInput/LabelInput";
 import Status from "../../client/Status";
-import ContextMenu from "../ContextMenu/ContextMenu";
 import StatusSelector from "../StatusSelector/StatusSelector";
 
 export default function TaskPopup({client, setTempDocumentTitle, project, setCurrentProject}: {setTempDocumentTitle: SetState<string | null>; client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
@@ -124,7 +123,15 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
         const newStatuses = [];
         for (const statusId of project.statusIds) {
 
-          newStatuses.push(await client.getStatus(statusId));
+          try {
+
+            newStatuses.push(await client.getStatus(statusId));
+
+          } catch (err) {
+
+            console.warn(`Couldn't get status from ID: ${statusId}`);
+
+          }
 
         }
         setStatuses(newStatuses);

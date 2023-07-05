@@ -28,8 +28,6 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
       
       if (project) {
         
-        console.log(project.statusIds);
-        console.log(await project.getStatuses());
         setStatuses(await project.getStatuses());
 
       }
