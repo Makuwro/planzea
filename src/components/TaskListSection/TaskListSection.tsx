@@ -125,35 +125,39 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
           </span>
         </section>
       </section>
-      <ul className={styles.tasks}>
-        {
-          taskList.taskIds.map((taskId) => {
+      {
+        taskList.taskIds[0] ? (
+          <ul className={styles.tasks}>
+            {
+              taskList.taskIds.map((taskId) => {
 
-            const subTask = taskObjects?.find((possibleTask) => possibleTask.id === taskId);
-            if (subTask) {
+                const subTask = taskObjects?.find((possibleTask) => possibleTask.id === taskId);
+                if (subTask) {
 
-              const status = statuses.find((status) => status.id === subTask.statusId);
-              return (
-                <li key={taskId}>
-                  <span>
-                    {
-                      status ? <StatusSelector selectedStatus={status} statuses={statuses} onChange={async (newStatus) => await subTask.update({statusId: newStatus.id})} /> : null
-                    }
-                    <Link onMouseDown={stopPropagation} to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
-                  </span>
-                  <button onMouseDown={stopPropagation} onClick={async () => await removeTask(taskList, taskId)}>
-                    <Icon name="close" />
-                  </button>
-                </li>
-              );
+                  const status = statuses.find((status) => status.id === subTask.statusId);
+                  return (
+                    <li key={taskId}>
+                      <span>
+                        {
+                          status ? <StatusSelector selectedStatus={status} statuses={statuses} onChange={async (newStatus) => await subTask.update({statusId: newStatus.id})} /> : null
+                        }
+                        <Link onMouseDown={stopPropagation} to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
+                      </span>
+                      <button onMouseDown={stopPropagation} onClick={async () => await removeTask(taskList, taskId)}>
+                        <Icon name="close" />
+                      </button>
+                    </li>
+                  );
 
+                }
+
+                return null;
+
+              })
             }
-
-            return null;
-
-          })
-        }
-      </ul>
+          </ul>
+        ) : null
+      }
       <input
         type="text"
         placeholder="Add a task..."
