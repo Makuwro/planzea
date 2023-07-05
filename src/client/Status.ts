@@ -5,7 +5,6 @@ export interface StatusProperties {
   color?: number;
   description?: string;
   name: string;
-  projects?: string[];
   nextStatusId?: string;
   localProjectId?: string;
 }

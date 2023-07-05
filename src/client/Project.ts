@@ -2,7 +2,7 @@ import Client, { Optional, PropertiesUpdate } from "./Client";
 import Issue, { InitialTaskProperties } from "./Task";
 import Label, { InitialLabelProperties } from "./Label";
 import Task from "./Task";
-import Status from "./Status";
+import Status, { InitialStatusProperties } from "./Status";
 
 interface DeprecatedStatusProperties {
   id: string;
@@ -90,6 +90,25 @@ export default class Project {
 
   }
 
+  async createLabel(props: Omit<InitialLabelProperties, "projects">): Promise<Label> {
+
+    return await this.#client.createLabel({...props, projects: [this.id]});
+
+  }
+
+  async createStatus(props: InitialStatusProperties): Promise<Status> {
+
+    // Create the status.
+    const status = await this.#client.createStatus(props);
+    
+    // Add the status to the project.
+    await this.update({statusIds: [...this.statusIds, status.id]});
+
+    // Return the status.
+    return status;
+
+  }
+
   async createTask(props: Optional<Omit<InitialTaskProperties, "projects">, "statusId" | "projectId" | "labelIds">): Promise<Task> {
 
     return await this.#client.createTask({
@@ -98,12 +117,6 @@ export default class Project {
       labelIds: props.labelIds ?? [],
       projectId: this.id
     });
-
-  }
-
-  async createLabel(props: Omit<InitialLabelProperties, "projects">): Promise<Label> {
-
-    return await this.#client.createLabel({...props, projects: [this.id]});
 
   }
 
