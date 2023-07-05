@@ -124,13 +124,6 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
             </button>
           </span>
         </section>
-        <input
-          type="text"
-          placeholder="Add a task..."
-          value={taskListSettings.taskName ?? ""}
-          onChange={(event) => setTaskListSettings ? setTaskListSettings({ ...taskListSettings, taskName: event.target.value }) : undefined}
-          onMouseDown={stopPropagation}
-          onKeyDown={async (event) => event.key === "Enter" && taskListSettings.taskName ? await taskList.update({ taskIds: [...taskList.taskIds, (await project.createTask({ name: taskListSettings.taskName })).id] }) : undefined} />
       </section>
       <ul className={styles.tasks}>
         {
@@ -161,6 +154,13 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
           })
         }
       </ul>
+      <input
+        type="text"
+        placeholder="Add a task..."
+        value={taskListSettings.taskName ?? ""}
+        onChange={(event) => setTaskListSettings ? setTaskListSettings({ ...taskListSettings, taskName: event.target.value }) : undefined}
+        onMouseDown={stopPropagation}
+        onKeyDown={async (event) => event.key === "Enter" && taskListSettings.taskName ? await taskList.update({ taskIds: [...taskList.taskIds, (await project.createTask({ name: taskListSettings.taskName })).id] }) : undefined} />
     </li>
   );
 
