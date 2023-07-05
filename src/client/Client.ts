@@ -309,10 +309,10 @@ export default class Client {
     }
 
     // Delete the status from the database.
-    await this.#db.labels.delete(statusId);
+    await this.#db.statuses.delete(statusId);
 
     // Run each callback.
-    this.#fireEvent("labelDelete", statusId);
+    this.#fireEvent("statusDelete", statusId);
 
   }
 

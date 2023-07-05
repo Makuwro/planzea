@@ -24,39 +24,35 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
 
     })();
 
-  }, [project]);
-
-  useEffect(() => {
-
     if (project) {
 
-      const onLabelCreate = (status: Status) => {
+      const onStatusCreate = (status: Status) => {
 
         setStatuses((statuses) => [...statuses, status]);
 
       };
 
-      const onLabelDelete = (statusId: string) => {
+      const onStatusDelete = (statusId: string) => {
 
         setStatuses((statuses) => statuses.filter((possibleStatus) => possibleStatus.id !== statusId));
 
       };
 
-      const onLabelUpdate = (newStatus: Status) => {
+      const onStatusUpdate = (newStatus: Status) => {
 
         setStatuses((statuses) => statuses.map((status) => status.id === newStatus.id ? newStatus : status));
 
       };
 
-      client.addEventListener("statusCreate", onLabelCreate);
-      client.addEventListener("statusDelete", onLabelDelete);
-      client.addEventListener("statusUpdate", onLabelUpdate);
+      client.addEventListener("statusCreate", onStatusCreate);
+      client.addEventListener("statusDelete", onStatusDelete);
+      client.addEventListener("statusUpdate", onStatusUpdate);
       
       return () => {
         
-        client.removeEventListener("statusCreate", onLabelCreate);
-        client.removeEventListener("statusDelete", onLabelDelete);
-        client.removeEventListener("statusUpdate", onLabelUpdate);
+        client.removeEventListener("statusCreate", onStatusCreate);
+        client.removeEventListener("statusDelete", onStatusDelete);
+        client.removeEventListener("statusUpdate", onStatusUpdate);
 
       };
 
