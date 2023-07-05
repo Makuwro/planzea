@@ -11,6 +11,6 @@ assignees: ''
 
 <!-- What will it take for this issue to be completed? -->
 ```[tasklist]
-### Completion criteria
+### Completion criteria for developers
 - [ ] 
 ```
