@@ -294,6 +294,21 @@ export default class Client {
 
   async deleteStatus(statusId: string): Promise<void> {
 
+    for (const project of (await this.getProjects()).filter((possibleProject) => possibleProject.statusIds.includes(statusId))) {
+
+      // Change all project tasks to the default status.
+      for (const task of (await this.getTasks()).filter((possibleTask) => possibleTask.statusId === statusId && possibleTask.projectId === project.id)) {
+
+        await task.update({statusId: project.statusIds[0]});
+
+      }
+      
+      // Remove the status from the project.
+      await project.update({statusIds: project.statusIds.filter((possibleStatusId) => possibleStatusId !== statusId)});
+
+    }
+
+    // Delete the status from the database.
     await this.#db.labels.delete(statusId);
 
     // Run each callback.
