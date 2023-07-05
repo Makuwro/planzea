@@ -9,9 +9,10 @@ import TaskPopupAttachmentSection from "../TaskPopupAttachmentSection/TaskPopupA
 import TaskPopupSubTaskSection from "../TaskPopupSubTaskSection/TaskPopupSubTaskSection";
 import Project from "../../client/Project";
 import Popup from "../Popup/Popup";
-import TaskPopupParentTaskSection from "../TaskPopupParentTaskSection/TaskPopupParentTaskSection";
 import { SetState } from "../../App";
 import LabelInput from "../LabelInput/LabelInput";
+import Status from "../../client/Status";
+import StatusSelector from "../StatusSelector/StatusSelector";
 
 export default function TaskPopup({client, setTempDocumentTitle, project, setCurrentProject}: {setTempDocumentTitle: SetState<string | null>; client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
 
@@ -111,6 +112,35 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
     }
 
   }, [task, project]);
+
+  const [statuses, setStatuses] = useState<Status[]>([]);
+  useEffect(() => {
+
+    (async () => {
+
+      if (project) {
+
+        const newStatuses = [];
+        for (const statusId of project.statusIds) {
+
+          try {
+
+            newStatuses.push(await client.getStatus(statusId));
+
+          } catch (err) {
+
+            console.warn(`Couldn't get status from ID: ${statusId}`);
+
+          }
+
+        }
+        setStatuses(newStatuses);
+
+      }
+
+    })();
+
+  }, [project]);
 
   const descriptionRef = useRef<HTMLElement>(null);
   async function updateDescription() {
@@ -263,11 +293,22 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
     currentDate.setDate(currentDate.getDate() - 1);
     const isPastDue = task.dueDate ? new Date(task.dueDate).getTime() < currentDate.getTime() : false;
 
+    const currentStatus = statuses.find((possibleStatus) => possibleStatus.id === task.statusId);
+
     return (
       <Popup popupContainerRef={popupContainerRef} actions={
-        <button onClick={() => navigate(`?delete=task&id=${task.id}`, {replace: true})}>
-          <Icon name="delete" />
-        </button>
+        <>
+          {
+            currentStatus ? (
+              <span>
+                <StatusSelector showName selectedStatus={currentStatus} onChange={async (newStatus) => await task.update({statusId: newStatus.id})} statuses={statuses} />
+              </span>
+            ) : null
+          }
+          <button onClick={() => navigate(`?delete=task&id=${task.id}`, {replace: true})}>
+            <Icon name="delete" />
+          </button>
+        </>
       } isOpen={isOpen} name={task.name} onClose={() => {
 
         setTask(null);
@@ -275,8 +316,8 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
         navigate(`/personal/projects/${project.id}/tasks`);
 
       }} popupContentPadding={0}>
-        <h1 id={styles.taskName}>{task.name}</h1>
         <section id={styles.details}>
+          <h1 id={styles.taskName}>{task.name}</h1>
           <section 
             id={styles.description} 
             ref={descriptionRef}
@@ -286,12 +327,7 @@ export default function TaskPopup({client, setTempDocumentTitle, project, setCur
             onBlur={updateDescription}>
             {descriptionComponents}
           </section>
-          {
-            task.parentTaskId ? (
-              <TaskPopupParentTaskSection childTask={task} client={client} parentTaskId={task.parentTaskId} project={project} />
-            ) : null
-          }
-          <TaskPopupSubTaskSection popupContainerRef={popupContainerRef} client={client} task={task} project={project} />
+          <TaskPopupSubTaskSection statuses={statuses} popupContainerRef={popupContainerRef} client={client} task={task} project={project} />
           <section>
             <label>Labels</label>
             <LabelInput resultsContainer={popupContainerRef?.current ?? undefined} client={client} labelIds={task.labelIds} taskId={task.id} onChange={async (labelIds) => await task.update({labelIds})} />

@@ -61,10 +61,6 @@ a {
   font-weight: 300;
 }
 
-a:visited {
-  color: var(--link);
-}
-
 label {
   color: var(--text);
 }
@@ -84,7 +80,7 @@ body, #root {
   overflow-y: hidden;
 }
 
-button {
+button, input[type="submit"] {
   background-color: var(--button);
   border: none;
   padding: 8px 20px;
@@ -95,19 +91,36 @@ button {
   font-weight: 300;
 }
 
-button[disabled] span {
+button[disabled], input[type="submit"][disabled] {
+  filter: grayscale(1) brightness(1.2);
+  cursor: not-allowed;
+}
+
+button[disabled].destructive, input[type="submit"][disabled].destructive {
+  background-color: var(--button);
+}
+
+button[disabled]:hover, input[type="submit"][disabled]:hover {
+  filter: grayscale(1) brightness(1.15);
+}
+
+button[disabled]:hover:active, input[type="submit"][disabled]:hover:active {
+  filter: grayscale(1) brightness(1.1);
+}
+
+button[disabled] span, input[type="submit"][disabled] span {
   color: var(--text-disabled);
 }
 
-button:hover {
+button:hover, input[type="submit"]:hover {
   filter: brightness(0.9);
 }
 
-button:hover:active {
+button:hover:active, input[type="submit"]:hover:active {
   filter: brightness(0.8)
 }
 
-button.destructive {
+button.destructive, input[type="submit"].destructive {
   background-color: var(--destructive);
 }
 
@@ -151,4 +164,34 @@ h1 {
 
 .singlePixelBorder {
   border: 1px solid var(--border);
+}
+
+.info {
+  background-color: var(--border);
+}
+
+.info, .warning {
+  border-radius: 5px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: var(--box-shadow-default);
+}
+
+.warning {
+  background-color: rgb(250, 200, 107);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+.statusIcon {
+  border-radius: 100%;
+  height: 15px;
+  width: 15px;
+  padding: 0;
+  flex-shrink: 0;
 }

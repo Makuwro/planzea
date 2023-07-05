@@ -1,103 +1,134 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import Client from "../../client/Client";
-import styles from "./SettingsPage.module.css";
+import React, { ReactElement, useEffect, useState } from "react";
+import CacheClient from "../../client/CacheClient";
+import { SetState } from "../../App";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Project from "../../client/Project";
-import Label from "../../client/Label";
-import { useNavigate, useParams } from "react-router-dom";
-import SettingsPageOption from "../SettingsPageOption/SettingsPageOption";
+import Icon, { IconName } from "../Icon/Icon";
+import LabelManagementPage from "../LabelManagementPage/LabelManagementPage";
+import styles from "./SettingsPage.module.css";
+import StatusManagementPage from "../StatusManagementPage/StatusManagementPage";
 
-export default function SettingsPage({client, project, setCurrentProject, setDocumentTitle}: {client: Client; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
+interface SettingsPageProperties {
+  client: CacheClient;
+  setDocumentTitle: SetState<string>;
+}
 
-  const [labels, setLabels] = useState<Label[]>([]);
-  const params = useParams<{projectId: string}>();
+export default function SettingsPage({client, setDocumentTitle}: SettingsPageProperties) {
+
+  const [project, setProject] = useState<Project | null>(client.currentProject);
+  const [navItems, setNavItems] = useState<{name: string; iconName: IconName; element: ReactElement}[] | null>(null);
+  const [selectedNavIndex, setSelectedNavIndex] = useState<number>(0);
+  const {projectId, settingName} = useParams<{projectId: string; settingName: string}>();
+
+  const navigate = useNavigate();
+  useEffect(() => {
+
+    if (project && projectId && navItems) {
+
+      const selectedNavIndex = navItems.findIndex((item) => settingName ? item.name.toLowerCase() === settingName.toLowerCase() : item.name === "Overview");
+      setSelectedNavIndex(selectedNavIndex === -1 ? 0 : selectedNavIndex);
+      if (selectedNavIndex === -1) {
+
+        navigate(`/personal/projects/${projectId}/settings`, {replace: true});
+
+      }
+
+    }
+
+  }, [project, projectId, navItems, settingName]);
+
+  useEffect(() => {
+
+    setNavItems([
+      {
+        name: "Overview",
+        iconName: "info",
+        element: (
+          <section>
+            <h1>Overview</h1>
+          </section>
+        )
+      },
+      {
+        name: "Labels",
+        iconName: "label",
+        element: <LabelManagementPage client={client} project={project} setDocumentTitle={setDocumentTitle} />
+      },
+      {
+        name: "Statuses",
+        iconName: "done",
+        element: <StatusManagementPage client={client} project={project} setDocumentTitle={setDocumentTitle} />
+      }
+    ]);
+
+    if (project) {
+
+      const onProjectUpdate = (newProject: Project) => {
+
+        if (newProject.id === project.id) {
+
+          setProject(newProject);
+
+        }
+
+      };
+
+      client.addEventListener("projectUpdate", onProjectUpdate);
+
+      return () => client.removeEventListener("projectUpdate", onProjectUpdate);
+
+    }
+
+  }, [client, project]);
+
   useEffect(() => {
 
     (async () => {
 
-      if (project) {
+      if (!client.currentProject && projectId) {
 
-        setLabels(await project.getLabels());
-        setDocumentTitle(`Labels ▪ ${project.name} settings`);
-
-      } else if (params.projectId) {
-
-        const project = await client.getProject(params.projectId);
-        setCurrentProject(project);
+        client.setCurrentProject(await client.getProject(projectId));
 
       }
 
     })();
 
-  }, [project]);
+    const onCurrentProjectChange = (project: Project | null) => {
 
-  useEffect(() => {
+      setProject(project);
 
-    if (project) {
+    };
 
-      const onLabelCreate = (label: Label) => {
+    client.addEventListener("currentProjectChange", onCurrentProjectChange);
 
-        setLabels((labels) => [...labels, label]);
+    return () => client.removeEventListener("currentProjectChange", onCurrentProjectChange);
 
-      };
+  }, [client, projectId]);
 
-      const onLabelDelete = (labelId: string) => {
-
-        setLabels((labels) => labels.filter((possibleLabel) => possibleLabel.id !== labelId));
-
-      };
-
-      const onLabelUpdate = (newLabel: Label) => {
-
-        setLabels((labels) => labels.map((label) => label.id === newLabel.id ? newLabel : label));
-
-      }
-
-      client.addEventListener("labelCreate", onLabelCreate);
-      client.addEventListener("labelDelete", onLabelDelete);
-      client.addEventListener("labelUpdate", onLabelUpdate);
-      
-      return () => {
-        
-        client.removeEventListener("labelCreate", onLabelCreate);
-        client.removeEventListener("labelDelete", onLabelDelete);
-        client.removeEventListener("labelUpdate", onLabelUpdate);
-
-      };
-
-    }
-
-  }, [project]);
-
-  const navigate = useNavigate();
-  const [openOptions, setOpenOptions] = useState<{[key: string]: boolean}>({});
-
-  return (
+  return project && navItems && projectId ? (
     <main id={styles.main}>
-      <section id={styles.content}>
-        <section id={styles.info}>
-          <h1>Labels</h1>
-          <p>You can use labels to organize your tasks. Labels are owned by your account rather than the project, so you can use them across projects if you would like.</p>
-        </section>
-        <section id={styles.listContainer}>
-          <section>
-            <button onClick={() => navigate(`?create=label`)}>Create label</button>
-          </section>
-          <ul id={styles.list}>
-            {
-              labels.map((label) => (
-                <SettingsPageOption key={label.id} isOpen={openOptions[label.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [label.id]: isOpen})} name={label.name}>
-                  {label.description}
-                  <span className={styles.labelActions}>
-                    <button onClick={() => navigate(`?edit=label&id=${label.id}`, {replace: true})}>Edit</button>
-                    <button onClick={() => navigate(`?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
-                  </span>
-                </SettingsPageOption>
-              ))
-            }
-          </ul>
-        </section>
+      <nav id={styles.nav}>
+        {
+          navItems.map((item, index) => {
+            
+            const isSelected = selectedNavIndex === index;
+            return (
+              <Link className={`${styles.navItem}${isSelected ? ` ${styles.selected}` : ""}`} key={item.name} to={`/personal/projects/${project.id}/settings${item.name !== "Overview" ? `/${item.name.toLowerCase()}` : ""}`}>
+                <span className={styles.marker} />
+                <span className={styles.navItemText}>
+                  <Icon name={item.iconName} />
+                  <span>{item.name}</span>
+                </span>
+              </Link>
+            );
+
+          })
+        }
+      </nav>
+      <section id={styles.page}>
+        {navItems[selectedNavIndex !== -1 ? selectedNavIndex : 0].element}
       </section>
     </main>
-  );
+  ) : null;
 
 }

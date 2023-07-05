@@ -14,6 +14,8 @@ import TaskLabelManagementPopup from "./components/TaskLabelManagementPopup/Task
 import CacheClient from "./client/CacheClient";
 import "./global.css";
 import ProjectDeletionPopup from "./components/ProjectDeletionPopup/ProjectDeletionPopup";
+import StatusCreationPopup from "./components/StatusCreationPopup/StatusCreationPopup";
+import StatusDeletionPopup from "./components/StatusDeletionPopup/StatusDeletionPopup";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -66,9 +68,11 @@ export default function App() {
     <>
       <TaskPopup setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
       <LabelRemovalPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
-      <LabelCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
+      <LabelCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <ProjectCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <ProjectDeletionPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
+      <StatusCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
+      <StatusDeletionPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskDeletionPopup client={client} currentProject={currentProject} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskLabelManagementPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} />
       <Header client={client} />
@@ -83,8 +87,8 @@ export default function App() {
         })()} replace />} />
         <Route path="/:username/projects/:projectId/tasks" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/:username/projects/:projectId/tasks/:taskId" element={<Backlog client={client} setCurrentProject={(project) => setCurrentProject(project)} setDocumentTitle={setDocumentTitle} />} />
-        <Route path="/:username/projects/:projectId/settings" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
-        <Route path="/:username/projects/:projectId/settings/labels" element={<SettingsPage client={client} project={currentProject} setCurrentProject={setCurrentProject} setDocumentTitle={setDocumentTitle} />} />
+        <Route path="/:username/projects/:projectId/settings" element={<SettingsPage client={client} setDocumentTitle={setDocumentTitle} />} />
+        <Route path="/:username/projects/:projectId/settings/:settingName" element={<SettingsPage client={client} setDocumentTitle={setDocumentTitle} />} />
         <Route path="/" element={<HomePage client={client} setDocumentTitle={setDocumentTitle} />} />
       </Routes>
     </>

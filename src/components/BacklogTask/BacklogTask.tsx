@@ -6,6 +6,8 @@ import completeSound from "../../complete.ogg";
 import Label from "../../client/Label";
 import ContextMenu from "../ContextMenu/ContextMenu";
 import LabelButton from "../LabelButton/LabelButton";
+import Status from "../../client/Status";
+import StatusSelector from "../StatusSelector/StatusSelector";
 
 interface BacklogTaskComponentProperties {
   isSelected: boolean;
@@ -18,9 +20,23 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
 
   const [isStatusSelectorOpen, setIsStatusSelectorOpen] = useState<boolean>(false);
   const statusButtonRef = useRef<HTMLButtonElement>(null);
+  const [statuses, setStatuses] = useState<Status[]>([]);
 
-  const status = project.statuses.find((status) => status.id === task.statusId);
-  const statusHexBG = status ? `#${status.backgroundColor.toString(16)}` : undefined;
+  useEffect(() => {
+
+    (async () => {
+      
+      if (project) {
+        
+        setStatuses(await project.getStatuses());
+
+      }
+
+    })();
+
+  }, [project]);
+
+  const status = statuses.find((status) => status.id === task.statusId);
 
   async function setStatus(newStatusId: string) {
 
@@ -79,10 +95,10 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
 
       }}>
         <span>
-          <section className={styles.statusContainer} onClick={(event) => event.stopPropagation()}>
-            <button className={styles.status} onClick={() => setIsStatusSelectorOpen(!isStatusSelectorOpen)} ref={statusButtonRef} style={{backgroundColor: statusHexBG}} />
-          </section>
-          <span style={task.statusId === "dc" ? {color: "#9d9d9d"} : undefined}>
+          {
+            status ? <StatusSelector statuses={statuses} selectedStatus={status} onChange={async (newStatus) => await task.update({statusId: newStatus.id})} /> : null
+          }
+          <span>
             {task.name}
           </span>
           <ul className={styles.labels}>
@@ -97,12 +113,12 @@ export default function BacklogTask({task, project, isSelected, onClick}: Backlo
           {dueMonth && dueDate ? <span>{dueMonth} {dueDate.getDate() + 1}</span> : null}
         </span>
       </section>
-      {isStatusSelectorOpen ? <ContextMenu isOpen options={project.statuses.map((status) => ({label: status.name, onClick: (event) => {
+      <ContextMenu isOpen={isStatusSelectorOpen} options={statuses.map((status) => ({label: status.name, onClick: (event) => {
         
         event.stopPropagation();
         setStatus(status.id);
       
-      }}))} onOutsideClick={() => setIsStatusSelectorOpen(false)} triggerElement={statusButtonRef.current} /> : null}
+      }}))} onOutsideClick={() => setIsStatusSelectorOpen(false)} triggerElement={statusButtonRef.current} />
     </li>
   );
 

@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import Task from "../../client/Task";
 import Project from "../../client/Project";
 import { createPortal } from "react-dom";
+import Status from "../../client/Status";
+import StatusSelector from "../StatusSelector/StatusSelector";
 
 interface TaskListSectionProperties { 
   setTaskListSettings?: (taskListSettings: TaskListSettings[string]) => void; 
@@ -23,9 +25,10 @@ interface TaskListSectionProperties {
   popupContainerRef?: RefObject<HTMLElement>; 
   onMoveUp?: () => void;
   onMoveDown?: () => void;
+  statuses: Status[];
 }
 
-export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, initialCoordinates, setTaskListSettings, taskListSettings, taskList, onGrab, isGrabbed, originalBoxRef, taskObjects, project, popupContainerRef, setTaskListBoundary }: TaskListSectionProperties) {
+export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, initialCoordinates, setTaskListSettings, taskListSettings, taskList, onGrab, isGrabbed, originalBoxRef, taskObjects, project, popupContainerRef, setTaskListBoundary, statuses }: TaskListSectionProperties) {
 
   const isEditingName = taskListSettings?.isEditingName;
   const newTaskListName = taskListSettings?.name;
@@ -121,41 +124,47 @@ export default function TaskListSection({ onMoveUp, onMoveDown, coordinates, ini
             </button>
           </span>
         </section>
-        <input
-          type="text"
-          placeholder="Add a task..."
-          value={taskListSettings.taskName ?? ""}
-          onChange={(event) => setTaskListSettings ? setTaskListSettings({ ...taskListSettings, taskName: event.target.value }) : undefined}
-          onMouseDown={stopPropagation}
-          onKeyDown={async (event) => event.key === "Enter" && taskListSettings.taskName ? await taskList.update({ taskIds: [...taskList.taskIds, (await project.createTask({ name: taskListSettings.taskName })).id] }) : undefined} />
       </section>
-      <ul className={styles.tasks}>
-        {
-          taskList.taskIds.map((taskId) => {
+      {
+        taskList.taskIds[0] ? (
+          <ul className={styles.tasks}>
+            {
+              taskList.taskIds.map((taskId) => {
 
-            const subTask = taskObjects?.find((possibleTask) => possibleTask.id === taskId);
-            if (subTask) {
+                const subTask = taskObjects?.find((possibleTask) => possibleTask.id === taskId);
+                if (subTask) {
 
-              const status = project.statuses.find((status) => status.id === subTask.statusId);
-              return (
-                <li key={taskId}>
-                  <span>
-                    <span onMouseDown={stopPropagation} style={{ color: `#${status?.textColor.toString(16)}`, backgroundColor: `#${status?.backgroundColor.toString(16)}` }}>{status?.name}</span>
-                    <Link onMouseDown={stopPropagation} to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
-                  </span>
-                  <button onMouseDown={stopPropagation} onClick={async () => await removeTask(taskList, taskId)}>
-                    <Icon name="close" />
-                  </button>
-                </li>
-              );
+                  const status = statuses.find((status) => status.id === subTask.statusId);
+                  return (
+                    <li key={taskId}>
+                      <span>
+                        {
+                          status ? <StatusSelector selectedStatus={status} statuses={statuses} onChange={async (newStatus) => await subTask.update({statusId: newStatus.id})} /> : null
+                        }
+                        <Link onMouseDown={stopPropagation} to={`/personal/projects/${project.id}/tasks/${subTask.id}`}>{subTask.name}</Link>
+                      </span>
+                      <button onMouseDown={stopPropagation} onClick={async () => await removeTask(taskList, taskId)}>
+                        <Icon name="close" />
+                      </button>
+                    </li>
+                  );
 
+                }
+
+                return null;
+
+              })
             }
-
-            return null;
-
-          })
-        }
-      </ul>
+          </ul>
+        ) : null
+      }
+      <input
+        type="text"
+        placeholder="Add a task..."
+        value={taskListSettings.taskName ?? ""}
+        onChange={(event) => setTaskListSettings ? setTaskListSettings({ ...taskListSettings, taskName: event.target.value }) : undefined}
+        onMouseDown={stopPropagation}
+        onKeyDown={async (event) => event.key === "Enter" && taskListSettings.taskName ? await taskList.update({ taskIds: [...taskList.taskIds, (await project.createTask({ name: taskListSettings.taskName })).id] }) : undefined} />
     </li>
   );
 

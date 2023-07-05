@@ -6,6 +6,7 @@ import TaskList from "../../client/TaskList";
 import Client from "../../client/Client";
 import TaskListSection from "../TaskListSection/TaskListSection";
 import { ContentNotFoundError } from "../../client/errors/ContentNotFoundError";
+import Status from "../../client/Status";
 
 type TaskListContainer<T> = {[taskListId: string]: T};
 
@@ -17,7 +18,7 @@ export type TaskListSettings = TaskListContainer<{
   taskName?: string;
 }>;
 
-export default function TaskPopupSubTaskSection({client, project, task, popupContainerRef}: {client: Client; project: Project; task: Task; popupContainerRef: RefObject<HTMLElement>}) {
+export default function TaskPopupSubTaskSection({client, project, task, popupContainerRef, statuses}: {client: Client; project: Project; task: Task; popupContainerRef: RefObject<HTMLElement>; statuses: Status[]}) {
 
   const [ready, setReady] = useState(false);
   const [newTaskListSettings, setNewTaskListSettings] = useState<TaskListSettings>({});
@@ -256,15 +257,11 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
 
   return ready ? (
     <section>
-      <section>
-        <button onClick={
-          async () => await task.createTaskList()
-        }>Create task list</button>
-      </section>
       <ul id={styles.taskLists}>
         {
           grabbedTaskList ? (
             <TaskListSection
+              statuses={statuses}
               originalBoxRef={originalBoxRef}
               taskList={grabbedTaskList}
               taskListSettings={newTaskListSettings[grabbedTaskList.id]}
@@ -291,6 +288,7 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
               return taskListSettings ? (
                 <TaskListSection 
                   key={taskList.id} 
+                  statuses={statuses}
                   isGrabbed={taskList === grabbedTaskList}
                   taskList={taskList} 
                   onGrab={(originalBoxRef, initialCoordinates) => {
@@ -324,6 +322,11 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
           ) : null
         }
       </ul>
+      <section>
+        <button onClick={
+          async () => await task.createTaskList()
+        }>Create task list</button>
+      </section>
     </section>
   ) : null;
 

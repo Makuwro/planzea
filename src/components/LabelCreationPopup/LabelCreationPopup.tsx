@@ -1,14 +1,14 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Popup from "../Popup/Popup";
 import FormSection from "../FormSection/FormSection";
-import Client from "../../client/Client";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Project from "../../client/Project";
 import Label, { InitialLabelProperties } from "../../client/Label";
 import { SetState } from "../../App";
 import Task from "../../client/Task";
+import CacheClient from "../../client/CacheClient";
 
-export default function LabelCreationPopup({client, setTempDocumentTitle, project, setCurrentProject}: {client: Client; setTempDocumentTitle: SetState<string | null>; project: Project | null; setCurrentProject: Dispatch<SetStateAction<Project | null>>}) {
+export default function LabelCreationPopup({client, setTempDocumentTitle}: {client: CacheClient; setTempDocumentTitle: SetState<string | null>;}) {
 
   const [isCreatingLabel, setIsCreatingLabel] = useState<boolean>(false);
   const [labelProperties, setLabelProperties] = useState<InitialLabelProperties>({name: ""});
@@ -19,9 +19,34 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
   const labelId = searchParams.get("id");
   const initialLabelName = searchParams.get("name");
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const params = useParams<{projectId: string}>();
+  const {projectId} = useParams<{projectId: string}>();
   const isEditing = editValue === "label";
   const [label, setLabel] = useState<Label | null>(null);
+  const [project, setProject] = useState<Project | null>(client.currentProject);
+
+  useEffect(() => {
+
+    (async () => {
+
+      if (!client.currentProject && projectId) {
+
+        client.setCurrentProject(await client.getProject(projectId));
+
+      }
+
+    })();
+
+    const onCurrentProjectChange = (project: Project | null) => {
+
+      setProject(project);
+
+    };
+
+    client.addEventListener("currentProjectChange", onCurrentProjectChange);
+
+    return () => client.removeEventListener("currentProjectChange", onCurrentProjectChange);
+
+  }, [client, projectId]);
 
   useEffect(() => {
 
@@ -31,14 +56,14 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
 
         if (project) {
 
-          let label;
           if (isEditing) {
 
             if (labelId) {
 
-              label = await client.getLabel(labelId);
+              const label = await client.getLabel(labelId);
               setLabel(label);
               setLabelProperties({name: label.name});
+              setTempDocumentTitle(`${isEditing ? "Edit" : "New"} label ▪ ${label ? `${label.name} ▪ ` : ""}${project.name}`);
 
             } else {
 
@@ -53,17 +78,7 @@ export default function LabelCreationPopup({client, setTempDocumentTitle, projec
             
           }
 
-          setTempDocumentTitle(`${isEditing ? "Edit" : "New"} label ▪ ${label ? `${label.name} ▪ ` : ""}${project.name}`);
           setIsOpen(true);
-
-        } else if (params.projectId) {
-
-          const project = await client.getProject(params.projectId);
-          if (project) {
-
-            setCurrentProject(project);
-
-          }
 
         }
 
