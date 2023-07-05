@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./SettingsPageOption.module.css";
 import Icon from "../Icon/Icon";
 
-export default function SettingsPageOption({name, isOpen, onToggle, color, children}: {color?: string; name: ReactNode; isOpen?: boolean; onToggle: (isOpen: boolean) => void; children: ReactNode}) {
+export default function SettingsPageOption({name, isOpen, onToggle, color, children, options}: {color?: string; name: ReactNode; isOpen?: boolean; onToggle: (isOpen: boolean) => void; children: ReactNode; options?: ReactNode}) {
 
   return (
     <li className={styles.isOpen}>
@@ -13,9 +13,12 @@ export default function SettingsPageOption({name, isOpen, onToggle, color, child
             {name}
           </span>
         </span>
-        <button onClick={() => onToggle(!isOpen)}>
-          <Icon name={`expand_${isOpen ? "less" : "more"}`} />
-        </button>
+        <span className={styles.options}>
+          {options}
+          <button onClick={() => onToggle(!isOpen)}>
+            <Icon name={`expand_${isOpen ? "less" : "more"}`} />
+          </button>
+        </span>
       </section>
       {
         isOpen ? (

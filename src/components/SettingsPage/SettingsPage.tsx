@@ -61,6 +61,24 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
       }
     ]);
 
+    if (project) {
+
+      const onProjectUpdate = (newProject: Project) => {
+
+        if (newProject.id === project.id) {
+
+          setProject(newProject);
+
+        }
+
+      };
+
+      client.addEventListener("projectUpdate", onProjectUpdate);
+
+      return () => client.removeEventListener("projectUpdate", onProjectUpdate);
+
+    }
+
   }, [client, project]);
 
   useEffect(() => {
