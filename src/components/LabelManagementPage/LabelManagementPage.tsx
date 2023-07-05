@@ -5,6 +5,8 @@ import Project from "../../client/Project";
 import Label from "../../client/Label";
 import { useNavigate } from "react-router-dom";
 import SettingsPageOption from "../SettingsPageOption/SettingsPageOption";
+import FormSection from "../FormSection/FormSection";
+import ColorInput from "../ColorInput/ColorInput";
 
 export default function LabelManagementPage({client, project, setDocumentTitle}: {client: Client; project: Project | null; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
 
@@ -65,6 +67,8 @@ export default function LabelManagementPage({client, project, setDocumentTitle}:
   const navigate = useNavigate();
   const [openOptions, setOpenOptions] = useState<{[key: string]: boolean}>({});
 
+  const [hex, setHex] = useState<{code: string; isValid: boolean}>({code: "", isValid: true});
+
   return (
     <section id={styles.content}>
       <section id={styles.info}>
@@ -79,10 +83,15 @@ export default function LabelManagementPage({client, project, setDocumentTitle}:
           {
             labels.map((label) => (
               <SettingsPageOption key={label.id} isOpen={openOptions[label.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [label.id]: isOpen})} name={label.name}>
-                {label.description}
+                <FormSection name="Label name">
+                  <input type="text" />
+                </FormSection>
+                <FormSection name="Label color">
+                  <ColorInput hexCode={hex.code} onChange={(code, isValid) => setHex({code, isValid})} />
+                </FormSection>
                 <span className={styles.labelActions}>
-                  <button onClick={() => navigate(`?edit=label&id=${label.id}`, {replace: true})}>Edit</button>
-                  <button onClick={() => navigate(`?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
+                  <button disabled onClick={() => navigate(`?remove=label&id=${label.id}`, {replace: true})}>Save</button>
+                  <button className="destructive" onClick={() => navigate(`?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
                 </span>
               </SettingsPageOption>
             ))
