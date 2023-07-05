@@ -93,6 +93,7 @@ button, input[type="submit"] {
 
 button[disabled], input[type="submit"][disabled] {
   filter: grayscale(1) brightness(1.2);
+  cursor: not-allowed;
 }
 
 button[disabled].destructive, input[type="submit"][disabled].destructive {

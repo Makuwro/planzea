@@ -297,16 +297,17 @@ export default class Client {
     for (const project of (await this.getProjects()).filter((possibleProject) => possibleProject.statusIds.includes(statusId))) {
 
       // Change all project tasks to the default status.
+      const newProjectStatusIds = project.statusIds.filter((possibleStatusId) => possibleStatusId !== statusId);
       for (const task of (await this.getTasks()).filter((possibleTask) => possibleTask.statusId === statusId && possibleTask.projectId === project.id)) {
 
         console.log(`Changing ${task.id} to the default status (${project.statusIds[0]})...`);
-        await task.update({statusId: project.statusIds[0]});
+        await task.update({statusId: newProjectStatusIds[0]});
 
       }
       
       // Remove the status from the project.
       console.log(`Removing status ${statusId} from project ${project.id}...`);
-      await project.update({statusIds: project.statusIds.filter((possibleStatusId) => possibleStatusId !== statusId)});
+      await project.update({statusIds: newProjectStatusIds});
 
     }
 

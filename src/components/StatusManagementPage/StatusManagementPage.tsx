@@ -7,17 +7,36 @@ import SettingsPageOption from "../SettingsPageOption/SettingsPageOption";
 import Status from "../../client/Status";
 import Icon from "../Icon/Icon";
 import FormSection from "../FormSection/FormSection";
+import ColorInput from "../ColorInput/ColorInput";
 
 export default function StatusManagementPage({client, project, setDocumentTitle}: {client: Client; project: Project | null; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
 
   const [statuses, setStatuses] = useState<Status[]>([]);
+  type NewStatusInfo = {
+    name?: string;
+    color?: string;
+    description?: string;
+  };
+  const [newStatusInfo, setNewStatusInfo] = useState<{[statusId: string]: NewStatusInfo}>({});
   useEffect(() => {
 
     (async () => {
 
       if (project) {
 
-        setStatuses(await project.getStatuses());
+        const statuses = await project.getStatuses();
+        const newStatusInfo: {[statusId: string]: NewStatusInfo} = {};
+        for (const status of statuses) {
+
+          const color = status.color?.toString(16);
+          newStatusInfo[status.id] = {
+            name: status.name,
+            color
+          };
+
+        }
+        setNewStatusInfo(newStatusInfo);
+        setStatuses(statuses);
         setDocumentTitle(`Statuses ▪ ${project.name} project settings`);
 
       }
@@ -62,11 +81,6 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
 
   const navigate = useNavigate();
   const [openOptions, setOpenOptions] = useState<{[key: string]: boolean}>({});
-  const [newStatusInfo, setNewStatusInfo] = useState<{[statusId: string]: {
-    name?: string;
-    color?: string;
-    description?: string;
-  }}>({});
 
   return (
     <section id={styles.content}>
@@ -84,7 +98,14 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
               
               const isOnlyStatus = statuses.length === 1;
               const isDefaultStatus = status === statuses[0];
-              const color = status.color?.toString(16);
+              const setThisNewStatusInfo = (info: NewStatusInfo) => setNewStatusInfo((statusInfo) => {
+
+                const newStatusInfo = {...statusInfo};
+                newStatusInfo[status.id] = info;
+                return newStatusInfo;
+
+              });
+              const { color } = newStatusInfo[status.id];
 
               return (
                 <SettingsPageOption color={color ? `#${color}` : undefined} key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={
@@ -122,7 +143,7 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
                     <input type="text" placeholder={status.name} value={newStatusInfo[status.id]?.name ?? ""} />
                   </section>
                   <FormSection name="Color">
-                    <input type="text" placeholder="#ffffff" value={(newStatusInfo[status.id]?.color ?? status.color)?.toString(16) ?? ""} />
+                    <ColorInput hexCode={color ?? ""} onChange={(color) => setThisNewStatusInfo({...newStatusInfo, color})} placeholder={color} />
                   </FormSection>
                   <span className={styles.labelActions}>
                     <button disabled>Save</button>

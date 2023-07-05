@@ -180,6 +180,16 @@ export default function Search({client, onMobileSearchChange}: {client: CacheCli
                 name: "Manage project settings",
                 isDisabled: !projectId,
                 onClick: () => navigateIfProjectExists(`/personal/projects/${projectId}/settings`)
+              },
+              {
+                name: "Manage project labels",
+                isDisabled: !projectId,
+                onClick: () => navigateIfProjectExists(`/personal/projects/${projectId}/settings/labels`)
+              },
+              {
+                name: "Manage project statuses",
+                isDisabled: !projectId,
+                onClick: () => navigateIfProjectExists(`/personal/projects/${projectId}/settings/statuses`)
               }
             ].filter(itemFilter).sort(itemSort).splice(0, 4)
           }

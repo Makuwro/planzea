@@ -6,10 +6,11 @@
 }
 
 .colorContainer {
-  background-color: var(--border);
+  background-color: var(--background);
   border-radius: 5px;
   flex-shrink: 0;
   padding: 15px;
+  box-shadow: var(--box-shadow-default);
 }
 
 .inputContainer {

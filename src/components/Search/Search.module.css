@@ -91,6 +91,10 @@
   border-radius: 5px;
 }
 
+#resultContainer button[disabled] {
+  background-color: transparent;
+}
+
 #resultContainer button:hover {
   box-shadow: var(--box-shadow-default);
 }

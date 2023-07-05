@@ -16,14 +16,14 @@ interface SettingsPageProperties {
 export default function SettingsPage({client, setDocumentTitle}: SettingsPageProperties) {
 
   const [project, setProject] = useState<Project | null>(client.currentProject);
-  const [navItems, setNavItems] = useState<{name: string; iconName: IconName; element: ReactElement}[]>([]);
+  const [navItems, setNavItems] = useState<{name: string; iconName: IconName; element: ReactElement}[] | null>(null);
   const [selectedNavIndex, setSelectedNavIndex] = useState<number>(0);
   const {projectId, settingName} = useParams<{projectId: string; settingName: string}>();
 
   const navigate = useNavigate();
   useEffect(() => {
 
-    if (project && projectId) {
+    if (project && projectId && navItems) {
 
       const selectedNavIndex = navItems.findIndex((item) => settingName ? item.name.toLowerCase() === settingName.toLowerCase() : item.name === "Overview");
       setSelectedNavIndex(selectedNavIndex === -1 ? 0 : selectedNavIndex);
@@ -87,7 +87,7 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
 
   }, [client, projectId]);
 
-  return project && navItems[0] && projectId ? (
+  return project && navItems && projectId ? (
     <main id={styles.main}>
       <nav id={styles.nav}>
         {
