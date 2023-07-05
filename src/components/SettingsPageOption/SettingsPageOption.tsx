@@ -19,9 +19,9 @@ export default function SettingsPageOption({name, isOpen, onToggle, color, child
       </section>
       {
         isOpen ? (
-          <form className={styles.labelDescription}>
+          <section className={styles.labelDescription}>
             {children}
-          </form>
+          </section>
         ) : null
       }
       
