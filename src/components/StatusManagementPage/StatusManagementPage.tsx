@@ -87,9 +87,10 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
               
               const isOnlyStatus = statuses.length === 1;
               const isDefaultStatus = status === statuses[0];
+              const color = status.color?.toString(16);
 
               return (
-                <SettingsPageOption key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={
+                <SettingsPageOption color={color ? `#${color}` : undefined} key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={
                   <>
                     <span>
                       {status.name}

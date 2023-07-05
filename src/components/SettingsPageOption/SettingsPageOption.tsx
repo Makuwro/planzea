@@ -2,13 +2,13 @@ import React from "react";
 import styles from "./SettingsPageOption.module.css";
 import Icon from "../Icon/Icon";
 
-export default function SettingsPageOption({name, isOpen, onToggle, children}: {name: ReactNode; isOpen?: boolean; onToggle: (isOpen: boolean) => void; children: ReactNode}) {
+export default function SettingsPageOption({name, isOpen, onToggle, color, children}: {color?: string; name: ReactNode; isOpen?: boolean; onToggle: (isOpen: boolean) => void; children: ReactNode}) {
 
   return (
     <li className={styles.isOpen}>
       <section className={styles.labelBaseInfo}>
         <span>
-          <span className={styles.labelColor} />
+          <span style={color ? {backgroundColor: color} : undefined} className={styles.labelColor} />
           <span>
             {name}
           </span>
