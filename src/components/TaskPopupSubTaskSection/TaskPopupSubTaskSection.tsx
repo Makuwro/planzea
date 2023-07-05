@@ -257,11 +257,6 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
 
   return ready ? (
     <section>
-      <section>
-        <button onClick={
-          async () => await task.createTaskList()
-        }>Create task list</button>
-      </section>
       <ul id={styles.taskLists}>
         {
           grabbedTaskList ? (
@@ -327,6 +322,11 @@ export default function TaskPopupSubTaskSection({client, project, task, popupCon
           ) : null
         }
       </ul>
+      <section>
+        <button onClick={
+          async () => await task.createTaskList()
+        }>Create task list</button>
+      </section>
     </section>
   ) : null;
 
