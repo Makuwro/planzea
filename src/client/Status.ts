@@ -6,7 +6,6 @@ export interface StatusProperties {
   description?: string;
   name: string;
   nextStatusId?: string;
-  localProjectId?: string;
 }
 
 export type InitialStatusProperties = Optional<Omit<StatusProperties, "id">, "color">;
@@ -50,8 +49,6 @@ export default class Status {
    */
   readonly nextStatusId?: StatusProperties["nextStatusId"];
 
-  readonly localProjectId?: StatusProperties["localProjectId"];
-
   constructor(props: StatusProperties, client: Client) {
 
     this.color = props.color;
@@ -59,7 +56,6 @@ export default class Status {
     this.name = props.name;
     this.nextStatusId = props.nextStatusId;
     this.description = props.description;
-    this.localProjectId;
     this.#client = client;
 
   }
