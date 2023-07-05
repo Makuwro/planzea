@@ -13,9 +13,8 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
 
   const [statuses, setStatuses] = useState<Status[]>([]);
   type NewStatusInfo = {
-    name?: string;
-    color?: string;
-    description?: string;
+    name: string;
+    color: string;
   };
   const [newStatusInfo, setNewStatusInfo] = useState<{[statusId: string]: NewStatusInfo}>({});
   useEffect(() => {
@@ -28,7 +27,7 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
         const newStatusInfo: {[statusId: string]: NewStatusInfo} = {};
         for (const status of statuses) {
 
-          const color = status.color?.toString(16);
+          const color = status.color.toString(16);
           newStatusInfo[status.id] = {
             name: status.name,
             color
@@ -98,6 +97,7 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
               
               const isOnlyStatus = statuses.length === 1;
               const isDefaultStatus = status === statuses[0];
+              const thisNewStatusInfo = newStatusInfo[status.id];
               const setThisNewStatusInfo = (info: NewStatusInfo) => setNewStatusInfo((statusInfo) => {
 
                 const newStatusInfo = {...statusInfo};
@@ -105,7 +105,7 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
                 return newStatusInfo;
 
               });
-              const { color } = newStatusInfo[status.id];
+              const { name, color } = newStatusInfo[status.id];
 
               return (
                 <SettingsPageOption color={color ? `#${color}` : undefined} key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={
@@ -140,13 +140,16 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
                   }
                   <section>
                     <label>Name</label>
-                    <input type="text" placeholder={status.name} value={newStatusInfo[status.id]?.name ?? ""} />
+                    <input type="text" placeholder={status.name} value={thisNewStatusInfo.name ?? ""} />
                   </section>
                   <FormSection name="Color">
-                    <ColorInput hexCode={color ?? ""} onChange={(color) => setThisNewStatusInfo({...newStatusInfo, color})} placeholder={color} />
+                    <ColorInput hexCode={color ?? ""} onChange={(color) => setThisNewStatusInfo({...thisNewStatusInfo, color})} placeholder={color} />
                   </FormSection>
                   <span className={styles.labelActions}>
-                    <button disabled>Save</button>
+                    <button disabled={name === status.name && color !== undefined && parseInt(color, 16) === status.color} onClick={async () => await status.update({
+                      name: name || status.name,
+                      color: color ? parseInt(color, 16) : status.color
+                    })}>Save</button>
                     <button className="destructive" onClick={() => navigate(`?delete=status&id=${status.id}`, {replace: true})} disabled={isOnlyStatus}>Delete</button>
                   </span>
                 </SettingsPageOption>

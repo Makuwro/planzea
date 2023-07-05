@@ -1,15 +1,15 @@
-import Client, { PropertiesUpdate } from "./Client";
+import Client, { Optional, PropertiesUpdate } from "./Client";
 
 export interface StatusProperties {
   id: string;
-  color?: number;
+  color: number;
   description?: string;
   name: string;
   nextStatusId?: string;
   localProjectId?: string;
 }
 
-export type InitialStatusProperties = Omit<StatusProperties, "id">;
+export type InitialStatusProperties = Optional<Omit<StatusProperties, "id">, "color">;
 
 export default class Status {
 
@@ -25,25 +25,25 @@ export default class Status {
    * This status' color.
    * @since v1.1.0
    */
-  readonly color?: StatusProperties["color"];
+  readonly color: StatusProperties["color"];
 
   /**
    * This status' description.
    * @since v1.1.0
    */
-  readonly description?: string;
+  readonly description: StatusProperties["description"];
 
   /**
    * This status' ID.
    * @since v1.1.0
    */
-  readonly id: string;
+  readonly id: StatusProperties["id"];
 
   /**
    * This status' name.
    * @since v1.1.0
    */
-  readonly name: string;
+  readonly name: StatusProperties["name"];
 
   /**
    * @since v1.1.0

@@ -198,7 +198,7 @@ export default class Client {
    */
   async createStatus(props: InitialStatusProperties): Promise<Status> {
 
-    const status = await this.#createObject(Status, props);
+    const status = await this.#createObject(Status, {...props, color: props.color ?? 15527148});
 
     // Fire the event.
     this.#fireEvent("statusCreate", status);
