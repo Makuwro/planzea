@@ -80,7 +80,7 @@ body, #root {
   overflow-y: hidden;
 }
 
-button {
+button, input[type="submit"] {
   background-color: var(--button);
   border: none;
   padding: 8px 20px;
@@ -91,35 +91,35 @@ button {
   font-weight: 300;
 }
 
-button[disabled] {
+button[disabled], input[type="submit"][disabled] {
   filter: grayscale(1) brightness(1.2);
 }
 
-button[disabled].destructive {
+button[disabled].destructive, input[type="submit"][disabled].destructive {
   background-color: var(--button);
 }
 
-button[disabled]:hover {
+button[disabled]:hover, input[type="submit"][disabled]:hover {
   filter: grayscale(1) brightness(1.15);
 }
 
-button[disabled]:hover:active {
+button[disabled]:hover:active, input[type="submit"][disabled]:hover:active {
   filter: grayscale(1) brightness(1.1);
 }
 
-button[disabled] span {
+button[disabled] span, input[type="submit"][disabled] span {
   color: var(--text-disabled);
 }
 
-button:hover {
+button:hover, input[type="submit"]:hover {
   filter: brightness(0.9);
 }
 
-button:hover:active {
+button:hover:active, input[type="submit"]:hover:active {
   filter: brightness(0.8)
 }
 
-button.destructive {
+button.destructive, input[type="submit"].destructive {
   background-color: var(--destructive);
 }
 

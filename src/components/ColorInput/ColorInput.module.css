@@ -1,0 +1,22 @@
+.ball {
+  border-radius: 100%;
+  width: 15px;
+  height: 15px;
+  display: flex;
+}
+
+.colorContainer {
+  background-color: var(--border);
+  border-radius: 5px;
+  flex-shrink: 0;
+  padding: 15px;
+}
+
+.inputContainer {
+  display: flex;
+  gap: 15px;
+}
+
+.invalid {
+  color: var(--destructive);
+}

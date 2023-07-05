@@ -6,6 +6,7 @@ import Project from "../../client/Project";
 import { SetState } from "../../App";
 import CacheClient from "../../client/CacheClient";
 import { InitialStatusProperties } from "../../client/Status";
+import ColorInput from "../ColorInput/ColorInput";
 
 export default function StatusCreationPopup({ client, setTempDocumentTitle }: { client: CacheClient; setTempDocumentTitle: SetState<string | null>; }) {
 
@@ -72,13 +73,14 @@ export default function StatusCreationPopup({ client, setTempDocumentTitle }: { 
 
   }, [editValue, createValue, project, initialStatusName]);
 
+  const [hex, setHex] = useState<{code: string; isValid: boolean}>({code: "", isValid: true});
   useEffect(() => {
 
     (async () => {
 
       if (project && isCreatingStatus) {
 
-        await project.createStatus(statusProperties);
+        await project.createStatus({...statusProperties, color: hex.isValid ? parseInt(hex.code, 16) : undefined});
         setIsOpen(false);
 
       }
@@ -90,7 +92,7 @@ export default function StatusCreationPopup({ client, setTempDocumentTitle }: { 
   }, [project, isCreatingStatus]);
 
   return (
-    <Popup name={"New status"} isOpen={isOpen} onClose={() => {
+    <Popup name="New status" isOpen={isOpen} onClose={() => {
 
       setTempDocumentTitle(null);
       navigate(location.pathname, { replace: true });
@@ -106,8 +108,11 @@ export default function StatusCreationPopup({ client, setTempDocumentTitle }: { 
         <FormSection name="Status name">
           <input type="text" value={statusProperties.name} onChange={({ target: { value } }) => setStatusProperties({ name: value })} />
         </FormSection>
+        <FormSection name="Status color">
+          <ColorInput hexCode={hex.code} onChange={(code, isValid) => setHex({code, isValid})} />
+        </FormSection>
         <section style={{ flexDirection: "row" }}>
-          <input type="submit" value={"Create status"} disabled={isCreatingStatus || !statusProperties.name} />
+          <input type="submit" value={"Create status"} disabled={isCreatingStatus || !statusProperties.name || !hex.isValid} />
           <button onClick={(event) => {
 
             event.preventDefault();
