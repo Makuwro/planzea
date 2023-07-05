@@ -15,6 +15,7 @@ import CacheClient from "./client/CacheClient";
 import "./global.css";
 import ProjectDeletionPopup from "./components/ProjectDeletionPopup/ProjectDeletionPopup";
 import StatusCreationPopup from "./components/StatusCreationPopup/StatusCreationPopup";
+import StatusDeletionPopup from "./components/StatusDeletionPopup/StatusDeletionPopup";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
@@ -71,6 +72,7 @@ export default function App() {
       <ProjectCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <ProjectDeletionPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <StatusCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
+      <StatusDeletionPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskDeletionPopup client={client} currentProject={currentProject} setTempDocumentTitle={setTempDocumentTitle} />
       <TaskLabelManagementPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} />
       <Header client={client} />
