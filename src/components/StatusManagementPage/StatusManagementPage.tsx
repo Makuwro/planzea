@@ -16,7 +16,8 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
     name: string;
     color: string;
   };
-  const [newStatusInfo, setNewStatusInfo] = useState<{[statusId: string]: NewStatusInfo}>({});
+  const [newValues, setNewValues] = useState<{[statusId: string]: NewStatusInfo}>({});
+  
   useEffect(() => {
 
     (async () => {
@@ -34,7 +35,7 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
           };
 
         }
-        setNewStatusInfo(newStatusInfo);
+        setNewValues(newStatusInfo);
         setStatuses(statuses);
         setDocumentTitle(`Statuses ▪ ${project.name} project settings`);
 
@@ -97,63 +98,70 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
               
               const isOnlyStatus = statuses.length === 1;
               const isDefaultStatus = status === statuses[0];
-              const thisNewStatusInfo = newStatusInfo[status.id];
-              const setThisNewStatusInfo = (info: NewStatusInfo) => setNewStatusInfo((statusInfo) => {
+              const statusNewValues = newValues[status.id];
 
-                const newStatusInfo = {...statusInfo};
-                newStatusInfo[status.id] = info;
-                return newStatusInfo;
+              if (statusNewValues) {
 
-              });
-              const { name, color } = newStatusInfo[status.id];
+                const { name, color } = statusNewValues;
+                const setThisNewStatusInfo = (info: NewStatusInfo) => setNewValues((statusInfo) => {
 
-              return (
-                <SettingsPageOption color={color ? `#${color}` : undefined} key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={
-                  <>
-                    <span>
-                      {status.name}
-                    </span>
+                  const newStatusInfo = {...statusInfo};
+                  newStatusInfo[status.id] = info;
+                  return newStatusInfo;
+
+                });
+
+                return (
+                  <SettingsPageOption color={color ? `#${color}` : undefined} key={status.id} isOpen={openOptions[status.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [status.id]: isOpen})} name={
+                    <>
+                      <span>
+                        {status.name}
+                      </span>
+                      {
+                        isDefaultStatus ? (
+                          <span style={{marginLeft: "10px", backgroundColor: "var(--border)", padding: "0px 5px", borderRadius: "5px", boxShadow: "var(--box-shadow-default)"}}>
+                            Default
+                          </span>
+                        ) : null
+                      }
+                    </>
+                  }>
                     {
                       isDefaultStatus ? (
-                        <span style={{marginLeft: "10px", backgroundColor: "var(--border)", padding: "0px 5px", borderRadius: "5px", boxShadow: "var(--box-shadow-default)"}}>
-                          Default
-                        </span>
+                        <section className={"info"}>
+                          <Icon name="info" />
+                          <p>This is the default status because it's on the top of the list.</p>
+                        </section>
                       ) : null
                     }
-                  </>
-                }>
-                  {
-                    isDefaultStatus ? (
-                      <section className={"info"}>
-                        <Icon name="info" />
-                        <p>This is the default status because it's on the top of the list.</p>
-                      </section>
-                    ) : null
-                  }
-                  {
-                    isOnlyStatus ? (
-                      <section className={"warning"}>
-                        <Icon name="warning" />
-                        <p>You can't delete this status because it's the only one in this project.</p>
-                      </section>
-                    ) : null
-                  }
-                  <section>
-                    <label>Name</label>
-                    <input type="text" placeholder={status.name} value={thisNewStatusInfo.name ?? ""} />
-                  </section>
-                  <FormSection name="Color">
-                    <ColorInput hexCode={color ?? ""} onChange={(color) => setThisNewStatusInfo({...thisNewStatusInfo, color})} placeholder={color} />
-                  </FormSection>
-                  <span className={styles.labelActions}>
-                    <button disabled={name === status.name && color !== undefined && parseInt(color, 16) === status.color} onClick={async () => await status.update({
-                      name: name || status.name,
-                      color: color ? parseInt(color, 16) : status.color
-                    })}>Save</button>
-                    <button className="destructive" onClick={() => navigate(`?delete=status&id=${status.id}`, {replace: true})} disabled={isOnlyStatus}>Delete</button>
-                  </span>
-                </SettingsPageOption>
-              );
+                    {
+                      isOnlyStatus ? (
+                        <section className={"warning"}>
+                          <Icon name="warning" />
+                          <p>You can't delete this status because it's the only one in this project.</p>
+                        </section>
+                      ) : null
+                    }
+                    <section>
+                      <label>Name</label>
+                      <input type="text" placeholder={status.name} value={name ?? ""} onChange={({target: {value: name}}) => setThisNewStatusInfo({name, color})} />
+                    </section>
+                    <FormSection name="Color">
+                      <ColorInput hexCode={color ?? ""} onChange={(color) => setThisNewStatusInfo({name, color})} placeholder={color} />
+                    </FormSection>
+                    <span className={styles.labelActions}>
+                      <button disabled={name === status.name && color !== undefined && parseInt(color, 16) === status.color} onClick={async () => await status.update({
+                        name: name || status.name,
+                        color: color ? parseInt(color, 16) : status.color
+                      })}>Save</button>
+                      <button className="destructive" onClick={() => navigate(`?delete=status&id=${status.id}`, {replace: true})} disabled={isOnlyStatus}>Delete</button>
+                    </span>
+                  </SettingsPageOption>
+                );
+
+              } 
+
+              return null;
 
             })
           }
