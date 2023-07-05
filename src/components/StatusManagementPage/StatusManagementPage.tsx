@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import SettingsPageOption from "../SettingsPageOption/SettingsPageOption";
 import Status from "../../client/Status";
 import Icon from "../Icon/Icon";
+import FormSection from "../FormSection/FormSection";
 
 export default function StatusManagementPage({client, project, setDocumentTitle}: {client: Client; project: Project | null; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
 
@@ -124,10 +125,9 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
                     <label>Name</label>
                     <input type="text" placeholder={status.name} value={newStatusInfo[status.id]?.name ?? ""} />
                   </section>
-                  <section>
-                    <label>Color</label>
+                  <FormSection name="Color">
                     <input type="text" placeholder="#ffffff" value={(newStatusInfo[status.id]?.color ?? status.color)?.toString(16) ?? ""} />
-                  </section>
+                  </FormSection>
                   <span className={styles.labelActions}>
                     <button disabled>Save</button>
                     <button className="destructive" onClick={() => navigate(`?delete=status&id=${status.id}`, {replace: true})} disabled={isOnlyStatus}>Delete</button>
