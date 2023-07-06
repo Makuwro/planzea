@@ -9,7 +9,7 @@ import Icon from "../Icon/Icon";
 import FormSection from "../FormSection/FormSection";
 import ColorInput from "../ColorInput/ColorInput";
 
-export default function StatusManagementPage({client, project, setDocumentTitle}: {client: Client; project: Project | null; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
+export default function StatusManagementPage({client, project}: {client: Client; project: Project | null;}) {
 
   const [statuses, setStatuses] = useState<Status[]>([]);
   type NewStatusInfo = {
@@ -37,7 +37,6 @@ export default function StatusManagementPage({client, project, setDocumentTitle}
         }
         setNewValues(newStatusInfo);
         setStatuses(statuses);
-        setDocumentTitle(`Statuses ▪ ${project.name} project settings`);
 
       }
 

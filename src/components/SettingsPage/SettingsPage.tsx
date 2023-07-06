@@ -31,6 +31,10 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
 
         navigate(`/personal/projects/${projectId}/settings`, {replace: true});
 
+      } else {
+
+        setDocumentTitle(`${navItems[selectedNavIndex].name} ▪ ${project.name} project settings`);
+
       }
 
     }
@@ -52,12 +56,12 @@ export default function SettingsPage({client, setDocumentTitle}: SettingsPagePro
       {
         name: "Labels",
         iconName: "label",
-        element: <LabelManagementPage client={client} project={project} setDocumentTitle={setDocumentTitle} />
+        element: <LabelManagementPage client={client} project={project} />
       },
       {
         name: "Statuses",
         iconName: "done",
-        element: <StatusManagementPage client={client} project={project} setDocumentTitle={setDocumentTitle} />
+        element: <StatusManagementPage client={client} project={project} />
       }
     ]);
 

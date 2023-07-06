@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Client from "../../client/Client";
 import styles from "./LabelManagementPage.module.css";
 import Project from "../../client/Project";
@@ -8,7 +8,7 @@ import SettingsPageOption from "../SettingsPageOption/SettingsPageOption";
 import FormSection from "../FormSection/FormSection";
 import ColorInput from "../ColorInput/ColorInput";
 
-export default function LabelManagementPage({client, project, setDocumentTitle}: {client: Client; project: Project | null; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
+export default function LabelManagementPage({client, project}: {client: Client; project: Project | null;}) {
 
   const [labels, setLabels] = useState<Label[]>([]);
   useEffect(() => {
@@ -18,7 +18,6 @@ export default function LabelManagementPage({client, project, setDocumentTitle}:
       if (project) {
 
         setLabels(await project.getLabels());
-        setDocumentTitle(`Labels ▪ ${project.name} settings`);
 
       }
 
