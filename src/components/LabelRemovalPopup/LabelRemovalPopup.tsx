@@ -71,7 +71,7 @@ export default function LabelRemovalPopup({client, setTempDocumentTitle, project
       if (project && isDeletingLabel && label) {
 
         // Create the project and redirect to it.
-        await label.removeFromProject(project.id);
+        await project.update({labelIds: project.labelIds.filter((possibleLabelId) => possibleLabelId !== label.id)});
         setIsOpen(false);
 
       }

@@ -11,21 +11,35 @@ import ColorInput from "../ColorInput/ColorInput";
 export default function LabelManagementPage({client, project}: {client: Client; project: Project | null;}) {
 
   const [labels, setLabels] = useState<Label[]>([]);
+  type NewLabelInfo = {
+    name: string;
+    color: string;
+  };
+  const [newValues, setNewValues] = useState<{[labelId: string]: NewLabelInfo}>({});
   useEffect(() => {
 
+    // Get all project labels.
     (async () => {
 
       if (project) {
 
-        setLabels(await project.getLabels());
+        const labels = await project.getLabels();
+        const newLabelInfo: {[labelId: string]: NewLabelInfo} = {};
+        for (const label of labels) {
+
+          const color = label.color.toString(16);
+          newLabelInfo[label.id] = {
+            name: label.name,
+            color
+          };
+
+        }
+        setNewValues(newLabelInfo);
+        setLabels(labels);
 
       }
 
     })();
-
-  }, [project]);
-
-  useEffect(() => {
 
     if (project) {
 
