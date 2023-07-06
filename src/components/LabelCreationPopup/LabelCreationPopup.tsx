@@ -3,7 +3,7 @@ import Popup from "../Popup/Popup";
 import FormSection from "../FormSection/FormSection";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Project from "../../client/Project";
-import Label, { InitialLabelProperties } from "../../client/Label";
+import { InitialLabelProperties } from "../../client/Label";
 import { SetState } from "../../App";
 import Task from "../../client/Task";
 import CacheClient from "../../client/CacheClient";
@@ -15,11 +15,9 @@ export default function LabelCreationPopup({client, setTempDocumentTitle}: {clie
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const createValue = searchParams.get("create");
-  const labelId = searchParams.get("id");
   const initialLabelName = searchParams.get("name");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const {projectId} = useParams<{projectId: string}>();
-  const [label, setLabel] = useState<Label | null>(null);
   const [project, setProject] = useState<Project | null>(client.currentProject);
 
   useEffect(() => {
@@ -126,7 +124,6 @@ export default function LabelCreationPopup({client, setTempDocumentTitle}: {clie
       setTempDocumentTitle(null);
       navigate(location.pathname, {replace: true});
       setLabelProperties({name: ""});
-      setLabel(null);
     
     }} maxWidth={420}>
       <form onSubmit={(event) => {
