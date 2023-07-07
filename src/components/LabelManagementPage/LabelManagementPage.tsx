@@ -15,7 +15,7 @@ export default function LabelManagementPage({client, project}: {client: Client; 
     name: string;
     color: string;
   };
-  const [newValues, setNewValues] = useState<{[labelId: string]: NewLabelInfo}>({});
+  const [newValues, setNewValues] = useState<{[labelId: string]: NewLabelInfo} | null>(null);
   useEffect(() => {
 
     // Get all project labels.
@@ -80,9 +80,7 @@ export default function LabelManagementPage({client, project}: {client: Client; 
   const navigate = useNavigate();
   const [openOptions, setOpenOptions] = useState<{[key: string]: boolean}>({});
 
-  const [hex, setHex] = useState<{code: string; isValid: boolean}>({code: "", isValid: true});
-
-  return (
+  return newValues ? (
     <section id={styles.content}>
       <section id={styles.info}>
         <h1>Labels</h1>
@@ -94,24 +92,38 @@ export default function LabelManagementPage({client, project}: {client: Client; 
         </section>
         <ul id={styles.list}>
           {
-            labels.map((label) => (
-              <SettingsPageOption key={label.id} isOpen={openOptions[label.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [label.id]: isOpen})} name={label.name}>
-                <FormSection name="Label name">
-                  <input type="text" />
-                </FormSection>
-                <FormSection name="Label color">
-                  <ColorInput hexCode={hex.code} onChange={(code, isValid) => setHex({code, isValid})} />
-                </FormSection>
-                <span className={styles.labelActions}>
-                  <button disabled onClick={() => navigate(`?remove=label&id=${label.id}`, {replace: true})}>Save</button>
-                  <button className="destructive" onClick={() => navigate(`?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
-                </span>
-              </SettingsPageOption>
-            ))
+            labels.map((label) => {
+              
+              const {name, color} = newValues[label.id];
+              const setThisNewValues = (info: NewLabelInfo) => setNewValues((newValues) => ({...newValues, [label.id]: info}));
+
+              return (
+                <SettingsPageOption 
+                  color={color ? `#${color}` : undefined} 
+                  key={label.id} 
+                  isOpen={openOptions[label.id]} 
+                  onToggle={(isOpen) => setOpenOptions({...openOptions, [label.id]: isOpen})} name={label.name}>
+                  <FormSection name="Label name">
+                    <input type="text" value={name} placeholder={label.name} onChange={({target: {value: name}}) => setThisNewValues({name, color})} />
+                  </FormSection>
+                  <FormSection name="Label color">
+                    <ColorInput hexCode={color} onChange={(color, isValid) => setThisNewValues({name, color})} />
+                  </FormSection>
+                  <span className={styles.labelActions}>
+                    <button disabled={name === label.name && color !== undefined && parseInt(color, 16) === label.color} onClick={async () => await label.update({
+                      name: name ?? label.color,
+                      color: color ? parseInt(color, 16) : label.color
+                    })}>Save</button>
+                    <button className="destructive" onClick={() => navigate(`?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
+                  </span>
+                </SettingsPageOption>
+              );
+
+            })
           }
         </ul>
       </section>
     </section>
-  );
+  ) : null;
 
 }

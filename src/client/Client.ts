@@ -14,7 +14,6 @@ export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
 export type PlanzeaObject = Attachment | Label | Status | Task | TaskList | Project;
 export type PlanzeaObjectConstructor = typeof Attachment | typeof Label | typeof Status | typeof TaskList | typeof Task | typeof Project;
 export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties & StatusProperties;
-
 export type ContentCreateEventCallback<ContentType> = ((content: ContentType) => void) | (() => void);
 export type ContentDeleteEventCallback = ((contentId: string) => void) | (() => void);
 export type ContentUpdateEventCallback<ContentType, ContentProperties> = ((newContent: ContentType, oldContentProperties?: ContentProperties) => void) | ((newContent: ContentType) => void) | (() => void);
@@ -180,7 +179,7 @@ export default class Client {
   async createLabel(props: InitialLabelProperties): Promise<Label> {
 
     // Create the label.
-    const label = await this.#createObject(Label, {...props, color: props.color ?? 0});
+    const label = await this.#createObject(Label, {...props, color: props.color ?? 5412849});
 
     // Fire the event.
     this.#fireEvent("labelCreate", label);
