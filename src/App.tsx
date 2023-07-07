@@ -67,7 +67,7 @@ export default function App() {
   return client && isReady ? (
     <>
       <TaskPopup setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={(project) => setCurrentProject(project)} client={client} />
-      <LabelRemovalPopup client={client} setTempDocumentTitle={setTempDocumentTitle} project={currentProject} setCurrentProject={setCurrentProject} />
+      <LabelRemovalPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <LabelCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <ProjectCreationPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
       <ProjectDeletionPopup client={client} setTempDocumentTitle={setTempDocumentTitle} />
