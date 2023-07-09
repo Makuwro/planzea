@@ -10,12 +10,14 @@ import ColorInput from "../ColorInput/ColorInput";
 
 export default function LabelManagementPage({client, project}: {client: Client; project: Project | null;}) {
 
-  const [labels, setLabels] = useState<Label[]>([]);
-  type NewLabelInfo = {
-    name: string;
-    color: string;
+  type LabelFormInfo = {
+    label: Label;
+    newName: string;
+    newColor: string;
+    isOpen?: boolean;
+    isColorValid?: boolean;
   };
-  const [newValues, setNewValues] = useState<{[labelId: string]: NewLabelInfo} | null>(null);
+  const [labelInfoGroup, setLabelInfoGroup] = useState<LabelFormInfo[] | null>([]);
   useEffect(() => {
 
     // Get all project labels.
@@ -24,18 +26,18 @@ export default function LabelManagementPage({client, project}: {client: Client; 
       if (project) {
 
         const labels = await project.getLabels();
-        const newLabelInfo: {[labelId: string]: NewLabelInfo} = {};
+        const newLabelInfo = [];
         for (const label of labels) {
 
-          const color = label.color.toString(16);
-          newLabelInfo[label.id] = {
-            name: label.name,
-            color
-          };
+          newLabelInfo.push({
+            label,
+            newName: label.name,
+            newColor: label.color.toString(16),
+            isColorValid: true
+          });
 
         }
-        setNewValues(newLabelInfo);
-        setLabels(labels);
+        setLabelInfoGroup(newLabelInfo);
 
       }
 
@@ -45,20 +47,29 @@ export default function LabelManagementPage({client, project}: {client: Client; 
 
       const onLabelCreate = (label: Label) => {
 
-        setLabels((labels) => [...labels, label]);
-        setNewValues(null);
+        setLabelInfoGroup((labelInfoGroup) => [...(labelInfoGroup ?? []), {
+          label,
+          newName: label.name,
+          newColor: label.color.toString(16),
+          isColorValid: true
+        }]);
 
       };
 
       const onLabelDelete = (labelId: string) => {
 
-        setLabels((labels) => labels.filter((possibleLabel) => possibleLabel.id !== labelId));
+        setLabelInfoGroup((labelInfoGroup) => labelInfoGroup && labelInfoGroup.filter((possibleLabelInfo) => possibleLabelInfo.label.id !== labelId));
 
       };
 
       const onLabelUpdate = (newLabel: Label) => {
 
-        setLabels((labels) => labels.map((label) => label.id === newLabel.id ? newLabel : label));
+        setLabelInfoGroup((labelInfoGroup) => labelInfoGroup && labelInfoGroup.map((labelInfo) => labelInfo.label.id === newLabel.id ? {
+          label: newLabel,
+          newName: newLabel.name,
+          newColor: newLabel.color.toString(16),
+          isOpen: labelInfo.isOpen
+        } : labelInfo));
 
       };
 
@@ -76,12 +87,11 @@ export default function LabelManagementPage({client, project}: {client: Client; 
 
     }
 
-  }, [project, labels]);
+  }, [project]);
 
   const navigate = useNavigate();
-  const [openOptions, setOpenOptions] = useState<{[key: string]: boolean}>({});
 
-  return newValues ? (
+  return labelInfoGroup ? (
     <section id={styles.content}>
       <section id={styles.info}>
         <h1>Labels</h1>
@@ -93,29 +103,35 @@ export default function LabelManagementPage({client, project}: {client: Client; 
         </section>
         <ul id={styles.list}>
           {
-            labels.map((label) => {
+            labelInfoGroup.map((labelInfo, index) => {
               
-              const {name, color} = newValues[label.id];
-              const setThisNewValues = (info: NewLabelInfo) => setNewValues((newValues) => ({...newValues, [label.id]: info}));
+              const {newName, newColor, label, isOpen, isColorValid} = labelInfo;
+              const setThisNewValues = (info: LabelFormInfo) => {
+                
+                const newLabelInfoGroup = [...labelInfoGroup];
+                newLabelInfoGroup.splice(index, 1, info);
+                setLabelInfoGroup(newLabelInfoGroup);
+                
+              };
 
               return (
                 <SettingsPageOption 
-                  color={color ? `#${color}` : undefined} 
+                  color={`#${newColor}`} 
                   key={label.id} 
-                  isOpen={openOptions[label.id]} 
-                  onToggle={(isOpen) => setOpenOptions({...openOptions, [label.id]: isOpen})} name={label.name}>
+                  isOpen={isOpen} 
+                  onToggle={(isOpen) => setThisNewValues({newName, newColor, label, isOpen, isColorValid})} name={label.name}>
                   <FormSection name="Label name">
-                    <input type="text" value={name} placeholder={label.name} onChange={({target: {value: name}}) => setThisNewValues({name, color})} />
+                    <input type="text" value={newName} placeholder={label.name} onChange={({target: {value: newName}}) => setThisNewValues({newName, newColor, label, isOpen, isColorValid})} />
                   </FormSection>
                   <FormSection name="Label color">
-                    <ColorInput hexCode={color} onChange={(color, isValid) => setThisNewValues({name, color})} />
+                    <ColorInput hexCode={newColor} onChange={(newColor, isColorValid) => setThisNewValues({newName, newColor, label, isOpen, isColorValid})} placeholder={label.color.toString(16)} />
                   </FormSection>
                   <span className={styles.labelActions}>
                     <button 
-                      disabled={name === label.name && color !== undefined && parseInt(color, 16) === label.color} 
+                      disabled={!isColorValid || (newName === label.name && (!newColor || parseInt(newColor, 16) === label.color))} 
                       onClick={async () => await label.update({
-                        name: name ?? label.color,
-                        color: color ? parseInt(color, 16) : label.color
+                        name: newName ?? label.name,
+                        color: newColor ? parseInt(newColor, 16) : label.color
                       })}>
                       Save
                     </button>
