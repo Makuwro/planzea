@@ -68,7 +68,8 @@ export default function LabelManagementPage({client, project}: {client: Client; 
           label: newLabel,
           newName: newLabel.name,
           newColor: newLabel.color.toString(16),
-          isOpen: labelInfo.isOpen
+          isOpen: labelInfo.isOpen,
+          isColorValid: labelInfo.isColorValid
         } : labelInfo));
 
       };
@@ -128,7 +129,7 @@ export default function LabelManagementPage({client, project}: {client: Client; 
                   </FormSection>
                   <span className={styles.labelActions}>
                     <button 
-                      disabled={!isColorValid || (newName === label.name && (!newColor || parseInt(newColor, 16) === label.color))} 
+                      disabled={!isColorValid || ((!newName || newName === label.name) && (!newColor || parseInt(newColor, 16) === label.color))} 
                       onClick={async () => await label.update({
                         name: newName ?? label.name,
                         color: newColor ? parseInt(newColor, 16) : label.color
