@@ -39,22 +39,20 @@
 }
 
 .dark {
-  --background: #282828;
+  --background: #0c0c0c;
   --background-box: #1c1c1c;
   --background-header: #1b1c1be8;
   --background-info: #1f1f1f;
   --background-input: #171717;
   --background-input-header: #2e2f2e;
   --background-popup-box: var(--background-box);
-  --border: #101010b0;
+  --border: #282828;
   --border-default: 1px solid var(--border);
   --destructive: #a33030;
   --grid: #242424;
   --text: #bcbcbc;
   --text-important: #e3ebe3;
-  --button: #2d4f24;
-  --button-disabled: #434343;
-  --box-shadow-default: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  --box-shadow-default: rgba(86, 77, 140, 0.35) 0px 3px 15px;
   --sidebar-button: #365336;
 }
 
@@ -63,8 +61,8 @@ a {
   font-weight: 300;
 }
 
-a:visited {
-  color: var(--link);
+label {
+  color: var(--text);
 }
 
 html {
@@ -82,7 +80,7 @@ body, #root {
   overflow-y: hidden;
 }
 
-button {
+button, input[type="submit"] {
   background-color: var(--button);
   border: none;
   padding: 8px 20px;
@@ -93,19 +91,36 @@ button {
   font-weight: 300;
 }
 
-button[disabled] span {
+button[disabled], input[type="submit"][disabled] {
+  filter: grayscale(1) brightness(1.2);
+  cursor: not-allowed;
+}
+
+button[disabled].destructive, input[type="submit"][disabled].destructive {
+  background-color: var(--button);
+}
+
+button[disabled]:hover, input[type="submit"][disabled]:hover {
+  filter: grayscale(1) brightness(1.15);
+}
+
+button[disabled]:hover:active, input[type="submit"][disabled]:hover:active {
+  filter: grayscale(1) brightness(1.1);
+}
+
+button[disabled] span, input[type="submit"][disabled] span {
   color: var(--text-disabled);
 }
 
-button:hover {
+button:hover, input[type="submit"]:hover {
   filter: brightness(0.9);
 }
 
-button:hover:active {
+button:hover:active, input[type="submit"]:hover:active {
   filter: brightness(0.8)
 }
 
-button.destructive {
+button.destructive, input[type="submit"].destructive {
   background-color: var(--destructive);
 }
 
@@ -122,6 +137,7 @@ input {
   background-color: var(--background-input);
   font-weight: 100;
   font-size: 16px;
+  color: var(--text);
 }
 
 input[type="checkbox"] {
@@ -148,4 +164,34 @@ h1 {
 
 .singlePixelBorder {
   border: 1px solid var(--border);
+}
+
+.info {
+  background-color: var(--border);
+}
+
+.info, .warning {
+  border-radius: 5px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: var(--box-shadow-default);
+}
+
+.warning {
+  background-color: rgb(250, 200, 107);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+.statusIcon {
+  border-radius: 100%;
+  height: 15px;
+  width: 15px;
+  padding: 0;
+  flex-shrink: 0;
 }

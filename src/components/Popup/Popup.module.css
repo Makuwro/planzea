@@ -55,6 +55,10 @@
   pointer-events: all;
 }
 
+:global(.dark) #popupContainer.open {
+  background-color: rgba(17, 17, 17, 0.75);
+}
+
 #popupContainer.open #popup {
   transform: scale(1);
   border-radius: 0;

@@ -3,25 +3,37 @@ import Attachment, { AttachmentProperties, InitialAttachmentProperties } from ".
 import { ClientDatabase } from "./ClientDatabase";
 import Task, { InitialTaskProperties, TaskProperties } from "./Task";
 import Label, { InitialLabelProperties, LabelProperties } from "./Label";
-import Project, { defaultStatuses, InitialProjectProperties, ProjectProperties } from "./Project";
+import Project, { InitialProjectProperties, ProjectProperties } from "./Project";
 import "dexie-export-import";
+import TaskList, { InitialTaskListProperties, TaskListProperties } from "./TaskList";
+import { ContentNotFoundError } from "./errors/ContentNotFoundError";
+import Status, { InitialStatusProperties, StatusProperties } from "./Status";
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
-export type PlanzeaObject = Attachment | Task | Label | Project;
-export type PlanzeaObjectConstructor = typeof Attachment | typeof Task | typeof Label | typeof Project;
-export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties;
+export type PlanzeaObject = Attachment | Label | Status | Task | TaskList | Project;
+export type PlanzeaObjectConstructor = typeof Attachment | typeof Label | typeof Status | typeof TaskList | typeof Task | typeof Project;
+export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties & StatusProperties;
+export type ContentCreateEventCallback<ContentType> = ((content: ContentType) => void) | (() => void);
+export type ContentDeleteEventCallback = ((contentId: string) => void) | (() => void);
+export type ContentUpdateEventCallback<ContentType, ContentProperties> = ((newContent: ContentType, oldContentProperties?: ContentProperties) => void) | ((newContent: ContentType) => void) | (() => void);
 
 export interface EventCallbacks {
-  labelCreate: ((label: Label) => void) | (() => void);
-  labelDelete: ((labelId: string) => void) | (() => void);
-  labelUpdate: ((newLabel: Label, oldLabelProperties?: LabelProperties) => void) | ((newLabel: Label) => void) | (() => void);
-  projectCreate: ((project: Project) => void) | (() => void);
-  projectDelete: ((projectId: string) => void) | (() => void);
-  projectUpdate: ((newProject: Project, oldProjectProperties?: ProjectProperties) => void) | ((newProject: Project) => void) | (() => void);
-  taskCreate: ((task: Task) => void) | (() => void);
-  taskDelete: ((taskId: string) => void) | (() => void);
-  taskUpdate: ((newTask: Task, oldTaskProperties?: TaskProperties) => void) | ((newTask: Task) => void) | (() => void);
+  labelCreate: ContentCreateEventCallback<Label>;
+  labelDelete: ContentDeleteEventCallback;
+  labelUpdate: ContentUpdateEventCallback<Label, LabelProperties>;
+  projectCreate: ContentCreateEventCallback<Project>;
+  projectDelete: ContentDeleteEventCallback;
+  projectUpdate: ContentUpdateEventCallback<Project, ProjectProperties>;
+  statusCreate: ContentCreateEventCallback<Status>;
+  statusDelete: ContentDeleteEventCallback;
+  statusUpdate: ContentUpdateEventCallback<Status, StatusProperties>;
+  taskCreate: ContentCreateEventCallback<Task>;
+  taskDelete: ContentDeleteEventCallback;
+  taskUpdate: ContentUpdateEventCallback<Task, TaskProperties>;
+  taskListCreate: ContentCreateEventCallback<TaskList>;
+  taskListDelete: ContentDeleteEventCallback;
+  taskListUpdate: ContentUpdateEventCallback<TaskList, TaskListProperties>;
 }
 
 type EventCallbacksArray = {
@@ -63,25 +75,30 @@ export default class Client {
     projectCreate: [],
     projectDelete: [],
     projectUpdate: [],
+    statusCreate: [],
+    statusDelete: [],
+    statusUpdate: [],
     taskCreate: [],
     taskDelete: [],
-    taskUpdate: []
+    taskUpdate: [],
+    taskListCreate: [],
+    taskListDelete: [],
+    taskListUpdate: []
   };
   personalProjectId?: string;
 
   async #createObject(constructor: typeof Attachment, props: InitialAttachmentProperties): Promise<Attachment>;
-  async #createObject(constructor: typeof Task, props: InitialTaskProperties): Promise<Task>;
   async #createObject(constructor: typeof Label, props: InitialLabelProperties): Promise<Label>;
+  async #createObject(constructor: typeof Status, props: InitialStatusProperties): Promise<Status>;
+  async #createObject(constructor: typeof Task, props: InitialTaskProperties): Promise<Task>;
+  async #createObject(constructor: typeof TaskList, props: InitialTaskListProperties): Promise<TaskList>;
   async #createObject(constructor: typeof Project, props: InitialProjectProperties): Promise<Project>;
-  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialTaskProperties | InitialLabelProperties | InitialProjectProperties): Promise<PlanzeaObject> {
+  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialLabelProperties | InitialStatusProperties | InitialTaskProperties | InitialTaskListProperties | InitialProjectProperties): Promise<PlanzeaObject> {
 
     const { tableName } = constructor;
-    const isProject = constructor === Project;
     const content = new constructor({
       ...props,
-      id: await this.#getUnusedId(tableName), 
-      statuses: isProject ? defaultStatuses : undefined,
-      defaultStatusId: isProject ? "dns" : undefined
+      id: await this.#getUnusedId(tableName),
     } as PlanzeaObjectProperties, this);
 
     await clientDatabase[tableName].add(content as unknown as PlanzeaObjectProperties);
@@ -90,8 +107,10 @@ export default class Client {
   }
 
   async #getObject(constructor: typeof Attachment, objectId: string): Promise<Attachment>;
-  async #getObject(constructor: typeof Task, objectId: string): Promise<Task>;
   async #getObject(constructor: typeof Label, objectId: string): Promise<Label>;
+  async #getObject(constructor: typeof Status, objectId: string): Promise<Status>;
+  async #getObject(constructor: typeof Task, objectId: string): Promise<Task>;
+  async #getObject(constructor: typeof TaskList, objectId: string): Promise<TaskList>;
   async #getObject(constructor: typeof Project, objectId: string): Promise<Project>;
   async #getObject(constructor: PlanzeaObjectConstructor, objectId: string): Promise<PlanzeaObject> {
 
@@ -99,7 +118,7 @@ export default class Client {
 
     if (!properties) {
 
-      throw new Error();
+      throw new ContentNotFoundError(objectId);
 
     }
 
@@ -107,44 +126,16 @@ export default class Client {
 
   }
 
-  async #getObjects(constructor: typeof Attachment, filter?: Partial<AttachmentProperties>, exclusiveKeys?: [(keyof AttachmentProperties)?]): Promise<Attachment[]>;
-  async #getObjects(constructor: typeof Task, filter?: Partial<TaskProperties>, exclusiveKeys?: [(keyof TaskProperties)?]): Promise<Task[]>;
-  async #getObjects(constructor: typeof Label, filter?: Partial<LabelProperties>, exclusiveKeys?: [(keyof LabelProperties)?]): Promise<Label[]>;
-  async #getObjects(constructor: typeof Project, filter?: Partial<ProjectProperties>, exclusiveKeys?: [(keyof ProjectProperties)?]): Promise<Project[]>;
-  async #getObjects(constructor: PlanzeaObjectConstructor, filter: Partial<PlanzeaObjectProperties> = {}, exclusiveKeys: [(keyof PlanzeaObjectProperties)?] = []): Promise<PlanzeaObject[]> {
+  async #getObjects(constructor: typeof Attachment): Promise<Attachment[]>;
+  async #getObjects(constructor: typeof Label): Promise<Label[]>;
+  async #getObjects(constructor: typeof Status): Promise<Status[]>;
+  async #getObjects(constructor: typeof Task): Promise<Task[]>;
+  async #getObjects(constructor: typeof TaskList): Promise<TaskList[]>;
+  async #getObjects(constructor: typeof Project): Promise<Project[]>;
+  async #getObjects(constructor: PlanzeaObjectConstructor): Promise<PlanzeaObject[]> {
 
     const objects = [];
-    const issuePropertiesArray = (await this.#db[constructor.tableName].toArray() as PlanzeaObjectProperties[]).filter((object) => {
-
-      for (const key of Object.keys(filter) as (keyof TaskProperties)[]) {
-
-        const issueValue = object[key];
-        const filterValue = filter[key];
-        if (issueValue instanceof Array && filterValue instanceof Array) {
-
-          for (const item of filterValue) {
-
-            const includesKey = issueValue.includes(item);
-            if (exclusiveKeys.includes(key) ? includesKey : !includesKey) {
-
-              return false;
-
-            }
-
-          }
-
-        } else if (exclusiveKeys.includes(key) ? issueValue === filterValue : issueValue !== filterValue) {
-
-          return false;
-
-        }
-
-      }
-
-      return true;
-
-    });
-
+    const issuePropertiesArray = await this.#db[constructor.tableName].toArray() as PlanzeaObjectProperties[];
 
     for (const properties of issuePropertiesArray) {
 
@@ -161,7 +152,7 @@ export default class Client {
    * @param tableName The name of the table.
    * @returns An unused ID string.
    */
-  async #getUnusedId(tableName: "attachments" | "tasks" | "labels" | "projects"): Promise<string> {
+  async #getUnusedId(tableName: PlanzeaObjectConstructor["tableName"]): Promise<string> {
 
     let id = null;
     do {
@@ -185,10 +176,41 @@ export default class Client {
 
   }
 
+  async createLabel(props: InitialLabelProperties): Promise<Label> {
+
+    // Create the label.
+    const label = await this.#createObject(Label, {...props, color: props.color ?? 5412849});
+
+    // Fire the event.
+    this.#fireEvent("labelCreate", label);
+
+    // Return the label.
+    return label;
+
+  }
+
   /**
-   * Adds an issue to the database.
-   * @param props Issue properties.
-   * @returns An `Issue` object.
+   * Adds a status to the database.
+   * @param props Status properties.
+   * @since v1.1.0
+   * @returns A `Status` object.
+   */
+  async createStatus(props: InitialStatusProperties): Promise<Status> {
+
+    const status = await this.#createObject(Status, {...props, color: props.color ?? 15527148});
+
+    // Fire the event.
+    this.#fireEvent("statusCreate", status);
+
+    return status;
+
+  }
+
+  /**
+   * Adds a task to the database.
+   * @param props Task properties.
+   * @since v1.0.0
+   * @returns A `Task` object.
    */
   async createTask(props: InitialTaskProperties): Promise<Task> {
 
@@ -201,22 +223,51 @@ export default class Client {
     
   }
 
-  async createLabel(props: InitialLabelProperties): Promise<Label> {
+  async createTaskList(props: InitialTaskListProperties = {}) {
 
-    // Create the label.
-    const label = await this.#createObject(Label, props);
+    // Set the defaults.
+    props.name = props.name ?? "Tasks";
+    props.taskIds = props.taskIds ?? [];
+
+    // Create the task list.
+    const taskList = await this.#createObject(TaskList, props);
 
     // Fire the event.
-    this.#fireEvent("labelCreate", label);
+    this.#fireEvent("taskListCreate", taskList);
 
-    // Return the label.
-    return label;
+    return taskList;
 
   }
 
   async createProject(props: InitialProjectProperties): Promise<Project> {
 
-    const project = await this.#createObject(Project, props);
+    let statusCompleted, statusInProgress, statusNotStarted;
+    if (!props.statusIds) {
+
+      statusCompleted = await this.createStatus({
+        name: "Completed",
+        color: 3055966
+      });
+  
+      statusInProgress = await this.createStatus({
+        name: "In Progress",
+        color: 5412849,
+        nextStatusId: statusCompleted.id
+      });
+  
+      statusNotStarted = await this.createStatus({
+        name: "Not Started",
+        color: 15527148,
+        nextStatusId: statusInProgress.id
+      });
+
+      await statusCompleted.update({nextStatusId: statusNotStarted.id});
+
+      props.statusIds = [statusNotStarted.id, statusInProgress.id, statusCompleted.id];
+
+    }
+
+    const project = await this.#createObject(Project, {...props, labelIds: props.labelIds ?? []});
 
     // Fire the event.
     this.#fireEvent("projectCreate", project);
@@ -231,61 +282,6 @@ export default class Client {
 
   }
 
-  /**
-   * Deletes a task from the database.
-   * @param taskId The task's ID.
-   */
-  async deleteTask(taskId: string, shouldDeleteSubtasks = true): Promise<void> {
-
-    // Get all descendant tasks.
-    const descendantTasks: string[] = [];
-    for (const task of await this.getTasks()) {
-
-      if (task.parentTaskId === taskId || (shouldDeleteSubtasks && descendantTasks.find((possibleTask) => possibleTask === task.parentTaskId))) {
-
-        descendantTasks.push(task.id);
-
-      }
-
-    }
-    
-    // Delete or promote descendant tasks.
-    for (const descendantTaskId of [...descendantTasks, taskId]) {
-
-      if (taskId === descendantTaskId || shouldDeleteSubtasks) {
-        
-        // Delete all attachments.
-        for (const attachment of await this.getAttachments()) {
-
-          attachment.taskIds = attachment.taskIds.filter((possibleTaskId) => possibleTaskId === taskId);
-          if (attachment.taskIds[0]) {
-  
-            await attachment.update(attachment);
-  
-          } else {
-  
-            await attachment.delete();
-  
-          }
-  
-        }
-  
-        // Delete the task.
-        await this.#db.tasks.delete(taskId);
-  
-        // Run each callback.
-        this.#fireEvent("taskDelete", taskId);
-
-      } else {
-
-        await this.updateTask(descendantTaskId, {parentTaskId: undefined});
-
-      }
-
-    }
-    
-  }
-
   async deleteLabel(labelId: string): Promise<void> {
 
     await this.#db.labels.delete(labelId);
@@ -295,10 +291,86 @@ export default class Client {
 
   }
 
+  async deleteStatus(statusId: string): Promise<void> {
+
+    for (const project of (await this.getProjects()).filter((possibleProject) => possibleProject.statusIds.includes(statusId))) {
+
+      // Change all project tasks to the default status.
+      const newProjectStatusIds = project.statusIds.filter((possibleStatusId) => possibleStatusId !== statusId);
+      for (const task of (await this.getTasks()).filter((possibleTask) => possibleTask.statusId === statusId && possibleTask.projectId === project.id)) {
+
+        console.log(`Changing ${task.id} to the default status (${project.statusIds[0]})...`);
+        await task.update({statusId: newProjectStatusIds[0]});
+
+      }
+      
+      // Remove the status from the project.
+      console.log(`Removing status ${statusId} from project ${project.id}...`);
+      await project.update({statusIds: newProjectStatusIds});
+
+    }
+
+    // Delete the status from the database.
+    console.log(`Deleting status ${statusId}...`);
+    await this.#db.statuses.delete(statusId);
+
+    // Run each callback.
+    this.#fireEvent("statusDelete", statusId);
+
+  }
+
+  /**
+   * Deletes a task from the database.
+   * @param taskId The task's ID.
+   */
+  async deleteTask(taskId: string): Promise<void> {
+
+    // Delete all attachments.
+    for (const attachment of (await this.getAttachments()).filter((possibleTaskAttachment) => possibleTaskAttachment.taskIds.includes(taskId))) {
+
+      attachment.taskIds = attachment.taskIds.filter((possibleTaskId) => possibleTaskId === taskId);
+      if (attachment.taskIds[0]) {
+
+        await attachment.update(attachment);
+
+      } else {
+
+        await attachment.delete();
+
+      }
+
+    }
+
+    // Delete the task.
+    await this.#db.tasks.delete(taskId);
+
+    // Run each callback.
+    this.#fireEvent("taskDelete", taskId);
+
+  }
+
+  async deleteTaskList(taskListId: string): Promise<void> {
+
+    // Delete this list.
+    await this.#db.taskLists.delete(taskListId);
+
+    // Update each task.
+    const taskListFilter = (possibleTaskList: TaskListProperties) => possibleTaskList.id === taskListId;
+    for (const task of (await this.getTasks()).filter((possibleTask) => possibleTask.taskLists?.find(taskListFilter))) {
+
+      await task.update({taskLists: task.taskLists?.filter(taskListFilter)});
+
+    }
+
+    // Fire event.
+    this.#fireEvent("taskListDelete", taskListId);
+
+  }
+
   async deleteProject(projectId: string): Promise<void> {
 
     // Delete each project task.
-    for (const task of await this.getTasks({projectId})) {
+    for (const task of (await this.getTasks()).filter((possibleProjectTask) => possibleProjectTask.projectId === projectId)) {
 
       await task.delete();
 
@@ -355,10 +427,97 @@ export default class Client {
 
       // Create a personal project.
       const personalProject = await this.createProject({name: "Personal"});
-      this.#db.settings.put(personalProject.id, "personalProjectId");
+      await this.#db.settings.put(personalProject.id, "personalProjectId");
       this.personalProjectId = personalProject.id;
 
     }
+
+    // Fix tasks.
+    console.log("Checking for tasks with outdated properties...");
+    for (const taskProperties of (await this.#db.tasks.toArray()).filter((possibleTask) => possibleTask.parentTaskId)) {
+
+      if (taskProperties.parentTaskId) {
+
+        // Get the parent task.
+        const parentTask = await this.getTask(taskProperties.parentTaskId);
+
+        // Create the default task list, if necessary.
+        const taskLists = parentTask.taskLists ?? [];
+        const taskListId = taskLists.find((list) => list.name === "Tasks")?.id;
+        let taskList = taskListId ? await this.getTaskList(taskListId) : undefined;
+        if (!taskList) {
+          
+          taskList = await this.createTaskList({name: "Tasks"});
+
+        }
+
+        // Add this task to the list.
+        await taskList.update({taskIds: [...taskList.taskIds, taskProperties.id]});
+
+        // Remove the parentTaskId.
+        await this.updateTask(taskProperties.id, {parentTaskId: undefined});
+
+      }
+
+    }
+
+    // Fix projects.
+    console.log("Checking for projects with outdated properties...");
+    for (const projectProperties of (await this.#db.projects.toArray()).filter((possibleProject) => possibleProject.defaultStatusId || possibleProject.statuses)) {
+
+      if (projectProperties.statuses) {
+
+        const statusIds = [];
+        for (const statusInfo of projectProperties.statuses) {
+
+          const newStatusId = (await this.createStatus(statusInfo)).id;
+          statusIds.push(newStatusId);
+
+          for (const taskProperties of (await this.#db.tasks.toArray()).filter((possibleTask) => possibleTask.statusId === statusInfo.id)) {
+
+            await this.updateTask(taskProperties.id, {statusId: newStatusId});
+
+          }
+
+        }
+
+        await this.updateProject(projectProperties.id, {statusIds, defaultStatusId: undefined, statuses: undefined});
+
+      }
+
+    }
+
+    // Fix labels.
+    console.log("Checking for labels with outdated properties...");
+    for (const labelProperties of (await this.#db.labels.toArray()).filter((possibleLabel) => possibleLabel.projects || possibleLabel.color === undefined || Number.isNaN(possibleLabel.color))) {
+
+      if (labelProperties.projects) {
+
+        for (const projectId of labelProperties.projects) {
+
+          // Update all projects.
+          console.log(`Updating project (${labelProperties.id}) to include label (${labelProperties.id})...`);
+          const project = await this.getProject(projectId);
+          await project.update({labelIds: [...(project.labelIds ?? []), labelProperties.id]});
+
+          // Remove the projects array from the label.
+          console.log(`Removing label (${labelProperties.id}) projects array...`);
+          await this.updateLabel(labelProperties.id, {projects: undefined});
+
+        }
+
+      }
+
+      if (labelProperties.color === undefined || Number.isNaN(labelProperties.color)) {
+
+        console.log(`Updating label (${labelProperties.id}) to have a decimal color...`);
+        await this.updateLabel(labelProperties.id, {color: Number(labelProperties.color ?? 0)});
+
+      }
+
+    }
+
+    console.log("All content properties are updated!");
     
   }
 
@@ -368,9 +527,9 @@ export default class Client {
 
   }
 
-  async getAttachments(filter: Partial<AttachmentProperties> = {}, exclusiveKeys: [(keyof AttachmentProperties)?] = []): Promise<Attachment[]> {
+  async getAttachments(): Promise<Attachment[]> {
 
-    return await this.#getObjects(Attachment, filter, exclusiveKeys);
+    return await this.#getObjects(Attachment);
 
   }
 
@@ -380,13 +539,25 @@ export default class Client {
 
   }
 
+  async getTaskList(taskListId: string): Promise<TaskList> {
+
+    return await this.#getObject(TaskList, taskListId);
+
+  }
+
+  async getTaskLists(): Promise<TaskList[]> {
+
+    return await this.#getObjects(TaskList);
+
+  }
+
   /**
    * Gets all client tasks.
    * @returns An array of `Task` objects.
    */
-  async getTasks(filter: Partial<TaskProperties> = {}, exclusiveKeys: [(keyof TaskProperties)?] = []): Promise<Task[]> {
+  async getTasks(): Promise<Task[]> {
 
-    return await this.#getObjects(Task, filter, exclusiveKeys);
+    return await this.#getObjects(Task);
 
   }
 
@@ -400,9 +571,21 @@ export default class Client {
    * Gets all client labels.
    * @returns An array of `Label` objects.
    */
-  async getLabels(filter: Partial<LabelProperties> = {}, exclusiveKeys: [(keyof LabelProperties)?] = []): Promise<Label[]> {
+  async getLabels(): Promise<Label[]> {
 
-    return await this.#getObjects(Label, filter, exclusiveKeys);
+    return await this.#getObjects(Label);
+
+  }
+
+  async getStatus(statusId: string): Promise<Status> {
+
+    return await this.#getObject(Status, statusId);
+
+  }
+
+  async getStatuses(): Promise<Status[]> {
+
+    return await this.#getObjects(Status);
 
   }
 
@@ -412,9 +595,9 @@ export default class Client {
 
   }
 
-  async getProjects(filter: Partial<ProjectProperties> = {}, exclusiveKeys: [(keyof ProjectProperties)?] = []): Promise<Project[]> {
+  async getProjects(): Promise<Project[]> {
 
-    return await this.#getObjects(Project, filter, exclusiveKeys);
+    return await this.#getObjects(Project);
 
   }
 
@@ -428,24 +611,6 @@ export default class Client {
 
     this.eventCallbacks[eventName] = (this.eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
 
-  }
-
-  async removeLabelFromProject(labelId: string, projectId: string): Promise<void> {
-
-    const label = await this.getLabel(labelId);
-
-    if (label.projects) {
-
-      // Remove the label from the project.
-      await label.update({
-        projects: label.projects.filter((possibleProjectId) => possibleProjectId !== projectId)
-      });
-
-      // Run each callback.
-      this.#fireEvent("labelDelete", labelId);
-
-    }
-    
   }
 
   async updateAttachment(attachmentId: string, newProperties: PropertiesUpdate<AttachmentProperties>): Promise<void> {
@@ -465,6 +630,33 @@ export default class Client {
     // Fire the event.
     const task = await this.getTask(taskId);
     this.#fireEvent("taskUpdate", task, oldTaskProperties);
+
+  }
+
+  async updateStatus(statusId: string, newProperties: PropertiesUpdate<StatusProperties>): Promise<void> {
+
+    // Get current project properties.
+    const oldStatusProperties = await this.#db.statuses.get(statusId);
+
+    // Update the project.
+    await this.#db.statuses.update(statusId, newProperties);
+
+    // Fire the event.
+    this.#fireEvent("statusUpdate", await this.getStatus(statusId), oldStatusProperties);
+
+  }
+
+  async updateTaskList(taskListId: string, newProperties: PropertiesUpdate<TaskListProperties>): Promise<void> {
+
+    // Get current task properties.
+    const oldTasklistProperties = await this.#db.taskLists.get(taskListId);
+
+    // Update the task.
+    await this.#db.taskLists.update(taskListId, newProperties);
+
+    // Fire the event.
+    const taskList = await this.getTaskList(taskListId);
+    this.#fireEvent("taskListUpdate", taskList, oldTasklistProperties);
 
   }
 

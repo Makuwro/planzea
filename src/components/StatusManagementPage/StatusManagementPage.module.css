@@ -1,0 +1,41 @@
+#list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#list, .labelDescription, #listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#list > li {
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: var(--box-shadow-default);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 15px;
+}
+
+#info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.labelActions {
+  display: flex;
+  gap: 15px;
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 1080px;
+  width: 100%;
+}

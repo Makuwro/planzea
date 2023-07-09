@@ -1,0 +1,22 @@
+.statusContainer {
+  display: flex;
+  align-items: center;
+  background: none;
+  pointer-events: all;
+  padding: 0;
+}
+
+.statusContainer.withName {
+  height: 30px;
+  color: var(--text);
+  border: 1px solid var(--border);
+  gap: 8px;
+  padding: 0px 10px;
+}
+
+.statusIcon {
+  border-radius: 100%;
+  width: 15px;
+  height: 15px;
+  background-color: gray;
+}
