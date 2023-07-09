@@ -14,7 +14,6 @@ export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
 export type PlanzeaObject = Attachment | Label | Status | Task | TaskList | Project;
 export type PlanzeaObjectConstructor = typeof Attachment | typeof Label | typeof Status | typeof TaskList | typeof Task | typeof Project;
 export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties & StatusProperties;
-
 export type ContentCreateEventCallback<ContentType> = ((content: ContentType) => void) | (() => void);
 export type ContentDeleteEventCallback = ((contentId: string) => void) | (() => void);
 export type ContentUpdateEventCallback<ContentType, ContentProperties> = ((newContent: ContentType, oldContentProperties?: ContentProperties) => void) | ((newContent: ContentType) => void) | (() => void);
@@ -180,7 +179,7 @@ export default class Client {
   async createLabel(props: InitialLabelProperties): Promise<Label> {
 
     // Create the label.
-    const label = await this.#createObject(Label, props);
+    const label = await this.#createObject(Label, {...props, color: props.color ?? 5412849});
 
     // Fire the event.
     this.#fireEvent("labelCreate", label);
@@ -268,7 +267,7 @@ export default class Client {
 
     }
 
-    const project = await this.#createObject(Project, props);
+    const project = await this.#createObject(Project, {...props, labelIds: props.labelIds ?? []});
 
     // Fire the event.
     this.#fireEvent("projectCreate", project);
@@ -434,6 +433,7 @@ export default class Client {
     }
 
     // Fix tasks.
+    console.log("Checking for tasks with outdated properties...");
     for (const taskProperties of (await this.#db.tasks.toArray()).filter((possibleTask) => possibleTask.parentTaskId)) {
 
       if (taskProperties.parentTaskId) {
@@ -462,6 +462,7 @@ export default class Client {
     }
 
     // Fix projects.
+    console.log("Checking for projects with outdated properties...");
     for (const projectProperties of (await this.#db.projects.toArray()).filter((possibleProject) => possibleProject.defaultStatusId || possibleProject.statuses)) {
 
       if (projectProperties.statuses) {
@@ -485,6 +486,38 @@ export default class Client {
       }
 
     }
+
+    // Fix labels.
+    console.log("Checking for labels with outdated properties...");
+    for (const labelProperties of (await this.#db.labels.toArray()).filter((possibleLabel) => possibleLabel.projects || possibleLabel.color === undefined || Number.isNaN(possibleLabel.color))) {
+
+      if (labelProperties.projects) {
+
+        for (const projectId of labelProperties.projects) {
+
+          // Update all projects.
+          console.log(`Updating project (${labelProperties.id}) to include label (${labelProperties.id})...`);
+          const project = await this.getProject(projectId);
+          await project.update({labelIds: [...(project.labelIds ?? []), labelProperties.id]});
+
+          // Remove the projects array from the label.
+          console.log(`Removing label (${labelProperties.id}) projects array...`);
+          await this.updateLabel(labelProperties.id, {projects: undefined});
+
+        }
+
+      }
+
+      if (labelProperties.color === undefined || Number.isNaN(labelProperties.color)) {
+
+        console.log(`Updating label (${labelProperties.id}) to have a decimal color...`);
+        await this.updateLabel(labelProperties.id, {color: Number(labelProperties.color ?? 0)});
+
+      }
+
+    }
+
+    console.log("All content properties are updated!");
     
   }
 
@@ -578,39 +611,6 @@ export default class Client {
 
     this.eventCallbacks[eventName] = (this.eventCallbacks[eventName] as (() => void)[]).filter((possibleCallback) => possibleCallback !== callback);
 
-  }
-
-  async removeLabelFromProject(labelId: string, projectId: string): Promise<void> {
-
-    const label = await this.getLabel(labelId);
-
-    if (label.projects) {
-
-      // Remove the label from the project.
-      await label.update({
-        projects: label.projects.filter((possibleProjectId) => possibleProjectId !== projectId)
-      });
-
-      // Run each callback.
-      this.#fireEvent("labelDelete", labelId);
-
-    }
-    
-  }
-
-  async removeStatusFromProject(statusId: string, projectId: string): Promise<void> {
-
-    const label = await this.getLabel(statusId);
-
-    if (label.projects) {
-
-      // Remove the label from the project.
-      await label.update({
-        projects: label.projects.filter((possibleProjectId) => possibleProjectId !== projectId)
-      });
-
-    }
-    
   }
 
   async updateAttachment(attachmentId: string, newProperties: PropertiesUpdate<AttachmentProperties>): Promise<void> {

@@ -114,7 +114,7 @@ export default function LabelInput({client, taskId, labelIds, onChange, resultsC
               setLabelQuery("");
             
             }}>
-              <span className={styles.colorBubble} />
+              <span className={styles.colorBubble} style={{backgroundColor: `#${label.color.toString(16)}`}} />
               <span>
                 {label.name}
               </span>

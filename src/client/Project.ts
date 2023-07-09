@@ -19,11 +19,12 @@ export interface ProjectProperties {
   description?: string;
   isArchived?: boolean;
   isRecycled?: boolean;
+  labelIds: string[];
   statuses?: DeprecatedStatusProperties[];
   statusIds: string[];
 }
 
-export type InitialProjectProperties = Optional<Omit<ProjectProperties, "id" | "statuses" | "defaultStatusId">, "statusIds">;
+export type InitialProjectProperties = Optional<Omit<ProjectProperties, "id" | "statuses" | "defaultStatusId">, "statusIds" | "labelIds">;
 
 export default class Project {
 
@@ -66,15 +67,20 @@ export default class Project {
   readonly isRecycled?: boolean;
 
   /**
+   * 
+   */
+  readonly labelIds: ProjectProperties["labelIds"];
+
+  /**
    * @since v1.0.0
    * @deprecated since v1.1.0. Removing in v2.0.0.
    */
-  statuses?: DeprecatedStatusProperties[];
+  readonly statuses?: DeprecatedStatusProperties[];
 
   /**
    * @since v1.1.0
    */
-  statusIds: string[];
+  readonly statusIds: string[];
 
   constructor(props: ProjectProperties, client: Client) {
 
@@ -84,6 +90,7 @@ export default class Project {
     this.defaultStatusId = props.defaultStatusId;
     this.isArchived = props.isArchived;
     this.isRecycled = props.isRecycled;
+    this.labelIds = props.labelIds;
     this.statuses = props.statuses;
     this.statusIds = props.statusIds;
     this.#client = client;
@@ -134,24 +141,25 @@ export default class Project {
 
   async getLabels(): Promise<Label[]> {
 
-    return (await this.#client.getLabels()).filter((possibleProjectLabel) => possibleProjectLabel.projects?.includes(this.id));
+    const labels = [];
+    for (const labelId of this.labelIds) {
+
+      labels.push(await this.#client.getLabel(labelId));
+
+    }
+    return labels;
 
   }
 
   async getStatuses(): Promise<Status[]> {
 
-    return (await this.#client.getStatuses()).filter((status) => this.statusIds.includes(status.id)).sort((statusA, statusB) => this.statusIds.indexOf(statusA.id) - this.statusIds.indexOf(statusB.id));
+    const statuses = [];
+    for (const statusId of this.statusIds) {
 
-  }
-
-  async removeLabel(labelId: string): Promise<void> {
-
-    const label = (await this.#client.getLabels()).find((possibleLabel) => possibleLabel.id === labelId);
-    if (label) {
-
-      await label.removeFromProject(this.id);
+      statuses.push(await this.#client.getStatus(statusId));
 
     }
+    return statuses;
 
   }
 

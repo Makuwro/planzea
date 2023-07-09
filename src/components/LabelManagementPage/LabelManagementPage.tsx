@@ -1,48 +1,76 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Client from "../../client/Client";
 import styles from "./LabelManagementPage.module.css";
 import Project from "../../client/Project";
 import Label from "../../client/Label";
 import { useNavigate } from "react-router-dom";
 import SettingsPageOption from "../SettingsPageOption/SettingsPageOption";
+import FormSection from "../FormSection/FormSection";
+import ColorInput from "../ColorInput/ColorInput";
 
-export default function LabelManagementPage({client, project, setDocumentTitle}: {client: Client; project: Project | null; setDocumentTitle: Dispatch<SetStateAction<string>>}) {
+export default function LabelManagementPage({client, project}: {client: Client; project: Project | null;}) {
 
-  const [labels, setLabels] = useState<Label[]>([]);
+  type LabelFormInfo = {
+    label: Label;
+    newName: string;
+    newColor: string;
+    isOpen?: boolean;
+    isColorValid?: boolean;
+  };
+  const [labelInfoGroup, setLabelInfoGroup] = useState<LabelFormInfo[] | null>([]);
   useEffect(() => {
 
+    // Get all project labels.
     (async () => {
 
       if (project) {
 
-        setLabels(await project.getLabels());
-        setDocumentTitle(`Labels ▪ ${project.name} settings`);
+        const labels = await project.getLabels();
+        const newLabelInfo = [];
+        for (const label of labels) {
+
+          newLabelInfo.push({
+            label,
+            newName: label.name,
+            newColor: label.color.toString(16),
+            isColorValid: true
+          });
+
+        }
+        setLabelInfoGroup(newLabelInfo);
 
       }
 
     })();
 
-  }, [project]);
-
-  useEffect(() => {
-
     if (project) {
 
       const onLabelCreate = (label: Label) => {
 
-        setLabels((labels) => [...labels, label]);
+        setLabelInfoGroup((labelInfoGroup) => [...(labelInfoGroup ?? []), {
+          label,
+          newName: label.name,
+          newColor: label.color.toString(16),
+          isColorValid: true
+        }]);
 
       };
 
       const onLabelDelete = (labelId: string) => {
 
-        setLabels((labels) => labels.filter((possibleLabel) => possibleLabel.id !== labelId));
+        setLabelInfoGroup((labelInfoGroup) => labelInfoGroup && labelInfoGroup.filter((possibleLabelInfo) => possibleLabelInfo.label.id !== labelId));
 
       };
 
       const onLabelUpdate = (newLabel: Label) => {
 
-        setLabels((labels) => labels.map((label) => label.id === newLabel.id ? newLabel : label));
+        setLabelInfoGroup((labelInfoGroup) => labelInfoGroup && labelInfoGroup.map((labelInfo) => labelInfo.label.id === newLabel.id ? {
+          label: newLabel,
+          newName: newLabel.name,
+          newColor: newLabel.color.toString(16),
+          isOpen: labelInfo.isOpen,
+          isColorValid: labelInfo.isColorValid
+        } : labelInfo));
 
       };
 
@@ -63,9 +91,8 @@ export default function LabelManagementPage({client, project, setDocumentTitle}:
   }, [project]);
 
   const navigate = useNavigate();
-  const [openOptions, setOpenOptions] = useState<{[key: string]: boolean}>({});
 
-  return (
+  return labelInfoGroup ? (
     <section id={styles.content}>
       <section id={styles.info}>
         <h1>Labels</h1>
@@ -77,19 +104,50 @@ export default function LabelManagementPage({client, project, setDocumentTitle}:
         </section>
         <ul id={styles.list}>
           {
-            labels.map((label) => (
-              <SettingsPageOption key={label.id} isOpen={openOptions[label.id]} onToggle={(isOpen) => setOpenOptions({...openOptions, [label.id]: isOpen})} name={label.name}>
-                {label.description}
-                <span className={styles.labelActions}>
-                  <button onClick={() => navigate(`?edit=label&id=${label.id}`, {replace: true})}>Edit</button>
-                  <button onClick={() => navigate(`?remove=label&id=${label.id}`, {replace: true})}>Remove</button>
-                </span>
-              </SettingsPageOption>
-            ))
+            labelInfoGroup.map((labelInfo, index) => {
+              
+              const {newName, newColor, label, isOpen, isColorValid} = labelInfo;
+              const setThisNewValues = (info: LabelFormInfo) => {
+                
+                const newLabelInfoGroup = [...labelInfoGroup];
+                newLabelInfoGroup.splice(index, 1, info);
+                setLabelInfoGroup(newLabelInfoGroup);
+                
+              };
+
+              return (
+                <SettingsPageOption 
+                  color={`#${newColor}`} 
+                  key={label.id} 
+                  isOpen={isOpen} 
+                  onToggle={(isOpen) => setThisNewValues({newName, newColor, label, isOpen, isColorValid})} name={label.name}>
+                  <FormSection name="Label name">
+                    <input type="text" value={newName} placeholder={label.name} onChange={({target: {value: newName}}) => setThisNewValues({newName, newColor, label, isOpen, isColorValid})} />
+                  </FormSection>
+                  <FormSection name="Label color">
+                    <ColorInput hexCode={newColor} onChange={(newColor, isColorValid) => setThisNewValues({newName, newColor, label, isOpen, isColorValid})} placeholder={label.color.toString(16)} />
+                  </FormSection>
+                  <span className={styles.labelActions}>
+                    <button 
+                      disabled={!isColorValid || ((!newName || newName === label.name) && (!newColor || parseInt(newColor, 16) === label.color))} 
+                      onClick={async () => await label.update({
+                        name: newName ?? label.name,
+                        color: newColor ? parseInt(newColor, 16) : label.color
+                      })}>
+                      Save
+                    </button>
+                    <button className="destructive" onClick={() => navigate(`?delete=label&id=${label.id}`, {replace: true})}>
+                      Delete
+                    </button>
+                  </span>
+                </SettingsPageOption>
+              );
+
+            })
           }
         </ul>
       </section>
     </section>
-  );
+  ) : null;
 
 }

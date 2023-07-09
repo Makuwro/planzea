@@ -7,7 +7,7 @@ export default function LabelButton({label, onRemove}: {label: Label; onRemove: 
 
   return (
     <li className={styles.label}>
-      <button className={styles.colorBubble} onClick={onRemove}>
+      <button className={styles.colorBubble} onClick={onRemove} style={{backgroundColor: `#${label.color.toString(16)}`}}>
         <Icon name="close" />
       </button>
       <span>

@@ -66,12 +66,6 @@ export default class Status {
 
   }
 
-  async removeFromProject(projectId: string): Promise<void> {
-
-    await this.#client.removeStatusFromProject(this.id, projectId);
-
-  }
-
   async update(newProperties: PropertiesUpdate<StatusProperties>): Promise<void> {
 
     await this.#client.updateStatus(this.id, newProperties);
