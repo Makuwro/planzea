@@ -40,7 +40,7 @@ export default function Header({client}: {client: CacheClient}) {
       </section>
       <section id={styles.right}>
         <Search client={client} onMobileSearchChange={(isMobileSearching) => setIsMobileSearching(isMobileSearching)} />
-        <button id={styles.accountButton}>
+        <button id={styles.accountButton} onClick={() => window.open(`https://accounts.makuwro.com/auth?client_id=planzea&redirect=${location}`)}>
           <span id={styles.nameContainer}>User</span>
           <span id={styles.avatarContainer}>
             <Icon name="person" />
