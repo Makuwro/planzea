@@ -29,10 +29,6 @@
   flex-direction: column;
 }
 
-#popup > section {
-  background-color: inherit;
-}
-
 #popupContainer {
   left: 0;
   top: 0;
@@ -70,6 +66,7 @@
   flex-direction: column;
   gap: 15px;
   overflow-y: auto;
+  background-color: inherit;
 }
 
 #popupContent > form, #popupContent > form > section, #popupContent > section {
@@ -92,6 +89,7 @@
   align-items: center;
   font-weight: 300;
   color: var(--text);
+  background-color: var(--background-header);
 }
 
 @media screen and (min-width: 600px) {

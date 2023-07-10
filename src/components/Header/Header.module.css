@@ -7,6 +7,7 @@ header {
   position: relative;
   z-index: 1;
   gap: 15px;
+  background-color: var(--background-header);
 }
 
 #accountButton {

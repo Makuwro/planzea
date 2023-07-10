@@ -4,9 +4,9 @@
 
 :root {
   --article: #313237;
-  --background: #f6f8fa;
+  --background: white;
   --background-box: #fffffff0;
-  --background-header: #f5f4f4b8;
+  --background-header: #f6f8fa;
   --background-label: rgb(236, 236, 236);
   --background-info: #f1f1f1;
   --background-input: #eff1f3;
