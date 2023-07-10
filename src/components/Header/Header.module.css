@@ -30,6 +30,12 @@ header {
   display: flex;
   flex-shrink: 0;
   border-radius: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+#avatarContainer > span {
+  font-size: 18px;
 }
 
 #left {

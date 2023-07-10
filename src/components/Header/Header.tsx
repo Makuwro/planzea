@@ -4,6 +4,7 @@ import styles from "./Header.module.css";
 import HeaderProjectSwitcher from "../HeaderProjectSwitcher/HeaderProjectSwitcher";
 import Search from "../Search/Search";
 import CacheClient from "../../client/CacheClient";
+import Icon from "../Icon/Icon";
 
 export default function Header({client}: {client: CacheClient}) {
 
@@ -25,6 +26,7 @@ export default function Header({client}: {client: CacheClient}) {
   }, []);
 
   const [isMobileSearching, setIsMobileSearching] = useState<boolean>(false);
+  const [isAccountButtonOpen, setIsAccountButtonOpen] = useState<boolean>(false);
 
   return (
     <header className={isMobileSearching ? styles.mobileSearching : undefined} style={{
@@ -41,7 +43,7 @@ export default function Header({client}: {client: CacheClient}) {
         <button id={styles.accountButton}>
           <span id={styles.nameContainer}>User</span>
           <span id={styles.avatarContainer}>
-            
+            <Icon name="person" />
           </span>
         </button>
       </section>
