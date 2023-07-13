@@ -5,6 +5,9 @@ import { LabelProperties } from "./Label.js";
 import { ProjectProperties } from "./Project.js";
 import { TaskListProperties } from "./TaskList.js";
 import { StatusProperties } from "./Status.js";
+import { HistoryEntryProperties } from "./history-entries/HistoryEntry.js";
+import { ProjectHistoryEntryProperties } from "./history-entries/ProjectHistoryEntry.js";
+import { ProjectUpdateHistoryEntryProperties } from "./history-entries/ProjectUpdateHistoryEntry.js";
 
 export class ClientDatabase extends Dexie {
 
@@ -15,6 +18,7 @@ export class ClientDatabase extends Dexie {
   readonly tasks!: Table<TaskProperties>;
   readonly taskLists!: Table<TaskListProperties>;
   readonly projects!: Table<ProjectProperties>;
+  readonly history!: Table<HistoryEntryProperties | ProjectHistoryEntryProperties | ProjectUpdateHistoryEntryProperties>;
 
   constructor() {
 

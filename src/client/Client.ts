@@ -8,12 +8,14 @@ import "dexie-export-import";
 import TaskList, { InitialTaskListProperties, TaskListProperties } from "./TaskList";
 import { ContentNotFoundError } from "./errors/ContentNotFoundError";
 import Status, { InitialStatusProperties, StatusProperties } from "./Status";
+import HistoryEntry from "./history-entries/HistoryEntry";
+import ProjectUpdateHistoryEntry, { InitialProjectUpdateHistoryEntryProperties, ProjectUpdateHistoryEntryProperties } from "./history-entries/ProjectUpdateHistoryEntry";
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 export type PropertiesUpdate<T> = Partial<Omit<T, "id">>;
-export type PlanzeaObject = Attachment | Label | Status | Task | TaskList | Project;
-export type PlanzeaObjectConstructor = typeof Attachment | typeof Label | typeof Status | typeof TaskList | typeof Task | typeof Project;
-export type PlanzeaObjectProperties = AttachmentProperties & TaskProperties & LabelProperties & ProjectProperties & StatusProperties;
+export type PlanzeaObject = Attachment | Label | ProjectUpdateHistoryEntry | Status | Task | TaskList | Project;
+export type PlanzeaObjectConstructor = typeof Attachment | typeof Label | typeof ProjectUpdateHistoryEntry | typeof Status | typeof Task | typeof TaskList | typeof Project;
+export type PlanzeaObjectProperties = AttachmentProperties & ProjectUpdateHistoryEntryProperties & TaskProperties & LabelProperties & ProjectProperties & StatusProperties;
 export type ContentCreateEventCallback<ContentType> = ((content: ContentType) => void) | (() => void);
 export type ContentDeleteEventCallback = ((contentId: string) => void) | (() => void);
 export type ContentUpdateEventCallback<ContentType, ContentProperties> = ((newContent: ContentType, oldContentProperties?: ContentProperties) => void) | ((newContent: ContentType) => void) | (() => void);
@@ -93,16 +95,20 @@ export default class Client {
   async #createObject(constructor: typeof Task, props: InitialTaskProperties): Promise<Task>;
   async #createObject(constructor: typeof TaskList, props: InitialTaskListProperties): Promise<TaskList>;
   async #createObject(constructor: typeof Project, props: InitialProjectProperties): Promise<Project>;
-  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialLabelProperties | InitialStatusProperties | InitialTaskProperties | InitialTaskListProperties | InitialProjectProperties): Promise<PlanzeaObject> {
+  async #createObject(constructor: typeof ProjectUpdateHistoryEntry, props: InitialProjectUpdateHistoryEntryProperties): Promise<ProjectUpdateHistoryEntry>;
+  async #createObject(constructor: PlanzeaObjectConstructor, props: InitialAttachmentProperties | InitialLabelProperties | InitialProjectUpdateHistoryEntryProperties | InitialStatusProperties | InitialTaskProperties | InitialTaskListProperties | InitialProjectProperties): Promise<PlanzeaObject> {
 
+    // Add the properties to the database.
     const { tableName } = constructor;
-    const content = new constructor({
+    const properties = {
       ...props,
       id: await this.#getUnusedId(tableName),
-    } as PlanzeaObjectProperties, this);
+    } as PlanzeaObjectProperties;
 
-    await clientDatabase[tableName].add(content as unknown as PlanzeaObjectProperties);
-    return content;
+    await clientDatabase[tableName].add(properties);
+
+    // Return the new object.
+    return new constructor(properties, this);
 
   }
 
@@ -152,7 +158,7 @@ export default class Client {
    * @param tableName The name of the table.
    * @returns An unused ID string.
    */
-  async #getUnusedId(tableName: PlanzeaObjectConstructor["tableName"]): Promise<string> {
+  async #getUnusedId(tableName: PlanzeaObjectConstructor["tableName"] | (typeof HistoryEntry)["tableName"]): Promise<string> {
 
     let id = null;
     do {
@@ -268,6 +274,9 @@ export default class Client {
     }
 
     const project = await this.#createObject(Project, {...props, labelIds: props.labelIds ?? []});
+
+    // Add a history entry.
+
 
     // Fire the event.
     this.#fireEvent("projectCreate", project);
