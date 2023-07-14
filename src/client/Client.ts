@@ -8,7 +8,6 @@ import "dexie-export-import";
 import TaskList, { InitialTaskListProperties, TaskListProperties } from "./TaskList";
 import { ContentNotFoundError } from "./errors/ContentNotFoundError";
 import Status, { InitialStatusProperties, StatusProperties } from "./Status";
-import HistoryEntry from "./history-entries/HistoryEntry";
 import ProjectUpdateHistoryEntry, { InitialProjectUpdateHistoryEntryProperties, ProjectUpdateHistoryEntryProperties } from "./history-entries/ProjectUpdateHistoryEntry";
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
@@ -89,6 +88,12 @@ export default class Client {
   };
   personalProjectId?: string;
 
+  /**
+   * Creates a Planzea object, adds it to the database, then returns it. 
+   * @param constructor A Planzea object constructor.
+   * @param props Properties for the Planzea object.
+   * @returns A Planzea object.
+   */
   async #createObject(constructor: typeof Attachment, props: InitialAttachmentProperties): Promise<Attachment>;
   async #createObject(constructor: typeof Label, props: InitialLabelProperties): Promise<Label>;
   async #createObject(constructor: typeof Status, props: InitialStatusProperties): Promise<Status>;
@@ -157,22 +162,23 @@ export default class Client {
    * Finds an unused ID string for a specific table.
    * @param tableName The name of the table.
    * @returns An unused ID string.
+   * @since v1.0.0
    */
-  async #getUnusedId(tableName: PlanzeaObjectConstructor["tableName"] | (typeof HistoryEntry)["tableName"]): Promise<string> {
+  async #getUnusedId(tableName: PlanzeaObjectConstructor["tableName"]): Promise<string> {
 
-    let id = null;
-    do {
-      
-      id = new ObjectID().toHexString();
-      if (await clientDatabase[tableName].get(id)) {
+    let id;
+    while (id = new ObjectID().toHexString()) {
 
-        id = null;
+      if (!await clientDatabase[tableName].get(id)) {
+
+        return id;
 
       }
       
-    } while (!id);
+    }
 
-    return id;
+    // Something that should've been impossible just happened.
+    throw new Error("An unexpected error occured while trying to generate an unused ID.");
 
   }
 
